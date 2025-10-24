@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +7,13 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import jwt
+from passlib.context import CryptContext
+import base64
+from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,54 +23,241 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# JWT settings
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+# Security
+security = HTTPBearer()
+
+# Create the main app
 app = FastAPI()
 
-# Create a router with the /api prefix
+# Create API router
 api_router = APIRouter(prefix="/api")
 
+# Image Generation Client
+image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+# Models
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    username: str
+    email: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
 
-# Add your routes to the router instead of directly to app
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: User
+
+class Design(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    prompt: str
+    image_base64: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_favorite: bool = False
+
+class DesignCreate(BaseModel):
+    prompt: str
+
+class DesignResponse(BaseModel):
+    id: str
+    user_id: str
+    prompt: str
+    image_base64: str
+    created_at: str
+    is_favorite: bool
+
+# Helper functions
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="بيانات المصادقة غير صالحة")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="انتهت صلاحية الجلسة")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="بيانات المصادقة غير صالحة")
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if user is None:
+        raise HTTPException(status_code=401, detail="المستخدم غير موجود")
+    
+    if isinstance(user.get('created_at'), str):
+        user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    return User(**user)
+
+# Auth Routes
+@api_router.post("/auth/register", response_model=Token)
+async def register(user_data: UserCreate):
+    # Check if username exists
+    existing_user = await db.users.find_one({"username": user_data.username})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="اسم المستخدم موجود بالفعل")
+    
+    # Check if email exists
+    existing_email = await db.users.find_one({"email": user_data.email})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="البريد الإلكتروني مسجل بالفعل")
+    
+    # Create user
+    user = User(
+        username=user_data.username,
+        email=user_data.email
+    )
+    
+    user_dict = user.model_dump()
+    user_dict['created_at'] = user_dict['created_at'].isoformat()
+    user_dict['password'] = hash_password(user_data.password)
+    
+    await db.users.insert_one(user_dict)
+    
+    # Create token
+    access_token = create_access_token(data={"sub": user.id})
+    
+    return Token(access_token=access_token, token_type="bearer", user=user)
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(credentials: UserLogin):
+    user = await db.users.find_one({"username": credentials.username})
+    
+    if not user or not verify_password(credentials.password, user['password']):
+        raise HTTPException(status_code=401, detail="اسم المستخدم أو كلمة المرور غير صحيحة")
+    
+    if isinstance(user.get('created_at'), str):
+        user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    user_obj = User(**{k: v for k, v in user.items() if k != 'password'})
+    access_token = create_access_token(data={"sub": user_obj.id})
+    
+    return Token(access_token=access_token, token_type="bearer", user=user_obj)
+
+@api_router.get("/auth/me", response_model=User)
+async def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+# Design Routes
+@api_router.post("/designs/generate", response_model=DesignResponse)
+async def generate_design(design_data: DesignCreate, current_user: User = Depends(get_current_user)):
+    try:
+        # Generate image using AI
+        enhanced_prompt = f"Professional fashion design: {design_data.prompt}. High quality, detailed clothing design, modern style, clean background"
+        
+        images = await image_gen.generate_images(
+            prompt=enhanced_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if not images or len(images) == 0:
+            raise HTTPException(status_code=500, detail="فشل في توليد التصميم")
+        
+        # Convert to base64
+        image_base64 = base64.b64encode(images[0]).decode('utf-8')
+        
+        # Create design document
+        design = Design(
+            user_id=current_user.id,
+            prompt=design_data.prompt,
+            image_base64=image_base64
+        )
+        
+        design_dict = design.model_dump()
+        design_dict['created_at'] = design_dict['created_at'].isoformat()
+        
+        await db.designs.insert_one(design_dict)
+        
+        return DesignResponse(
+            id=design.id,
+            user_id=design.user_id,
+            prompt=design.prompt,
+            image_base64=design.image_base64,
+            created_at=design_dict['created_at'],
+            is_favorite=design.is_favorite
+        )
+    
+    except Exception as e:
+        logger.error(f"Error generating design: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في توليد التصميم: {str(e)}")
+
+@api_router.get("/designs", response_model=List[DesignResponse])
+async def get_designs(current_user: User = Depends(get_current_user)):
+    designs = await db.designs.find({"user_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    return [
+        DesignResponse(
+            id=d['id'],
+            user_id=d['user_id'],
+            prompt=d['prompt'],
+            image_base64=d['image_base64'],
+            created_at=d['created_at'] if isinstance(d['created_at'], str) else d['created_at'].isoformat(),
+            is_favorite=d.get('is_favorite', False)
+        )
+        for d in designs
+    ]
+
+@api_router.put("/designs/{design_id}/favorite")
+async def toggle_favorite(design_id: str, current_user: User = Depends(get_current_user)):
+    design = await db.designs.find_one({"id": design_id, "user_id": current_user.id})
+    
+    if not design:
+        raise HTTPException(status_code=404, detail="التصميم غير موجود")
+    
+    new_favorite_status = not design.get('is_favorite', False)
+    await db.designs.update_one(
+        {"id": design_id},
+        {"$set": {"is_favorite": new_favorite_status}}
+    )
+    
+    return {"is_favorite": new_favorite_status}
+
+@api_router.delete("/designs/{design_id}")
+async def delete_design(design_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.designs.delete_one({"id": design_id, "user_id": current_user.id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="التصميم غير موجود")
+    
+    return {"message": "تم حذف التصميم بنجاح"}
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "مرحباً بك في استوديو تصميم الأزياء بالذكاء الاصطناعي"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
+# Include router
 app.include_router(api_router)
 
 app.add_middleware(
