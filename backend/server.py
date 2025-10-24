@@ -100,6 +100,9 @@ def create_access_token(data: dict) -> str:
     return encoded_jwt
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
+    if not credentials:
+        raise HTTPException(status_code=401, detail="بيانات المصادقة مطلوبة")
+    
     try:
         token = credentials.credentials
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
