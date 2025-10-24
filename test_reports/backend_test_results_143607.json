@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 9,
+    "failed_tests": 1,
+    "success_rate": 90.0,
+    "test_timestamp": "2025-10-24T14:36:29.310430"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Root API Endpoint",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:07.754555"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:08.109235"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:08.160606"
+    },
+    {
+      "test_name": "Generate AI Design",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:28.771099"
+    },
+    {
+      "test_name": "Get User Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:28.875609"
+    },
+    {
+      "test_name": "Toggle Design Favorite",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:28.924665"
+    },
+    {
+      "test_name": "Invalid Login Test",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-10-24T14:36:28.963557"
+    },
+    {
+      "test_name": "Unauthorized Access Test",
+      "success": false,
+      "details": "Expected 401, got 403. Error: {'detail': 'Not authenticated'}",
+      "timestamp": "2025-10-24T14:36:28.999324"
+    },
+    {
+      "test_name": "Delete Design",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:29.047794"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-24T14:36:29.309383"
+    }
+  ]
+}
