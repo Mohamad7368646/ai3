@@ -130,11 +130,14 @@ export default function LandingPage({ onLogin }) {
 
       {/* Auth Dialog */}
       <Dialog open={showAuth} onOpenChange={setShowAuth}>
-        <DialogContent className="sm:max-w-md" dir="rtl" data-testid="auth-dialog">
+        <DialogContent className="sm:max-w-md" dir="rtl" data-testid="auth-dialog" aria-describedby="auth-dialog-description">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#3E2723] text-center">
               {authMode === "login" ? "تسجيل الدخول" : "إنشاء حساب جديد"}
             </DialogTitle>
+            <p id="auth-dialog-description" className="sr-only">
+              {authMode === "login" ? "نموذج تسجيل الدخول للوصول إلى حسابك" : "نموذج إنشاء حساب جديد"}
+            </p>
           </DialogHeader>
 
           <Tabs value={authMode} onValueChange={setAuthMode} className="w-full">
