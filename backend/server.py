@@ -14,7 +14,7 @@ import jwt
 from passlib.context import CryptContext
 import base64
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
-from emergentintegrations.llm.openai import OpenAI
+from emergentintegrations.llm.openai.text_generation import OpenAI
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
