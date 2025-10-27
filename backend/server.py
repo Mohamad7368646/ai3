@@ -241,23 +241,25 @@ async def get_templates():
 @api_router.post("/prompt/enhance", response_model=PromptEnhanceResponse)
 async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Depends(get_current_user)):
     try:
-        system_prompt = f"""أنت خبير في تصميم الأزياء. مهمتك تحسين وصف تصميم الملابس ليكون أكثر دقة واحترافية.
-نوع الملبس: {request.clothing_type}
-
+        # Create LLM client for this session
+        llm = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=str(uuid.uuid4()),
+            system_message=f"""أنت خبير في تصميم الأزياء. مهمتك تحسين وصف تصميم الملابس ليكون أكثر دقة واحترافية.
 قواعد التحسين:
 1. أضف تفاصيل عن القماش والجودة
 2. حدد الألوان بدقة
 3. أضف تفاصيل عن القصة والتصميم
-4. اجعل الوصف بال لغة الإنجليزية للحصول على أفضل نتائج
+4. اجعل الوصف باللغة الإنجليزية للحصول على أفضل نتائج
 5. كن محدداً ومختصراً (2-3 جمل)
-
-الوصف الأصلي: {request.prompt}
-
 قدم فقط الوصف المحسّن بدون أي نص إضافي."""
+        )
         
-        response = await llm_client.chat(
-            messages=[{"role": "user", "content": system_prompt}],
-            model="gpt-4o"
+        user_prompt = f"نوع الملبس: {request.clothing_type}\\nالوصف: {request.prompt}"
+        
+        response = await llm.chat(
+            messages=[{\"role\": \"user\", \"content\": user_prompt}],
+            model=\"gpt-4o\"
         )
         
         enhanced = response['choices'][0]['message']['content'].strip()
@@ -267,10 +269,11 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
             enhanced_prompt=enhanced
         )
     except Exception as e:
-        logger.error(f"Error enhancing prompt: {str(e)}")
+        logger.error(f\"Error enhancing prompt: {str(e)}\")
+        # Fallback to simple enhancement
         return PromptEnhanceResponse(
             original_prompt=request.prompt,
-            enhanced_prompt=f"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching"
+            enhanced_prompt=f\"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching\"
         )
 
 # Design Routes
