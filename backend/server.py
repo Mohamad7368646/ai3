@@ -79,8 +79,17 @@ class Design(BaseModel):
     has_logo: bool = False
     has_user_photo: bool = False
 
-class DesignCreate(BaseModel):
+class DesignCreatePreview(BaseModel):
     prompt: str
+    clothing_type: Optional[str] = None
+    template_id: Optional[str] = None
+    logo_base64: Optional[str] = None
+    user_photo_base64: Optional[str] = None
+    save_to_gallery: bool = False
+
+class DesignSave(BaseModel):
+    prompt: str
+    image_base64: str
     clothing_type: Optional[str] = None
     template_id: Optional[str] = None
     logo_base64: Optional[str] = None
@@ -94,6 +103,9 @@ class DesignResponse(BaseModel):
     created_at: str
     is_favorite: bool
     clothing_type: Optional[str] = None
+
+class PreviewResponse(BaseModel):
+    image_base64: str
 
 class PromptEnhanceRequest(BaseModel):
     prompt: str
@@ -255,7 +267,8 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
 قدم فقط الوصف المحسّن بدون أي نص إضافي."""
         )
         
-        user_prompt = f"نوع الملبس: {request.clothing_type}\nالوصف: {request.prompt}"
+        user_prompt = f"نوع الملبس: {request.clothing_type}
+الوصف: {request.prompt}"
         
         response = await llm.chat(
             messages=[{"role": "user", "content": user_prompt}],
@@ -276,9 +289,9 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
             enhanced_prompt=f"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching"
         )
 
-# Design Routes
-@api_router.post("/designs/generate", response_model=DesignResponse)
-async def generate_design(design_data: DesignCreate, current_user: User = Depends(get_current_user)):
+# Design Routes - Preview (no save)
+@api_router.post("/designs/preview", response_model=PreviewResponse)
+async def preview_design(design_data: DesignCreatePreview, current_user: User = Depends(get_current_user)):
     try:
         # Build enhanced prompt
         base_prompt = f"Professional fashion design: {design_data.prompt}"
@@ -309,11 +322,21 @@ async def generate_design(design_data: DesignCreate, current_user: User = Depend
         # Convert to base64
         image_base64 = base64.b64encode(images[0]).decode('utf-8')
         
+        return PreviewResponse(image_base64=image_base64)
+    
+    except Exception as e:
+        logger.error(f"Error generating design preview: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في توليد التصميم: {str(e)}")
+
+# Design Routes - Save to gallery
+@api_router.post("/designs/save", response_model=DesignResponse)
+async def save_design(design_data: DesignSave, current_user: User = Depends(get_current_user)):
+    try:
         # Create design document
         design = Design(
             user_id=current_user.id,
             prompt=design_data.prompt,
-            image_base64=image_base64,
+            image_base64=design_data.image_base64,
             clothing_type=design_data.clothing_type,
             template_id=design_data.template_id,
             has_logo=bool(design_data.logo_base64),
@@ -336,8 +359,8 @@ async def generate_design(design_data: DesignCreate, current_user: User = Depend
         )
     
     except Exception as e:
-        logger.error(f"Error generating design: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"خطأ في توليد التصميم: {str(e)}")
+        logger.error(f"Error saving design: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في حفظ التصميم: {str(e)}")
 
 @api_router.get("/designs", response_model=List[DesignResponse])
 async def get_designs(current_user: User = Depends(get_current_user)):
