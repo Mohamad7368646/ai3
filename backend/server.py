@@ -249,20 +249,19 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
 1. أضف تفاصيل عن القماش والجودة
 2. حدد الألوان بدقة
 3. أضف تفاصيل عن القصة والتصميم
-4. اجعل الوصف باللغة الإنجليزية للحصول على أفضل نتائج
+4. اجعل الوصف بال لغة الإنجليزية للحصول على أفضل نتائج
 5. كن محدداً ومختصراً (2-3 جمل)
 
 الوصف الأصلي: {request.prompt}
 
 قدم فقط الوصف المحسّن بدون أي نص إضافي."""
         
-        response = await llm_client.generate(
-            prompt=system_prompt,
-            model="gpt-4o",
-            max_tokens=150
+        response = await llm_client.chat(
+            messages=[{"role": "user", "content": system_prompt}],
+            model="gpt-4o"
         )
         
-        enhanced = response.strip()
+        enhanced = response['choices'][0]['message']['content'].strip()
         
         return PromptEnhanceResponse(
             original_prompt=request.prompt,
