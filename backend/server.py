@@ -43,7 +43,6 @@ api_router = APIRouter(prefix="/api")
 
 # AI Clients
 image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
-llm_client = LlmChat(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
 # Models
 class User(BaseModel):
