@@ -255,11 +255,11 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
 قدم فقط الوصف المحسّن بدون أي نص إضافي."""
         )
         
-        user_prompt = f"نوع الملبس: {request.clothing_type}\\nالوصف: {request.prompt}"
+        user_prompt = f"نوع الملبس: {request.clothing_type}\nالوصف: {request.prompt}"
         
         response = await llm.chat(
-            messages=[{\"role\": \"user\", \"content\": user_prompt}],
-            model=\"gpt-4o\"
+            messages=[{"role": "user", "content": user_prompt}],
+            model="gpt-4o"
         )
         
         enhanced = response['choices'][0]['message']['content'].strip()
@@ -269,11 +269,11 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
             enhanced_prompt=enhanced
         )
     except Exception as e:
-        logger.error(f\"Error enhancing prompt: {str(e)}\")
+        logger.error(f"Error enhancing prompt: {str(e)}")
         # Fallback to simple enhancement
         return PromptEnhanceResponse(
             original_prompt=request.prompt,
-            enhanced_prompt=f\"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching\"
+            enhanced_prompt=f"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching"
         )
 
 # Design Routes
