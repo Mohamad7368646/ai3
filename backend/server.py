@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -14,6 +14,7 @@ import jwt
 from passlib.context import CryptContext
 import base64
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+from emergentintegrations.llm.openai import OpenAI
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -40,8 +41,9 @@ app = FastAPI()
 # Create API router
 api_router = APIRouter(prefix="/api")
 
-# Image Generation Client
+# AI Clients
 image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
+llm_client = OpenAI(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
 # Models
 class User(BaseModel):
@@ -73,9 +75,17 @@ class Design(BaseModel):
     image_base64: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_favorite: bool = False
+    clothing_type: Optional[str] = None
+    template_id: Optional[str] = None
+    has_logo: bool = False
+    has_user_photo: bool = False
 
 class DesignCreate(BaseModel):
     prompt: str
+    clothing_type: Optional[str] = None
+    template_id: Optional[str] = None
+    logo_base64: Optional[str] = None
+    user_photo_base64: Optional[str] = None
 
 class DesignResponse(BaseModel):
     id: str
@@ -84,6 +94,61 @@ class DesignResponse(BaseModel):
     image_base64: str
     created_at: str
     is_favorite: bool
+    clothing_type: Optional[str] = None
+
+class PromptEnhanceRequest(BaseModel):
+    prompt: str
+    clothing_type: str
+
+class PromptEnhanceResponse(BaseModel):
+    original_prompt: str
+    enhanced_prompt: str
+
+# Templates
+TEMPLATES = [
+    {
+        "id": "casual-shirt",
+        "name": "قميص كاجوال",
+        "type": "shirt",
+        "description": "قميص كاجوال بسيط وأنيق",
+        "prompt": "casual button-up shirt, comfortable fit, modern design"
+    },
+    {
+        "id": "formal-shirt",
+        "name": "قميص رسمي",
+        "type": "shirt",
+        "description": "قميص رسمي للمناسبات",
+        "prompt": "formal dress shirt, elegant, professional look"
+    },
+    {
+        "id": "hoodie",
+        "name": "هودي عصري",
+        "type": "hoodie",
+        "description": "هودي مريح وعصري",
+        "prompt": "modern hoodie, comfortable, streetwear style"
+    },
+    {
+        "id": "tshirt",
+        "name": "تيشيرت بسيط",
+        "type": "tshirt",
+        "description": "تيشيرت قطني بسيط",
+        "prompt": "simple cotton t-shirt, basic design, comfortable"
+    },
+    {
+        "id": "dress",
+        "name": "فستان أنيق",
+        "type": "dress",
+        "description": "فستان أنيق للمناسبات",
+        "prompt": "elegant dress, modern design, sophisticated"
+    },
+    {
+        "id": "jacket",
+        "name": "جاكيت رياضي",
+        "type": "jacket",
+        "description": "جاكيت رياضي مريح",
+        "prompt": "sporty jacket, comfortable, modern athletic wear"
+    }
+]
 
 # Helper functions
 def hash_password(password: str) -> str:
@@ -126,17 +191,14 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # Auth Routes
 @api_router.post("/auth/register", response_model=Token)
 async def register(user_data: UserCreate):
-    # Check if username exists
     existing_user = await db.users.find_one({"username": user_data.username})
     if existing_user:
         raise HTTPException(status_code=400, detail="اسم المستخدم موجود بالفعل")
     
-    # Check if email exists
     existing_email = await db.users.find_one({"email": user_data.email})
     if existing_email:
         raise HTTPException(status_code=400, detail="البريد الإلكتروني مسجل بالفعل")
     
-    # Create user
     user = User(
         username=user_data.username,
         email=user_data.email
@@ -148,7 +210,6 @@ async def register(user_data: UserCreate):
     
     await db.users.insert_one(user_dict)
     
-    # Create token
     access_token = create_access_token(data={"sub": user.id})
     
     return Token(access_token=access_token, token_type="bearer", user=user)
@@ -172,13 +233,69 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+# Templates Routes
+@api_router.get("/templates")
+async def get_templates():
+    return TEMPLATES
+
+# Prompt Enhancement
+@api_router.post("/prompt/enhance", response_model=PromptEnhanceResponse)
+async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Depends(get_current_user)):
+    try:
+        system_prompt = f"""أنت خبير في تصميم الأزياء. مهمتك تحسين وصف تصميم الملابس ليكون أكثر دقة واحترافية.
+نوع الملبس: {request.clothing_type}
+
+قواعد التحسين:
+1. أضف تفاصيل عن القماش والجودة
+2. حدد الألوان بدقة
+3. أضف تفاصيل عن القصة والتصميم
+4. اجعل الوصف باللغة الإنجليزية للحصول على أفضل نتائج
+5. كن محدداً ومختصراً (2-3 جمل)
+
+الوصف الأصلي: {request.prompt}
+
+قدم فقط الوصف المحسّن بدون أي نص إضافي."""
+        
+        response = await llm_client.generate(
+            prompt=system_prompt,
+            model="gpt-4o",
+            max_tokens=150
+        )
+        
+        enhanced = response.strip()
+        
+        return PromptEnhanceResponse(
+            original_prompt=request.prompt,
+            enhanced_prompt=enhanced
+        )
+    except Exception as e:
+        logger.error(f"Error enhancing prompt: {str(e)}")
+        return PromptEnhanceResponse(
+            original_prompt=request.prompt,
+            enhanced_prompt=f"Professional {request.clothing_type}: {request.prompt}, high quality fabric, modern design, detailed stitching"
+        )
+
 # Design Routes
 @api_router.post("/designs/generate", response_model=DesignResponse)
 async def generate_design(design_data: DesignCreate, current_user: User = Depends(get_current_user)):
     try:
-        # Generate image using AI
-        enhanced_prompt = f"Professional fashion design: {design_data.prompt}. High quality, detailed clothing design, modern style, clean background"
+        # Build enhanced prompt
+        base_prompt = f"Professional fashion design: {design_data.prompt}"
         
+        if design_data.clothing_type:
+            base_prompt = f"{design_data.clothing_type} design: {design_data.prompt}"
+        
+        # Add logo instruction if provided
+        if design_data.logo_base64:
+            base_prompt += ", with custom logo placement on chest area"
+        
+        # Add virtual try-on instruction if user photo provided
+        if design_data.user_photo_base64:
+            base_prompt += ", displayed on a person, realistic fit and drape"
+        
+        enhanced_prompt = f"{base_prompt}. High quality, detailed clothing design, modern style, clean white background, professional photography"
+        
+        # Generate image using AI
         images = await image_gen.generate_images(
             prompt=enhanced_prompt,
             model="gpt-image-1",
@@ -195,7 +312,11 @@ async def generate_design(design_data: DesignCreate, current_user: User = Depend
         design = Design(
             user_id=current_user.id,
             prompt=design_data.prompt,
-            image_base64=image_base64
+            image_base64=image_base64,
+            clothing_type=design_data.clothing_type,
+            template_id=design_data.template_id,
+            has_logo=bool(design_data.logo_base64),
+            has_user_photo=bool(design_data.user_photo_base64)
         )
         
         design_dict = design.model_dump()
@@ -209,7 +330,8 @@ async def generate_design(design_data: DesignCreate, current_user: User = Depend
             prompt=design.prompt,
             image_base64=design.image_base64,
             created_at=design_dict['created_at'],
-            is_favorite=design.is_favorite
+            is_favorite=design.is_favorite,
+            clothing_type=design.clothing_type
         )
     
     except Exception as e:
@@ -227,7 +349,8 @@ async def get_designs(current_user: User = Depends(get_current_user)):
             prompt=d['prompt'],
             image_base64=d['image_base64'],
             created_at=d['created_at'] if isinstance(d['created_at'], str) else d['created_at'].isoformat(),
-            is_favorite=d.get('is_favorite', False)
+            is_favorite=d.get('is_favorite', False),
+            clothing_type=d.get('clothing_type')
         )
         for d in designs
     ]
