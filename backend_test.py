@@ -205,6 +205,114 @@ class FashionDesignAPITester:
         self.token = temp_token
         return success
 
+    def test_get_coupons(self):
+        """Test get available coupons"""
+        success, response = self.run_test(
+            "Get Available Coupons",
+            "GET",
+            "coupons",
+            200
+        )
+        
+        if success:
+            print(f"   Found {len(response)} available coupons")
+            return response
+        return []
+
+    def test_validate_coupon(self, code="WELCOME10", amount=100):
+        """Test coupon validation"""
+        success, response = self.run_test(
+            "Validate Coupon",
+            "POST",
+            "coupons/validate",
+            200,
+            data={"code": code, "amount": amount}
+        )
+        
+        if success:
+            valid = response.get('valid', False)
+            message = response.get('message', '')
+            print(f"   Coupon {code}: {'Valid' if valid else 'Invalid'} - {message}")
+            return response
+        return {}
+
+    def test_get_orders(self):
+        """Test get user orders"""
+        success, response = self.run_test(
+            "Get User Orders",
+            "GET",
+            "orders",
+            200
+        )
+        
+        if success:
+            print(f"   Found {len(response)} orders")
+            return response
+        return []
+
+    def test_get_notifications(self):
+        """Test get user notifications"""
+        success, response = self.run_test(
+            "Get User Notifications",
+            "GET",
+            "notifications",
+            200
+        )
+        
+        if success:
+            print(f"   Found {len(response)} notifications")
+            return response
+        return []
+
+    def test_get_unread_notifications_count(self):
+        """Test get unread notifications count"""
+        success, response = self.run_test(
+            "Get Unread Notifications Count",
+            "GET",
+            "notifications/unread-count",
+            200
+        )
+        
+        if success:
+            count = response.get('count', 0)
+            print(f"   Unread notifications: {count}")
+            return count
+        return 0
+
+    def test_mark_notification_read(self, notification_id):
+        """Test mark notification as read"""
+        success, response = self.run_test(
+            "Mark Notification as Read",
+            "PUT",
+            f"notifications/{notification_id}/read",
+            200
+        )
+        return success
+
+    def test_create_order(self):
+        """Test create order with sample data"""
+        order_data = {
+            "design_image_base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            "prompt": "Test order - casual blue shirt",
+            "phone_number": "+966501234567",
+            "size": "M",
+            "color": "blue",
+            "notes": "Test order for API testing"
+        }
+        
+        success, response = self.run_test(
+            "Create Order",
+            "POST",
+            "orders/create",
+            200,
+            data=order_data
+        )
+        
+        if success and 'id' in response:
+            print(f"   Created order ID: {response['id']}")
+            return response['id']
+        return None
+
 def main():
     print("🚀 Starting Fashion Design API Testing...")
     print("=" * 60)
