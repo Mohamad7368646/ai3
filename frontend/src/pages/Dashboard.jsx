@@ -46,7 +46,6 @@ export default function Dashboard({ user, onLogout }) {
   const [logoPreview, setLogoPreview] = useState(null);
   const [userPhotoPreview, setUserPhotoPreview] = useState(null);
   const [enhancing, setEnhancing] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("");
   const [selectedPalette, setSelectedPalette] = useState("classic");
   const [selectedViewAngle, setSelectedViewAngle] = useState("front");
   const [selectedSize, setSelectedSize] = useState("M");
