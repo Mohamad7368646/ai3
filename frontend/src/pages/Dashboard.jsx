@@ -261,8 +261,7 @@ export default function Dashboard({ user, onLogout }) {
     try {
       const response = await axios.post(`${API}/prompt/enhance`, {
         prompt: prompt,
-        clothing_type: selectedTemplate.type,
-        color: selectedColor
+        clothing_type: selectedTemplate.type
       });
       setEnhancedPrompt(response.data.enhanced_prompt);
       toast.success("تم تحسين الوصف بنجاح!");
