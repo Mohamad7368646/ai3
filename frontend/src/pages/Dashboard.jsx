@@ -80,7 +80,6 @@ export default function Dashboard({ user, onLogout }) {
     fetchDesigns();
     fetchTemplates();
     fetchShowcase();
-    fetchColorPalettes();
     fetchSizeChart();
     fetchOrders();
     fetchNotifications();
@@ -88,9 +87,7 @@ export default function Dashboard({ user, onLogout }) {
   }, []);
 
   useEffect(() => {
-    if (selectedTemplate && selectedSize) {
-      calculatePrice();
-    }
+    // Remove price calculation since we don't need pricing anymore
   }, [selectedTemplate, selectedSize, logoPreview]);
 
   const fetchDesigns = async () => {
