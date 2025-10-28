@@ -316,12 +316,11 @@ export default function Dashboard({ user, onLogout }) {
         prompt: generatedDesign.prompt,
         image_base64: generatedDesign.image_base64,
         clothing_type: generatedDesign.clothing_type,
-        template_id: generatedDesign.template_id,
-        color: selectedColor
+        template_id: generatedDesign.template_id
       });
       
       setDesigns([response.data, ...designs]);
-      toast.success("تم حفظ التصميم في معرضك!");
+      toast.success("✨ تم حفظ التصميم في معرضك بنجاح!");
     } catch (error) {
       toast.error("فشل في حفظ التصميم");
     }
