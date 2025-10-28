@@ -658,11 +658,6 @@ export default function Dashboard({ user, onLogout }) {
                 <div>
                   <h2 className="text-3xl font-bold text-[#3E2723]">تخصيص: {selectedTemplate.name}</h2>
                   <p className="text-[#5D4037]">{selectedTemplate.description}</p>
-                  {calculatedPrice && (
-                    <div className="mt-2 text-2xl font-bold text-[#D4AF37]">
-                      السعر: {calculatedPrice.total_price} ر.س
-                    </div>
-                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button
