@@ -807,15 +807,16 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="space-y-3">
                       <Button
                         onClick={handleSaveToGallery}
-                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4 hover:scale-105 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden"
                       >
-                        <Save className="ml-2 w-5 h-5" />
-                        حفظ في معرضي
+                        <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                        <Save className="ml-2 w-5 h-5 group-hover:animate-bounce" />
+                        <span className="font-bold">حفظ في معرضي</span>
                       </Button>
                       <Button
                         onClick={() => setShowOrderForm(true)}
                         variant="outline"
-                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-4"
+                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-4 hover:scale-105 transition-all duration-300"
                       >
                         <ShoppingCart className="ml-2 w-5 h-5" />
                         أعجبني! أريد طلبه
