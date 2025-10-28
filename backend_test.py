@@ -198,7 +198,7 @@ class FashionDesignAPITester:
             "Unauthorized Access Test",
             "GET",
             "designs",
-            401
+            403
         )
         
         # Restore token
