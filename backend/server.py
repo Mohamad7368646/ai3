@@ -749,12 +749,95 @@ async def get_orders(current_user: User = Depends(get_current_user)):
             size=o.get('size'),
             color=o.get('color'),
             price=o['price'],
+            discount=o.get('discount', 0),
+            final_price=o.get('final_price', o['price']),
+            coupon_code=o.get('coupon_code'),
             status=o.get('status', 'pending'),
             created_at=o['created_at'] if isinstance(o['created_at'], str) else o['created_at'].isoformat(),
             notes=o.get('notes')
         )
         for o in orders
     ]
+
+# Coupon Routes
+@api_router.post("/coupons/validate")
+async def validate_coupon(code: str, amount: float, current_user: User = Depends(get_current_user)):
+    coupon = await db.coupons.find_one({
+        "code": code.upper(),
+        "is_active": True
+    })
+    
+    if not coupon:
+        return CouponValidation(
+            valid=False,
+            discount_percentage=0,
+            discount_amount=None,
+            message="الكوبون غير صالح"
+        )
+    
+    # Check expiry
+    if coupon.get("expiry_date"):
+        expiry = datetime.fromisoformat(coupon["expiry_date"]) if isinstance(coupon["expiry_date"], str) else coupon["expiry_date"]
+        if expiry < datetime.now(timezone.utc):
+            return CouponValidation(
+                valid=False,
+                discount_percentage=0,
+                discount_amount=None,
+                message="انتهت صلاحية الكوبون"
+            )
+    
+    # Check max uses
+    if coupon.get("max_uses") and coupon.get("current_uses", 0) >= coupon["max_uses"]:
+        return CouponValidation(
+            valid=False,
+            discount_percentage=0,
+            discount_amount=None,
+            message="تم استخدام الكوبون بالكامل"
+        )
+    
+    return CouponValidation(
+        valid=True,
+        discount_percentage=coupon.get("discount_percentage", 0),
+        discount_amount=coupon.get("discount_amount"),
+        message="تم تطبيق الخصم بنجاح!"
+    )
+
+# Notifications Routes
+@api_router.get("/notifications", response_model=List[NotificationResponse])
+async def get_notifications(current_user: User = Depends(get_current_user)):
+    notifications = await db.notifications.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(50)
+    
+    return [
+        NotificationResponse(
+            id=n['id'],
+            title=n['title'],
+            message=n['message'],
+            type=n['type'],
+            is_read=n.get('is_read', False),
+            related_order_id=n.get('related_order_id'),
+            created_at=n['created_at'] if isinstance(n['created_at'], str) else n['created_at'].isoformat()
+        )
+        for n in notifications
+    ]
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
+    await db.notifications.update_one(
+        {"id": notification_id, "user_id": current_user.id},
+        {"$set": {"is_read": True}}
+    )
+    return {"message": "تم تحديث الإشعار"}
+
+@api_router.get("/notifications/unread-count")
+async def get_unread_count(current_user: User = Depends(get_current_user)):
+    count = await db.notifications.count_documents({
+        "user_id": current_user.id,
+        "is_read": False
+    })
+    return {"count": count}
 
 @api_router.get("/")
 async def root():
