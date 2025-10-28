@@ -52,7 +52,6 @@ export default function Dashboard({ user, onLogout }) {
   
   // Preview State
   const [generatedDesign, setGeneratedDesign] = useState(null);
-  const [calculatedPrice, setCalculatedPrice] = useState(null);
   
   // Coupon State
   const [availableCoupons, setAvailableCoupons] = useState([]);
