@@ -440,6 +440,70 @@ export default function Dashboard({ user, onLogout }) {
             </div>
           </div>
           <div className="flex gap-3">
+            {/* Notifications Bell */}
+            <div className="relative">
+              <Button
+                onClick={() => setShowNotifications(!showNotifications)}
+                variant="outline"
+                size="icon"
+                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white relative"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+              
+              {/* Notifications Dropdown */}
+              {showNotifications && (
+                <div className="absolute left-0 mt-2 w-80 glass rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto" dir="rtl">
+                  <div className="p-4 border-b border-[#3E2723]/10">
+                    <h3 className="font-bold text-[#3E2723]">الإشعارات</h3>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-[#5D4037]">
+                      لا توجد إشعارات
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-[#3E2723]/10">
+                      {notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`p-4 cursor-pointer hover:bg-[#D4AF37]/10 transition-colors ${
+                            !notif.is_read ? 'bg-[#D4AF37]/5' : ''
+                          }`}
+                          onClick={() => markNotificationAsRead(notif.id)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`mt-1 w-2 h-2 rounded-full ${!notif.is_read ? 'bg-[#D4AF37]' : 'bg-gray-300'}`} />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-[#3E2723] mb-1">{notif.title}</h4>
+                              <p className="text-sm text-[#5D4037]">{notif.message}</p>
+                              <p className="text-xs text-[#5D4037] mt-1">
+                                {new Date(notif.created_at).toLocaleDateString('ar-EG')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="icon"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+
             <Button
               onClick={() => {
                 resetDesigner();
