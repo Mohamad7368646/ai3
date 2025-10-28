@@ -1,0 +1,107 @@
+{
+  "summary": {
+    "total_tests": 16,
+    "passed_tests": 14,
+    "failed_tests": 2,
+    "success_rate": 87.5,
+    "test_timestamp": "2025-10-28T16:40:22.258636"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Root API Endpoint",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:20.903717"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.224046"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.270762"
+    },
+    {
+      "test_name": "Generate AI Design",
+      "success": false,
+      "details": "Expected 200, got 405. Error: {'detail': 'Method Not Allowed'}",
+      "timestamp": "2025-10-28T16:40:21.310798"
+    },
+    {
+      "test_name": "Get User Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.404404"
+    },
+    {
+      "test_name": "Invalid Login Test",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-10-28T16:40:21.441144"
+    },
+    {
+      "test_name": "Unauthorized Access Test",
+      "success": false,
+      "details": "Expected 401, got 403. Error: {'detail': 'Not authenticated'}",
+      "timestamp": "2025-10-28T16:40:21.484025"
+    },
+    {
+      "test_name": "Get Available Coupons",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.546006"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.585753"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.622195"
+    },
+    {
+      "test_name": "Create Order",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.700857"
+    },
+    {
+      "test_name": "Get User Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.778191"
+    },
+    {
+      "test_name": "Get User Notifications",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.855425"
+    },
+    {
+      "test_name": "Get Unread Notifications Count",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.932177"
+    },
+    {
+      "test_name": "Mark Notification as Read",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:21.982999"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:40:22.257661"
+    }
+  ]
+}
