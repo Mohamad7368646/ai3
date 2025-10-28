@@ -349,9 +349,11 @@ def main():
     # 5. Test get designs
     designs = tester.test_get_designs()
     
-    # 6. Test favorite toggle (if we have a design)
-    if design_id:
-        tester.test_toggle_favorite(design_id)
+    # 6. Test favorite toggle (if we have designs)
+    if designs and len(designs) > 0:
+        first_design_id = designs[0].get('id')
+        if first_design_id:
+            tester.test_toggle_favorite(first_design_id)
     
     # 7. Test security - invalid login
     tester.test_invalid_login()
