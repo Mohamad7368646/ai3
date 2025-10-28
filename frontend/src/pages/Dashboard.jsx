@@ -143,6 +143,79 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${API}/orders`);
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Failed to fetch orders");
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get(`${API}/notifications`);
+      setNotifications(response.data);
+      
+      // Get unread count
+      const unreadResponse = await axios.get(`${API}/notifications/unread-count`);
+      setUnreadCount(unreadResponse.data.count);
+    } catch (error) {
+      console.error("Failed to fetch notifications");
+    }
+  };
+
+  const fetchCoupons = async () => {
+    try {
+      const response = await axios.get(`${API}/coupons`);
+      setAvailableCoupons(response.data);
+    } catch (error) {
+      console.error("Failed to fetch coupons");
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      await axios.put(`${API}/notifications/${notificationId}/read`);
+      setNotifications(notifications.map(n => 
+        n.id === notificationId ? { ...n, is_read: true } : n
+      ));
+      setUnreadCount(Math.max(0, unreadCount - 1));
+    } catch (error) {
+      console.error("Failed to mark notification as read");
+    }
+  };
+
+  const validateCouponCode = async () => {
+    if (!couponCode.trim() || !calculatedPrice) {
+      toast.error("الرجاء إدخال كود الكوبون");
+      return;
+    }
+
+    setValidatingCoupon(true);
+    try {
+      const response = await axios.post(`${API}/coupons/validate`, null, {
+        params: {
+          code: couponCode,
+          amount: calculatedPrice.total_price
+        }
+      });
+
+      if (response.data.valid) {
+        setAppliedCoupon(response.data);
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+        setAppliedCoupon(null);
+      }
+    } catch (error) {
+      toast.error("فشل في التحقق من الكوبون");
+      setAppliedCoupon(null);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
   const calculatePrice = async () => {
     if (!selectedTemplate) return;
     
