@@ -79,6 +79,19 @@ class Design(BaseModel):
     has_logo: bool = False
     has_user_photo: bool = False
 
+class Order(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    design_id: Optional[str] = None
+    design_image_base64: str
+    prompt: str
+    phone_number: str
+    uploaded_image_base64: str
+    status: str = "pending"  # pending, processing, completed, cancelled
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    notes: Optional[str] = None
+
 class DesignCreatePreview(BaseModel):
     prompt: str
     clothing_type: Optional[str] = None
@@ -94,6 +107,25 @@ class DesignSave(BaseModel):
     template_id: Optional[str] = None
     logo_base64: Optional[str] = None
     user_photo_base64: Optional[str] = None
+
+class OrderCreate(BaseModel):
+    design_image_base64: str
+    prompt: str
+    phone_number: str
+    uploaded_image_base64: str
+    design_id: Optional[str] = None
+    notes: Optional[str] = None
+
+class OrderResponse(BaseModel):
+    id: str
+    user_id: str
+    design_image_base64: str
+    prompt: str
+    phone_number: str
+    uploaded_image_base64: str
+    status: str
+    created_at: str
+    notes: Optional[str] = None
 
 class DesignResponse(BaseModel):
     id: str
@@ -257,7 +289,7 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
         llm = LlmChat(
             api_key=os.environ.get('EMERGENT_LLM_KEY'),
             session_id=str(uuid.uuid4()),
-            system_message=f"""أنت خبير في تصميم الأزياء. مهمتك تحسين وصف تصميم الملابس ليكون أكثر دقة واحترافية.
+            system_message="""أنت خبير في تصميم الأزياء. مهمتك تحسين وصف تصميم الملابس ليكون أكثر دقة واحترافية.
 قواعد التحسين:
 1. أضف تفاصيل عن القماش والجودة
 2. حدد الألوان بدقة
@@ -401,6 +433,59 @@ async def delete_design(design_id: str, current_user: User = Depends(get_current
         raise HTTPException(status_code=404, detail="التصميم غير موجود")
     
     return {"message": "تم حذف التصميم بنجاح"}
+
+# Order Routes
+@api_router.post("/orders/create", response_model=OrderResponse)
+async def create_order(order_data: OrderCreate, current_user: User = Depends(get_current_user)):
+    try:
+        order = Order(
+            user_id=current_user.id,
+            design_id=order_data.design_id,
+            design_image_base64=order_data.design_image_base64,
+            prompt=order_data.prompt,
+            phone_number=order_data.phone_number,
+            uploaded_image_base64=order_data.uploaded_image_base64,
+            notes=order_data.notes
+        )
+        
+        order_dict = order.model_dump()
+        order_dict['created_at'] = order_dict['created_at'].isoformat()
+        
+        await db.orders.insert_one(order_dict)
+        
+        return OrderResponse(
+            id=order.id,
+            user_id=order.user_id,
+            design_image_base64=order.design_image_base64,
+            prompt=order.prompt,
+            phone_number=order.phone_number,
+            uploaded_image_base64=order.uploaded_image_base64,
+            status=order.status,
+            created_at=order_dict['created_at'],
+            notes=order.notes
+        )
+    except Exception as e:
+        logger.error(f"Error creating order: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في إنشاء الطلب: {str(e)}")
+
+@api_router.get("/orders", response_model=List[OrderResponse])
+async def get_orders(current_user: User = Depends(get_current_user)):
+    orders = await db.orders.find({"user_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    return [
+        OrderResponse(
+            id=o['id'],
+            user_id=o['user_id'],
+            design_image_base64=o['design_image_base64'],
+            prompt=o['prompt'],
+            phone_number=o['phone_number'],
+            uploaded_image_base64=o['uploaded_image_base64'],
+            status=o.get('status', 'pending'),
+            created_at=o['created_at'] if isinstance(o['created_at'], str) else o['created_at'].isoformat(),
+            notes=o.get('notes')
+        )
+        for o in orders
+    ]
 
 @api_router.get("/")
 async def root():
