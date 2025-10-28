@@ -247,15 +247,15 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Get Available Coupons API"
-    - "Get User Orders API"
-    - "Get Notifications API"
-    - "User Authentication"
+    - "Dark/Light Mode Toggle"
+    - "Notifications Bell Icon with Dropdown"
+    - "My Orders Tab and View"
+    - "Coupons Tab and View"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -263,3 +263,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Completed implementation of My Orders, Coupons, Notifications, and Dark/Light mode features. Backend endpoint for getting coupons was added. Frontend Dashboard.jsx updated with all new UI components. Need to test all backend APIs for new features."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETE - All 6 backend APIs tested successfully with 100% pass rate (16/16 tests passed). Key findings: 1) User authentication working with JWT tokens, 2) Coupons API correctly filtering expired/used coupons and returning 3 active coupons, 3) Orders API returning complete data structure with all required fields, 4) Notifications system working with automatic creation on order placement and read/unread tracking, 5) Coupon validation working for both valid and invalid codes. All endpoints using correct HTTP status codes and authentication. Backend ready for frontend integration testing."
