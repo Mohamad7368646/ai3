@@ -1,24 +1,37 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Sparkles, Heart, Trash2, LogOut, Loader2, Download, Upload, Wand2, Save, Edit, X, Phone, ShoppingCart, Package } from "lucide-react";
+import { Sparkles, Heart, Trash2, LogOut, Loader2, Wand2, Save, Edit, X, Phone, ShoppingCart, Package, Palette, Ruler, Eye, TrendingUp } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent } from "../components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const VIEW_ANGLES = [
+  { value: "front", label: "أمامي", icon: "👔" },
+  { value: "side", label: "جانبي", icon: "🔄" },
+  { value: "back", label: "خلفي", icon: "🔙" }
+];
+
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
 export default function Dashboard({ user, onLogout }) {
   const [designs, setDesigns] = useState([]);
+  const [showcaseDesigns, setShowcaseDesigns] = useState([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, designId: null });
   const [templates, setTemplates] = useState([]);
-  const [activeView, setActiveView] = useState("templates");
+  const [colorPalettes, setColorPalettes] = useState({});
+  const [sizeChart, setSizeChart] = useState({});
+  const [activeView, setActiveView] = useState("showcase");
   
   // Design State
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -27,20 +40,45 @@ export default function Dashboard({ user, onLogout }) {
   const [logoPreview, setLogoPreview] = useState(null);
   const [userPhotoPreview, setUserPhotoPreview] = useState(null);
   const [enhancing, setEnhancing] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedPalette, setSelectedPalette] = useState("classic");
+  const [selectedViewAngle, setSelectedViewAngle] = useState("front");
+  const [selectedSize, setSelectedSize] = useState("M");
   
-  // Preview State (in-page)
+  // Preview State
   const [generatedDesign, setGeneratedDesign] = useState(null);
+  const [calculatedPrice, setCalculatedPrice] = useState(null);
   
   // Order State
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [orderImagePreview, setOrderImagePreview] = useState(null);
   const [submittingOrder, setSubmittingOrder] = useState(false);
+  
+  // Measurements Dialog
+  const [showMeasurements, setShowMeasurements] = useState(false);
+  const [showSizeChart, setShowSizeChart] = useState(false);
+  const [measurements, setMeasurements] = useState({
+    chest: "",
+    waist: "",
+    hips: "",
+    height: "",
+    weight: ""
+  });
+  const [suggestedSize, setSuggestedSize] = useState("");
 
   useEffect(() => {
     fetchDesigns();
     fetchTemplates();
+    fetchShowcase();
+    fetchColorPalettes();
+    fetchSizeChart();
   }, []);
+
+  useEffect(() => {
+    if (selectedTemplate && selectedSize) {
+      calculatePrice();
+    }
+  }, [selectedTemplate, selectedSize, logoPreview]);
 
   const fetchDesigns = async () => {
     setLoading(true);
@@ -54,12 +92,56 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  const fetchShowcase = async () => {
+    try {
+      const response = await axios.get(`${API}/showcase`);
+      setShowcaseDesigns(response.data);
+    } catch (error) {
+      console.error("Failed to fetch showcase");
+    }
+  };
+
   const fetchTemplates = async () => {
     try {
       const response = await axios.get(`${API}/templates`);
       setTemplates(response.data);
     } catch (error) {
       console.error("Failed to fetch templates");
+    }
+  };
+
+  const fetchColorPalettes = async () => {
+    try {
+      const response = await axios.get(`${API}/color-palettes`);
+      setColorPalettes(response.data);
+    } catch (error) {
+      console.error("Failed to fetch color palettes");
+    }
+  };
+
+  const fetchSizeChart = async () => {
+    try {
+      const response = await axios.get(`${API}/size-chart`);
+      setSizeChart(response.data);
+    } catch (error) {
+      console.error("Failed to fetch size chart");
+    }
+  };
+
+  const calculatePrice = async () => {
+    if (!selectedTemplate) return;
+    
+    try {
+      const response = await axios.post(`${API}/calculate-price`, null, {
+        params: {
+          template_id: selectedTemplate.id,
+          size: selectedSize,
+          has_logo: !!logoPreview
+        }
+      });
+      setCalculatedPrice(response.data);
+    } catch (error) {
+      console.error("Failed to calculate price");
     }
   };
 
@@ -93,14 +175,22 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const handleOrderImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setOrderImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const saveMeasurements = async () => {
+    try {
+      const response = await axios.put(`${API}/user/measurements`, {
+        chest: parseFloat(measurements.chest) || null,
+        waist: parseFloat(measurements.waist) || null,
+        hips: parseFloat(measurements.hips) || null,
+        height: parseFloat(measurements.height) || null,
+        weight: parseFloat(measurements.weight) || null
+      });
+      
+      setSuggestedSize(response.data.suggested_size);
+      setSelectedSize(response.data.suggested_size);
+      toast.success(`تم حفظ المقاسات! المقاس المقترح: ${response.data.suggested_size}`);
+      setShowMeasurements(false);
+    } catch (error) {
+      toast.error("فشل في حفظ المقاسات");
     }
   };
 
@@ -114,7 +204,8 @@ export default function Dashboard({ user, onLogout }) {
     try {
       const response = await axios.post(`${API}/prompt/enhance`, {
         prompt: prompt,
-        clothing_type: selectedTemplate.type
+        clothing_type: selectedTemplate.type,
+        color: selectedColor
       });
       setEnhancedPrompt(response.data.enhanced_prompt);
       toast.success("تم تحسين الوصف بنجاح!");
@@ -141,7 +232,8 @@ export default function Dashboard({ user, onLogout }) {
         template_id: selectedTemplate?.id,
         logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
         user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null,
-        save_to_gallery: false
+        color: selectedColor,
+        view_angle: selectedViewAngle
       };
 
       const response = await axios.post(`${API}/designs/preview`, payload);
@@ -150,7 +242,8 @@ export default function Dashboard({ user, onLogout }) {
         image_base64: response.data.image_base64,
         prompt: finalPrompt,
         clothing_type: selectedTemplate?.type,
-        template_id: selectedTemplate?.id
+        template_id: selectedTemplate?.id,
+        color: selectedColor
       });
       
       toast.success("تم إنشاء التصميم بنجاح!");
@@ -170,13 +263,11 @@ export default function Dashboard({ user, onLogout }) {
         image_base64: generatedDesign.image_base64,
         clothing_type: generatedDesign.clothing_type,
         template_id: generatedDesign.template_id,
-        logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
-        user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null
+        color: selectedColor
       });
       
       setDesigns([response.data, ...designs]);
       toast.success("تم حفظ التصميم في معرضك!");
-      setActiveView("gallery");
     } catch (error) {
       toast.error("فشل في حفظ التصميم");
     }
@@ -187,11 +278,6 @@ export default function Dashboard({ user, onLogout }) {
       toast.error("الرجاء إدخال رقم الهاتف");
       return;
     }
-    
-    if (!orderImagePreview) {
-      toast.error("الرجاء رفع صورة");
-      return;
-    }
 
     setSubmittingOrder(true);
     try {
@@ -199,13 +285,14 @@ export default function Dashboard({ user, onLogout }) {
         design_image_base64: generatedDesign.image_base64,
         prompt: generatedDesign.prompt,
         phone_number: phoneNumber,
-        uploaded_image_base64: orderImagePreview.split(',')[1]
+        size: selectedSize,
+        color: selectedColor,
+        design_id: generatedDesign.template_id
       });
       
       toast.success("تم إرسال الطلب بنجاح! سنتواصل معك قريباً");
       setShowOrderForm(false);
       setPhoneNumber("");
-      setOrderImagePreview(null);
     } catch (error) {
       toast.error("فشل في إرسال الطلب");
     } finally {
@@ -221,6 +308,8 @@ export default function Dashboard({ user, onLogout }) {
     setUserPhotoPreview(null);
     setGeneratedDesign(null);
     setShowOrderForm(false);
+    setSelectedColor("");
+    setSelectedViewAngle("front");
   };
 
   const toggleFavorite = async (designId, currentStatus) => {
@@ -247,17 +336,10 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const downloadImage = (imageBase64, prompt) => {
-    const link = document.createElement('a');
-    link.href = `data:image/png;base64,${imageBase64}`;
-    link.download = `design-${Date.now()}.png`;
-    link.click();
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-[#E8DCC8] to-[#F5F0E8]" data-testid="dashboard-page">
       {/* Header */}
-      <header className="glass border-b border-[#3E2723]/10 sticky top-0 z-50 backdrop-blur-xl" data-testid="dashboard-header">
+      <header className="glass border-b border-[#3E2723]/10 sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-xl shadow-lg">
@@ -272,11 +354,10 @@ export default function Dashboard({ user, onLogout }) {
             <Button
               onClick={() => {
                 resetDesigner();
-                setActiveView("templates");
+                setActiveView("showcase");
               }}
               variant="outline"
               className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
-              data-testid="new-design-btn"
             >
               <Sparkles className="ml-2 w-4 h-4" />
               تصميم جديد
@@ -285,7 +366,6 @@ export default function Dashboard({ user, onLogout }) {
               onClick={onLogout}
               variant="outline"
               className="border-[#3E2723] text-[#3E2723] hover:bg-[#3E2723] hover:text-white"
-              data-testid="logout-btn"
             >
               <LogOut className="ml-2 w-4 h-4" />
               خروج
@@ -296,7 +376,18 @@ export default function Dashboard({ user, onLogout }) {
 
       <div className="container mx-auto px-4 py-8">
         {/* Navigation Tabs */}
-        <div className="glass rounded-2xl p-2 mb-8 flex gap-2" data-testid="nav-tabs">
+        <div className="glass rounded-2xl p-2 mb-8 flex gap-2">
+          <button
+            onClick={() => setActiveView("showcase")}
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+              activeView === "showcase"
+                ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
+                : "text-[#5D4037] hover:bg-white/50"
+            }`}
+          >
+            <TrendingUp className="inline ml-2 w-4 h-4" />
+            تصاميم ملهمة
+          </button>
           <button
             onClick={() => setActiveView("templates")}
             className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
@@ -304,7 +395,6 @@ export default function Dashboard({ user, onLogout }) {
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
-            data-testid="tab-templates"
           >
             القوالب الجاهزة
           </button>
@@ -316,7 +406,6 @@ export default function Dashboard({ user, onLogout }) {
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
             }`}
-            data-testid="tab-customize"
           >
             تخصيص التصميم
           </button>
@@ -327,15 +416,67 @@ export default function Dashboard({ user, onLogout }) {
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
-            data-testid="tab-gallery"
           >
             معرضي ({designs.length})
           </button>
         </div>
 
+        {/* Showcase View */}
+        {activeView === "showcase" && (
+          <div className="fade-in">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">تصاميم ناجحة تلهمك</h2>
+              <p className="text-lg text-[#5D4037]">اكتشف أفضل التصاميم من مصممين آخرين</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {showcaseDesigns.map((design) => (
+                <Card key={design.id} className="glass overflow-hidden card-hover group">
+                  <div className="relative aspect-square bg-white">
+                    <img
+                      src={`data:image/png;base64,${design.image_base64}`}
+                      alt={design.title}
+                      className="w-full h-full object-cover"
+                    />
+                    {design.is_featured && (
+                      <div className="absolute top-2 right-2 bg-[#D4AF37] text-white px-3 py-1 rounded-full text-xs font-bold">
+                        مميز
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-bold text-[#3E2723] mb-1">{design.title}</h3>
+                    <p className="text-sm text-[#5D4037] line-clamp-2 mb-2">{design.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#5D4037]">❤️ {design.likes_count} إعجاب</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-[#D4AF37] hover:text-white hover:bg-[#D4AF37]"
+                        onClick={() => setActiveView("templates")}
+                      >
+                        ابدأ التصميم
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="mt-12 text-center">
+              <Button
+                onClick={() => setActiveView("templates")}
+                className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-lg px-12 py-6"
+              >
+                <Sparkles className="ml-2 w-5 h-5" />
+                ابدأ تصميمك الخاص
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Templates View */}
         {activeView === "templates" && (
-          <div className="fade-in" data-testid="templates-view">
+          <div className="fade-in">
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold text-[#3E2723] mb-3">اختر قالبك المفضل</h2>
               <p className="text-lg text-[#5D4037]">ابدأ بقالب جاهز وخصصه حسب ذوقك</p>
@@ -346,7 +487,6 @@ export default function Dashboard({ user, onLogout }) {
                   key={template.id}
                   className="glass overflow-hidden card-hover cursor-pointer group"
                   onClick={() => handleTemplateSelect(template)}
-                  data-testid={`template-card-${template.id}`}
                 >
                   <div className="relative h-64 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 flex items-center justify-center">
                     <div className="text-6xl">
@@ -355,6 +495,9 @@ export default function Dashboard({ user, onLogout }) {
                       {template.type === "hoodie" && "🧥"}
                       {template.type === "dress" && "👗"}
                       {template.type === "jacket" && "🧥"}
+                    </div>
+                    <div className="absolute top-4 left-4 bg-[#D4AF37] text-white px-3 py-1 rounded-lg text-sm font-bold">
+                      من {template.base_price} ر.س
                     </div>
                     <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 transition-all flex items-center justify-center">
                       <Button className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#3E2723] hover:bg-[#D4AF37] hover:text-white">
@@ -366,32 +509,43 @@ export default function Dashboard({ user, onLogout }) {
                   <CardContent className="p-6">
                     <h3 className="text-2xl font-bold text-[#3E2723] mb-2">{template.name}</h3>
                     <p className="text-[#5D4037] mb-4">{template.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#5D4037]">انقر للتخصيص</span>
-                      <Wand2 className="w-5 h-5 text-[#D4AF37]" />
-                    </div>
                   </CardContent>
                 </Card>
-              ))}</div>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Customize View */}
         {activeView === "customize" && selectedTemplate && (
-          <div className="fade-in" data-testid="customize-view">
+          <div className="fade-in">
             <div className="glass rounded-3xl p-8 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-3xl font-bold text-[#3E2723]">تخصيص: {selectedTemplate.name}</h2>
                   <p className="text-[#5D4037]">{selectedTemplate.description}</p>
+                  {calculatedPrice && (
+                    <div className="mt-2 text-2xl font-bold text-[#D4AF37]">
+                      السعر: {calculatedPrice.total_price} ر.س
+                    </div>
+                  )}
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setActiveView("templates")}
-                  data-testid="back-to-templates"
-                >
-                  تغيير القالب
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSizeChart(true)}
+                    className="border-[#D4AF37] text-[#D4AF37]"
+                  >
+                    <Ruler className="ml-2 w-4 h-4" />
+                    جدول المقاسات
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveView("templates")}
+                  >
+                    تغيير القالب
+                  </Button>
+                </div>
               </div>
 
               <div className="grid lg:grid-cols-2 gap-8">
@@ -405,118 +559,136 @@ export default function Dashboard({ user, onLogout }) {
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder="صف التصميم الذي تريده بالتفصيل..."
-                      className="min-h-[120px] text-lg border-2 border-[#D4AF37]/30 focus:border-[#D4AF37]"
-                      data-testid="design-prompt-input"
+                      className="min-h-[100px] text-lg border-2 border-[#D4AF37]/30 focus:border-[#D4AF37]"
                     />
                   </div>
 
-                  <Button
-                    onClick={enhancePrompt}
-                    disabled={enhancing || !prompt.trim()}
-                    variant="outline"
-                    className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
-                    data-testid="enhance-prompt-btn"
-                  >
-                    {enhancing ? (
-                      <>
+                  {/* Color Palette Selector */}
+                  <div>
+                    <Label className="text-lg font-semibold text-[#3E2723] mb-3 block flex items-center">
+                      <Palette className="ml-2 w-5 h-5" />
+                      اختر اللون
+                    </Label>
+                    <Select value={selectedPalette} onValueChange={setSelectedPalette}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="اختر مجموعة ألوان" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="classic">كلاسيك</SelectItem>
+                        <SelectItem value="warm">دافئ</SelectItem>
+                        <SelectItem value="cool">بارد</SelectItem>
+                        <SelectItem value="earth">ترابي</SelectItem>
+                        <SelectItem value="pastel">باستيل</SelectItem>
+                        <SelectItem value="vibrant">نابض</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="grid grid-cols-5 gap-2 mt-3">
+                      {colorPalettes[selectedPalette]?.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColor(color)}
+                          className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-110 ${
+                            selectedColor === color ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]' : 'border-gray-300'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* View Angle Selector */}
+                  <div>
+                    <Label className="text-lg font-semibold text-[#3E2723] mb-3 block flex items-center">
+                      <Eye className="ml-2 w-5 h-5" />
+                      زاوية العرض
+                    </Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {VIEW_ANGLES.map((angle) => (
+                        <button
+                          key={angle.value}
+                          onClick={() => setSelectedViewAngle(angle.value)}
+                          className={`p-4 rounded-xl border-2 transition-all ${
+                            selectedViewAngle === angle.value
+                              ? 'border-[#D4AF37] bg-[#D4AF37]/10'
+                              : 'border-gray-300 hover:border-[#D4AF37]/50'
+                          }`}
+                        >
+                          <div className="text-3xl mb-1">{angle.icon}</div>
+                          <div className="text-sm font-semibold">{angle.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Size Selector */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <Label className="text-lg font-semibold text-[#3E2723] flex items-center">
+                        <Ruler className="ml-2 w-5 h-5" />
+                        المقاس
+                      </Label>
+                      <Button
+                        variant="link"
+                        onClick={() => setShowMeasurements(true)}
+                        className="text-[#D4AF37]"
+                      >
+                        أدخل مقاساتك
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-6 gap-2">
+                      {SIZES.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`p-3 rounded-lg border-2 font-bold transition-all ${
+                            selectedSize === size
+                              ? 'border-[#D4AF37] bg-[#D4AF37] text-white'
+                              : 'border-gray-300 hover:border-[#D4AF37]'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      onClick={enhancePrompt}
+                      disabled={enhancing || !prompt.trim()}
+                      variant="outline"
+                      className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+                    >
+                      {enhancing ? (
                         <Loader2 className="ml-2 w-4 h-4 animate-spin" />
-                        جاري التحسين...
-                      </>
-                    ) : (
-                      <>
+                      ) : (
                         <Sparkles className="ml-2 w-4 h-4" />
-                        تحسين الوصف بالذكاء الاصطناعي
-                      </>
-                    )}
-                  </Button>
+                      )}
+                      تحسين الوصف
+                    </Button>
+
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={generating || !prompt.trim()}
+                      className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                    >
+                      {generating ? (
+                        <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                      ) : (
+                        <Sparkles className="ml-2 w-5 h-5" />
+                      )}
+                      إنشاء التصميم
+                    </Button>
+                  </div>
 
                   {enhancedPrompt && (
                     <div className="p-4 bg-[#D4AF37]/10 rounded-xl border border-[#D4AF37]/30">
                       <p className="text-sm font-semibold text-[#3E2723] mb-2">الوصف المحسّن:</p>
-                      <p className="text-[#5D4037]">{enhancedPrompt}</p>
+                      <p className="text-[#5D4037] text-sm">{enhancedPrompt}</p>
                     </div>
                   )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Logo Upload */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-[#3E2723]">شعار (اختياري)</Label>
-                      <div className="border-2 border-dashed border-[#D4AF37]/50 rounded-xl p-4 text-center hover:border-[#D4AF37] transition-colors h-32 flex items-center justify-center">
-                        {logoPreview ? (
-                          <div className="relative w-full h-full">
-                            <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
-                            <button
-                              onClick={() => setLogoPreview(null)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ) : (
-                          <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                            <Upload className="w-8 h-8 text-[#D4AF37] mb-1" />
-                            <p className="text-xs text-[#5D4037]">رفع شعار</p>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleLogoUpload}
-                              className="hidden"
-                              data-testid="logo-upload"
-                            />
-                          </label>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* User Photo Upload */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-[#3E2723]">صورتك (اختياري)</Label>
-                      <div className="border-2 border-dashed border-[#D4AF37]/50 rounded-xl p-4 text-center hover:border-[#D4AF37] transition-colors h-32 flex items-center justify-center">
-                        {userPhotoPreview ? (
-                          <div className="relative w-full h-full">
-                            <img src={userPhotoPreview} alt="User" className="w-full h-full object-cover rounded" />
-                            <button
-                              onClick={() => setUserPhotoPreview(null)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ) : (
-                          <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                            <Upload className="w-8 h-8 text-[#D4AF37] mb-1" />
-                            <p className="text-xs text-[#5D4037]">رفع صورة</p>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={handlePhotoUpload}
-                              className="hidden"
-                              data-testid="photo-upload"
-                            />
-                          </label>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={generating || !prompt.trim()}
-                    className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-6 text-lg"
-                    data-testid="generate-design-btn"
-                  >
-                    {generating ? (
-                      <>
-                        <Loader2 className="ml-2 w-5 h-5 animate-spin" />
-                        جاري إنشاء تصميمك... (قد يستغرق دقيقة)
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="ml-2 w-5 h-5" />
-                        إنشاء التصميم الآن
-                      </>
-                    )}
-                  </Button>
                 </div>
 
                 {/* Right: Design Preview */}
@@ -527,7 +699,6 @@ export default function Dashboard({ user, onLogout }) {
                         src={`data:image/png;base64,${generatedDesign.image_base64}`}
                         alt="Generated Design" 
                         className="w-full h-full object-contain"
-                        data-testid="generated-design-preview"
                       />
                     ) : (
                       <div className="text-center">
@@ -543,7 +714,6 @@ export default function Dashboard({ user, onLogout }) {
                       <Button
                         onClick={handleSaveToGallery}
                         className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
-                        data-testid="save-to-gallery-btn"
                       >
                         <Save className="ml-2 w-5 h-5" />
                         حفظ في معرضي
@@ -552,26 +722,16 @@ export default function Dashboard({ user, onLogout }) {
                         onClick={() => setShowOrderForm(true)}
                         variant="outline"
                         className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-4"
-                        data-testid="order-design-btn"
                       >
                         <ShoppingCart className="ml-2 w-5 h-5" />
                         أعجبني! أريد طلبه
                       </Button>
-                      <Button
-                        onClick={() => downloadImage(generatedDesign.image_base64, generatedDesign.prompt)}
-                        variant="outline"
-                        className="w-full py-4"
-                        data-testid="download-design-btn"
-                      >
-                        <Download className="ml-2 w-5 h-5" />
-                        تحميل التصميم
-                      </Button>
                     </div>
                   )}
 
-                  {/* Order Form */}
+                  {/* Simple Order Form */}
                   {showOrderForm && (
-                    <div className="glass rounded-2xl p-6 space-y-4 fade-in" data-testid="order-form">
+                    <div className="glass rounded-2xl p-6 space-y-4 fade-in">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xl font-bold text-[#3E2723]">إتمام الطلب</h3>
                         <button 
@@ -582,58 +742,52 @@ export default function Dashboard({ user, onLogout }) {
                         </button>
                       </div>
 
+                      <div className="p-4 bg-[#D4AF37]/10 rounded-lg">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-[#5D4037]">المقاس:</span>
+                          <span className="font-bold text-[#3E2723]">{selectedSize}</span>
+                        </div>
+                        {selectedColor && (
+                          <div className="flex justify-between mb-2">
+                            <span className="text-[#5D4037]">اللون:</span>
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-6 h-6 rounded border-2 border-gray-300"
+                                style={{ backgroundColor: selectedColor }}
+                              />
+                              <span className="font-bold text-[#3E2723]">{selectedColor}</span>
+                            </div>
+                          </div>
+                        )}
+                        {calculatedPrice && (
+                          <div className="flex justify-between pt-2 border-t border-[#D4AF37]/30">
+                            <span className="text-[#5D4037]">السعر الإجمالي:</span>
+                            <span className="font-bold text-[#D4AF37] text-xl">
+                              {calculatedPrice.total_price} ر.س
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
                       <div>
                         <Label className="text-sm font-semibold text-[#3E2723] mb-2 block">
-                          رقم الهاتف
+                          <Phone className="inline ml-2 w-4 h-4" />
+                          رقم الهاتف للتواصل
                         </Label>
                         <Input
                           type="tel"
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                           placeholder="05xxxxxxxx"
-                          className="w-full"
-                          data-testid="phone-input"
+                          className="w-full text-lg"
+                          dir="ltr"
                         />
-                      </div>
-
-                      <div>
-                        <Label className="text-sm font-semibold text-[#3E2723] mb-2 block">
-                          رفع صورة توضيحية
-                        </Label>
-                        <div className="border-2 border-dashed border-[#D4AF37]/50 rounded-xl p-4 text-center hover:border-[#D4AF37] transition-colors">
-                          {orderImagePreview ? (
-                            <div className="relative">
-                              <img src={orderImagePreview} alt="Order" className="w-full h-32 object-cover rounded mb-2" />
-                              <Button
-                                onClick={() => setOrderImagePreview(null)}
-                                variant="destructive"
-                                size="sm"
-                              >
-                                <X className="ml-2 w-4 h-4" />
-                                إزالة
-                              </Button>
-                            </div>
-                          ) : (
-                            <label className="cursor-pointer">
-                              <Upload className="w-12 h-12 text-[#D4AF37] mx-auto mb-2" />
-                              <p className="text-sm text-[#5D4037]">اضغط لرفع صورة</p>
-                              <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleOrderImageUpload}
-                                className="hidden"
-                                data-testid="order-image-upload"
-                              />
-                            </label>
-                          )}
-                        </div>
                       </div>
 
                       <Button
                         onClick={handleSubmitOrder}
-                        disabled={submittingOrder || !phoneNumber.trim() || !orderImagePreview}
+                        disabled={submittingOrder || !phoneNumber.trim()}
                         className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
-                        data-testid="submit-order-btn"
                       >
                         {submittingOrder ? (
                           <>
@@ -647,6 +801,10 @@ export default function Dashboard({ user, onLogout }) {
                           </>
                         )}
                       </Button>
+                      
+                      <p className="text-xs text-center text-[#5D4037]">
+                        سيتم التواصل معك خلال 24 ساعة لتأكيد الطلب والدفع
+                      </p>
                     </div>
                   )}
                 </div>
@@ -657,22 +815,22 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Gallery View */}
         {activeView === "gallery" && (
-          <div className="fade-in" data-testid="gallery-view">
+          <div className="fade-in">
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold text-[#3E2723] mb-3">معرض تصاميمي</h2>
               <p className="text-lg text-[#5D4037]">جميع تصاميمك المحفوظة ({designs.length})</p>
             </div>
             
             {loading ? (
-              <div className="flex justify-center items-center py-20" data-testid="loading-designs">
+              <div className="flex justify-center items-center py-20">
                 <Loader2 className="w-12 h-12 text-[#D4AF37] animate-spin" />
               </div>
             ) : designs.length === 0 ? (
-              <div className="glass rounded-3xl p-12 text-center" data-testid="no-designs">
+              <div className="glass rounded-3xl p-12 text-center">
                 <Sparkles className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
                 <p className="text-xl text-[#5D4037] mb-4">لا توجد تصاميم محفوظة بعد</p>
                 <Button
-                  onClick={() => setActiveView("templates")}
+                  onClick={() => setActiveView("showcase")}
                   className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
                 >
                   <Sparkles className="ml-2 w-5 h-5" />
@@ -682,18 +840,16 @@ export default function Dashboard({ user, onLogout }) {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {designs.map((design) => (
-                  <Card key={design.id} className="glass overflow-hidden card-hover" data-testid={`design-card-${design.id}`}>
+                  <Card key={design.id} className="glass overflow-hidden card-hover">
                     <div className="relative aspect-square bg-white">
                       <img
                         src={`data:image/png;base64,${design.image_base64}`}
                         alt={design.prompt}
                         className="w-full h-full object-cover"
-                        data-testid={`design-image-${design.id}`}
                       />
                       <button
                         onClick={() => toggleFavorite(design.id, design.is_favorite)}
                         className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-transform"
-                        data-testid={`favorite-btn-${design.id}`}
                       >
                         <Heart
                           className={`w-6 h-6 ${
@@ -703,33 +859,24 @@ export default function Dashboard({ user, onLogout }) {
                           }`}
                         />
                       </button>
+                      {design.color && (
+                        <div 
+                          className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-white shadow-lg"
+                          style={{ backgroundColor: design.color }}
+                        />
+                      )}
                     </div>
                     <CardContent className="p-4 space-y-3">
-                      <p className="text-[#3E2723] line-clamp-2" data-testid={`design-prompt-${design.id}`}>
-                        {design.prompt}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => downloadImage(design.image_base64, design.prompt)}
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
-                          data-testid={`download-btn-${design.id}`}
-                        >
-                          <Download className="ml-2 w-4 h-4" />
-                          تحميل
-                        </Button>
-                        <Button
-                          onClick={() => setDeleteDialog({ open: true, designId: design.id })}
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                          data-testid={`delete-btn-${design.id}`}
-                        >
-                          <Trash2 className="ml-2 w-4 h-4" />
-                          حذف
-                        </Button>
-                      </div>
+                      <p className="text-[#3E2723] line-clamp-2">{design.prompt}</p>
+                      <Button
+                        onClick={() => setDeleteDialog({ open: true, designId: design.id })}
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                      >
+                        <Trash2 className="ml-2 w-4 h-4" />
+                        حذف
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -739,9 +886,88 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
+      {/* Measurements Dialog */}
+      <Dialog open={showMeasurements} onOpenChange={setShowMeasurements}>
+        <DialogContent className="max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#3E2723]">
+              أدخل مقاساتك
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>محيط الصدر (سم)</Label>
+              <Input
+                type="number"
+                value={measurements.chest}
+                onChange={(e) => setMeasurements({...measurements, chest: e.target.value})}
+                placeholder="95"
+              />
+            </div>
+            <div>
+              <Label>محيط الخصر (سم)</Label>
+              <Input
+                type="number"
+                value={measurements.waist}
+                onChange={(e) => setMeasurements({...measurements, waist: e.target.value})}
+                placeholder="80"
+              />
+            </div>
+            <div>
+              <Label>محيط الوركين (سم)</Label>
+              <Input
+                type="number"
+                value={measurements.hips}
+                onChange={(e) => setMeasurements({...measurements, hips: e.target.value})}
+                placeholder="100"
+              />
+            </div>
+            <Button
+              onClick={saveMeasurements}
+              className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+            >
+              حفظ واقتراح المقاس
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Size Chart Dialog */}
+      <Dialog open={showSizeChart} onOpenChange={setShowSizeChart}>
+        <DialogContent className="max-w-2xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#3E2723]">
+              جدول المقاسات
+            </DialogTitle>
+          </DialogHeader>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-[#D4AF37] text-white">
+                <tr>
+                  <th className="p-3">المقاس</th>
+                  <th className="p-3">الصدر (سم)</th>
+                  <th className="p-3">الخصر (سم)</th>
+                  <th className="p-3">الوركين (سم)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(sizeChart).map(([size, dims]) => (
+                  <tr key={size} className="border-b hover:bg-[#D4AF37]/10">
+                    <td className="p-3 font-bold text-center">{size}</td>
+                    <td className="p-3 text-center">{dims.chest}</td>
+                    <td className="p-3 text-center">{dims.waist}</td>
+                    <td className="p-3 text-center">{dims.hips}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, designId: null })}>
-        <AlertDialogContent dir="rtl" data-testid="delete-dialog">
+        <AlertDialogContent dir="rtl">
           <AlertDialogHeader>
             <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
             <AlertDialogDescription>
@@ -749,11 +975,10 @@ export default function Dashboard({ user, onLogout }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="delete-cancel-btn">إلغاء</AlertDialogCancel>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-500 hover:bg-red-600"
-              data-testid="delete-confirm-btn"
             >
               حذف
             </AlertDialogAction>
