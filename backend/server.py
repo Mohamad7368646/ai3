@@ -267,8 +267,7 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
 قدم فقط الوصف المحسّن بدون أي نص إضافي."""
         )
         
-        user_prompt = f"نوع الملبس: {request.clothing_type}
-الوصف: {request.prompt}"
+        user_prompt = f"نوع الملبس: {request.clothing_type}\nالوصف: {request.prompt}"
         
         response = await llm.chat(
             messages=[{"role": "user", "content": user_prompt}],
