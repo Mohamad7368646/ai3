@@ -164,6 +164,7 @@ class OrderCreate(BaseModel):
     color: Optional[str] = None
     design_id: Optional[str] = None
     notes: Optional[str] = None
+    coupon_code: Optional[str] = None
 
 class MeasurementsUpdate(BaseModel):
     chest: Optional[float] = None
