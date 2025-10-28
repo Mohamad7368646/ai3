@@ -760,6 +760,34 @@ async def get_orders(current_user: User = Depends(get_current_user)):
     ]
 
 # Coupon Routes
+@api_router.get("/coupons")
+async def get_available_coupons(current_user: User = Depends(get_current_user)):
+    """Get all active and non-expired coupons"""
+    coupons = await db.coupons.find({"is_active": True}, {"_id": 0}).to_list(100)
+    
+    # Filter out expired coupons
+    active_coupons = []
+    for coupon in coupons:
+        if coupon.get("expiry_date"):
+            expiry = datetime.fromisoformat(coupon["expiry_date"]) if isinstance(coupon["expiry_date"], str) else coupon["expiry_date"]
+            if expiry < datetime.now(timezone.utc):
+                continue
+        
+        # Check if max uses reached
+        if coupon.get("max_uses") and coupon.get("current_uses", 0) >= coupon["max_uses"]:
+            continue
+            
+        active_coupons.append({
+            "code": coupon["code"],
+            "discount_percentage": coupon.get("discount_percentage", 0),
+            "discount_amount": coupon.get("discount_amount"),
+            "description": coupon.get("description", ""),
+            "expiry_date": coupon.get("expiry_date"),
+            "min_purchase": coupon.get("min_purchase", 0)
+        })
+    
+    return active_coupons
+
 @api_router.post("/coupons/validate")
 async def validate_coupon(code: str, amount: float, current_user: User = Depends(get_current_user)):
     coupon = await db.coupons.find_one({
