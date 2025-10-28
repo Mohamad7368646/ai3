@@ -1093,12 +1093,6 @@ export default function Dashboard({ user, onLogout }) {
                           }`}
                         />
                       </button>
-                      {design.color && (
-                        <div 
-                          className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-white shadow-lg"
-                          style={{ backgroundColor: design.color }}
-                        />
-                      )}
                     </div>
                     <CardContent className="p-4 space-y-3">
                       <p className="text-[#3E2723] line-clamp-2">{design.prompt}</p>
