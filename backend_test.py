@@ -224,9 +224,8 @@ class FashionDesignAPITester:
         success, response = self.run_test(
             "Validate Coupon",
             "POST",
-            "coupons/validate",
-            200,
-            data={"code": code, "amount": amount}
+            f"coupons/validate?code={code}&amount={amount}",
+            200
         )
         
         if success:
