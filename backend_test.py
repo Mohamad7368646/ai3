@@ -364,7 +364,41 @@ def main():
     if design_id:
         tester.test_delete_design(design_id)
     
-    # 10. Test login with existing user
+    # 10. Test new features - Coupons
+    print("\n🎫 Testing Coupons API...")
+    coupons = tester.test_get_coupons()
+    
+    # Test coupon validation with default test coupon
+    tester.test_validate_coupon("WELCOME10", 100)
+    
+    # Test with invalid coupon
+    tester.test_validate_coupon("INVALID", 100)
+    
+    # 11. Test Orders API
+    print("\n📦 Testing Orders API...")
+    
+    # Create a test order first
+    order_id = tester.test_create_order()
+    
+    # Get user orders
+    orders = tester.test_get_orders()
+    
+    # 12. Test Notifications API
+    print("\n🔔 Testing Notifications API...")
+    
+    # Get notifications
+    notifications = tester.test_get_notifications()
+    
+    # Get unread count
+    unread_count = tester.test_get_unread_notifications_count()
+    
+    # Mark first notification as read if any exist
+    if notifications and len(notifications) > 0:
+        first_notification_id = notifications[0].get('id')
+        if first_notification_id:
+            tester.test_mark_notification_read(first_notification_id)
+    
+    # 13. Test login with existing user
     # Reset token to test login
     tester.token = None
     tester.test_login(test_username, test_password)
