@@ -692,41 +692,6 @@ export default function Dashboard({ user, onLogout }) {
                     />
                   </div>
 
-                  {/* Color Palette Selector */}
-                  <div>
-                    <Label className="text-lg font-semibold text-[#3E2723] mb-3 block flex items-center">
-                      <Palette className="ml-2 w-5 h-5" />
-                      اختر اللون
-                    </Label>
-                    <Select value={selectedPalette} onValueChange={setSelectedPalette}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="اختر مجموعة ألوان" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="classic">كلاسيك</SelectItem>
-                        <SelectItem value="warm">دافئ</SelectItem>
-                        <SelectItem value="cool">بارد</SelectItem>
-                        <SelectItem value="earth">ترابي</SelectItem>
-                        <SelectItem value="pastel">باستيل</SelectItem>
-                        <SelectItem value="vibrant">نابض</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <div className="grid grid-cols-5 gap-2 mt-3">
-                      {colorPalettes[selectedPalette]?.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => setSelectedColor(color)}
-                          className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-110 ${
-                            selectedColor === color ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]' : 'border-gray-300'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
                   {/* View Angle Selector */}
                   <div>
                     <Label className="text-lg font-semibold text-[#3E2723] mb-3 block flex items-center">
