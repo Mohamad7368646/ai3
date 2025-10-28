@@ -360,7 +360,6 @@ export default function Dashboard({ user, onLogout }) {
     setUserPhotoPreview(null);
     setGeneratedDesign(null);
     setShowOrderForm(false);
-    setSelectedColor("");
     setSelectedViewAngle("front");
   };
 
