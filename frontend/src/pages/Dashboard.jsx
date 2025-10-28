@@ -529,10 +529,10 @@ export default function Dashboard({ user, onLogout }) {
 
       <div className="container mx-auto px-4 py-8">
         {/* Navigation Tabs */}
-        <div className="glass rounded-2xl p-2 mb-8 flex gap-2">
+        <div className="glass rounded-2xl p-2 mb-8 flex gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveView("showcase")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
               activeView === "showcase"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
@@ -543,7 +543,7 @@ export default function Dashboard({ user, onLogout }) {
           </button>
           <button
             onClick={() => setActiveView("templates")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
               activeView === "templates"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
@@ -554,7 +554,7 @@ export default function Dashboard({ user, onLogout }) {
           <button
             onClick={() => setActiveView("customize")}
             disabled={!selectedTemplate}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
               activeView === "customize"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -564,13 +564,35 @@ export default function Dashboard({ user, onLogout }) {
           </button>
           <button
             onClick={() => setActiveView("gallery")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
               activeView === "gallery"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
           >
             معرضي ({designs.length})
+          </button>
+          <button
+            onClick={() => setActiveView("orders")}
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+              activeView === "orders"
+                ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
+                : "text-[#5D4037] hover:bg-white/50"
+            }`}
+          >
+            <Truck className="inline ml-2 w-4 h-4" />
+            طلباتي ({orders.length})
+          </button>
+          <button
+            onClick={() => setActiveView("coupons")}
+            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+              activeView === "coupons"
+                ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
+                : "text-[#5D4037] hover:bg-white/50"
+            }`}
+          >
+            <Tag className="inline ml-2 w-4 h-4" />
+            الكوبونات
           </button>
         </div>
 
