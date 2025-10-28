@@ -120,15 +120,6 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const fetchColorPalettes = async () => {
-    try {
-      const response = await axios.get(`${API}/color-palettes`);
-      setColorPalettes(response.data);
-    } catch (error) {
-      console.error("Failed to fetch color palettes");
-    }
-  };
-
   const fetchSizeChart = async () => {
     try {
       const response = await axios.get(`${API}/size-chart`);
