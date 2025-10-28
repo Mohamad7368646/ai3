@@ -64,33 +64,35 @@ function App() {
   }
 
   return (
-    <div className="App" dir="rtl">
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <LandingPage onLogin={handleLogin} />
-              )
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              isAuthenticated ? (
-                <Dashboard user={user} onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-      <Toaster position="top-center" dir="rtl" />
-    </div>
+    <ThemeProvider>
+      <div className="App" dir="rtl">
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <LandingPage onLogin={handleLogin} />
+                )
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                isAuthenticated ? (
+                  <Dashboard user={user} onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-center" dir="rtl" />
+      </div>
+    </ThemeProvider>
   );
 }
 
