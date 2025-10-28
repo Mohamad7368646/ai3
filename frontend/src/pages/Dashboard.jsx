@@ -977,10 +977,6 @@ export default function Dashboard({ user, onLogout }) {
                               <span className="font-bold text-[#3E2723]">{order.size || "غير محدد"}</span>
                             </div>
                             <div>
-                              <span className="text-[#5D4037]">اللون:</span>{" "}
-                              <span className="font-bold text-[#3E2723]">{order.color || "غير محدد"}</span>
-                            </div>
-                            <div>
                               <span className="text-[#5D4037]">رقم الهاتف:</span>{" "}
                               <span className="font-bold text-[#3E2723]">{order.phone_number}</span>
                             </div>
@@ -992,28 +988,13 @@ export default function Dashboard({ user, onLogout }) {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-3 border-t border-[#3E2723]/10">
-                            <div>
-                              {order.coupon_code && (
-                                <div className="text-sm text-green-600 mb-1">
-                                  ✓ تم تطبيق كوبون: {order.coupon_code} (-{order.discount} ر.س)
-                                </div>
-                              )}
-                              <div className="text-2xl font-bold text-[#D4AF37]">
-                                {order.final_price} ر.س
-                                {order.discount > 0 && (
-                                  <span className="text-sm line-through text-[#5D4037] mr-2">
-                                    {order.price} ر.س
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            {order.notes && (
+                          {order.notes && (
+                            <div className="pt-3 border-t border-[#3E2723]/10">
                               <div className="text-sm text-[#5D4037] italic">
                                 "{order.notes}"
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>
