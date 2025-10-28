@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Sparkles, Heart, Trash2, LogOut, Loader2, Wand2, Save, Edit, X, Phone, ShoppingCart, Package, Palette, Ruler, Eye, TrendingUp } from "lucide-react";
+import { Sparkles, Heart, Trash2, LogOut, Loader2, Wand2, Save, Edit, X, Phone, ShoppingCart, Package, Palette, Ruler, Eye, TrendingUp, Bell, Moon, Sun, Tag, Truck } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent } from "../components/ui/card";
