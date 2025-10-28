@@ -101,3 +101,147 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "AI-powered clothing design website with My Orders, Coupons, Dark/Light mode, and Notifications features"
+
+backend:
+  - task: "User Authentication (Register/Login)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Already implemented, needs testing"
+
+  - task: "Get Available Coupons API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added GET /api/coupons endpoint to fetch available coupons with expiry and usage checks"
+
+  - task: "Get User Orders API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/orders endpoint exists, needs testing"
+
+  - task: "Get Notifications API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/notifications and GET /api/notifications/unread-count endpoints exist"
+
+  - task: "Mark Notification as Read API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "PUT /api/notifications/{notification_id}/read endpoint exists"
+
+  - task: "Validate Coupon API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/coupons/validate endpoint exists"
+
+frontend:
+  - task: "Dark/Light Mode Toggle"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added theme toggle button in header with Moon/Sun icons"
+
+  - task: "Notifications Bell Icon with Dropdown"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added notifications bell with unread count badge and dropdown showing notifications list"
+
+  - task: "My Orders Tab and View"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Orders tab in navigation and complete orders view with order details, status, and pricing"
+
+  - task: "Coupons Tab and View"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Coupons tab showing available coupons with copy-to-clipboard functionality"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Get Available Coupons API"
+    - "Get User Orders API"
+    - "Get Notifications API"
+    - "User Authentication"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Completed implementation of My Orders, Coupons, Notifications, and Dark/Light mode features. Backend endpoint for getting coupons was added. Frontend Dashboard.jsx updated with all new UI components. Need to test all backend APIs for new features."
