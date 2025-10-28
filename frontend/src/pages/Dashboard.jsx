@@ -841,26 +841,6 @@ export default function Dashboard({ user, onLogout }) {
                           <span className="text-[#5D4037]">المقاس:</span>
                           <span className="font-bold text-[#3E2723]">{selectedSize}</span>
                         </div>
-                        {selectedColor && (
-                          <div className="flex justify-between mb-2">
-                            <span className="text-[#5D4037]">اللون:</span>
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-6 h-6 rounded border-2 border-gray-300"
-                                style={{ backgroundColor: selectedColor }}
-                              />
-                              <span className="font-bold text-[#3E2723]">{selectedColor}</span>
-                            </div>
-                          </div>
-                        )}
-                        {calculatedPrice && (
-                          <div className="flex justify-between pt-2 border-t border-[#D4AF37]/30">
-                            <span className="text-[#5D4037]">السعر الإجمالي:</span>
-                            <span className="font-bold text-[#D4AF37] text-xl">
-                              {calculatedPrice.total_price} ر.س
-                            </span>
-                          </div>
-                        )}
                       </div>
 
                       <div>
