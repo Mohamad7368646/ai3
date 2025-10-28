@@ -107,75 +107,93 @@ user_problem_statement: "AI-powered clothing design website with My Orders, Coup
 backend:
   - task: "User Authentication (Register/Login)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Already implemented, needs testing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Both registration and login endpoints working correctly. JWT token generation and validation working. Authentication required for protected endpoints (403/401 responses correct)."
 
   - task: "Get Available Coupons API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added GET /api/coupons endpoint to fetch available coupons with expiry and usage checks"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - GET /api/coupons returns 3 active coupons (WELCOME10, SAVE50, SUMMER25). Correctly filters out expired and max-used coupons. Response includes code, discount_percentage, discount_amount, expiry_date."
 
   - task: "Get User Orders API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/orders endpoint exists, needs testing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - GET /api/orders returns user orders with complete data structure: id, user_id, design_image_base64, prompt, phone_number, size, color, price, discount, final_price, coupon_code, status, created_at, notes."
 
   - task: "Get Notifications API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/notifications and GET /api/notifications/unread-count endpoints exist"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Both GET /api/notifications and GET /api/notifications/unread-count working correctly. Notifications created automatically when orders are placed. Unread count updates properly."
 
   - task: "Mark Notification as Read API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "PUT /api/notifications/{notification_id}/read endpoint exists"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - PUT /api/notifications/{id}/read successfully marks notifications as read. Verified unread count decreased from 1 to 0 after marking notification as read."
 
   - task: "Validate Coupon API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/coupons/validate endpoint exists"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - POST /api/coupons/validate working correctly. Valid coupon WELCOME10 returns valid:true with discount info. Invalid coupon returns valid:false with appropriate error message."
 
 frontend:
   - task: "Dark/Light Mode Toggle"
