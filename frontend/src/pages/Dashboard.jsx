@@ -633,9 +633,6 @@ export default function Dashboard({ user, onLogout }) {
                       {template.type === "dress" && "👗"}
                       {template.type === "jacket" && "🧥"}
                     </div>
-                    <div className="absolute top-4 left-4 bg-[#D4AF37] text-white px-3 py-1 rounded-lg text-sm font-bold">
-                      من {template.base_price} ر.س
-                    </div>
                     <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 transition-all flex items-center justify-center">
                       <Button className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#3E2723] hover:bg-[#D4AF37] hover:text-white">
                         <Edit className="ml-2 w-4 h-4" />
