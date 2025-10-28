@@ -35,7 +35,6 @@ export default function Dashboard({ user, onLogout }) {
   const [generating, setGenerating] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, designId: null });
   const [templates, setTemplates] = useState([]);
-  const [colorPalettes, setColorPalettes] = useState({});
   const [sizeChart, setSizeChart] = useState({});
   const [activeView, setActiveView] = useState("showcase");
   const [showNotifications, setShowNotifications] = useState(false);
