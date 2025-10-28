@@ -1,0 +1,107 @@
+{
+  "summary": {
+    "total_tests": 16,
+    "passed_tests": 16,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "test_timestamp": "2025-10-28T16:41:53.062877"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Root API Endpoint",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:29.443869"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:29.714237"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:29.760246"
+    },
+    {
+      "test_name": "Generate AI Design Preview",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.309341"
+    },
+    {
+      "test_name": "Get User Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.417430"
+    },
+    {
+      "test_name": "Invalid Login Test",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-10-28T16:41:52.452239"
+    },
+    {
+      "test_name": "Unauthorized Access Test",
+      "success": true,
+      "details": "Status: 403",
+      "timestamp": "2025-10-28T16:41:52.484289"
+    },
+    {
+      "test_name": "Get Available Coupons",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.525063"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.566864"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.601931"
+    },
+    {
+      "test_name": "Create Order",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.645547"
+    },
+    {
+      "test_name": "Get User Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.690955"
+    },
+    {
+      "test_name": "Get User Notifications",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.725341"
+    },
+    {
+      "test_name": "Get Unread Notifications Count",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.763439"
+    },
+    {
+      "test_name": "Mark Notification as Read",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:52.802200"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-28T16:41:53.061965"
+    }
+  ]
+}
