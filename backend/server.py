@@ -99,6 +99,18 @@ class ShowcaseDesign(BaseModel):
     is_featured: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class Coupon(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    code: str
+    discount_percentage: float  # 0-100
+    discount_amount: Optional[float] = None  # Fixed amount
+    is_active: bool = True
+    max_uses: Optional[int] = None
+    current_uses: int = 0
+    expiry_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class Order(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -110,9 +122,23 @@ class Order(BaseModel):
     size: Optional[str] = None
     color: Optional[str] = None
     price: float
+    discount: float = 0
+    final_price: float
+    coupon_code: Optional[str] = None
     status: str = "pending"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     notes: Optional[str] = None
+
+class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    message: str
+    type: str  # order_status, promotion, system
+    is_read: bool = False
+    related_order_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class DesignCreatePreview(BaseModel):
     prompt: str
