@@ -57,6 +57,7 @@ export default function Dashboard({ user, onLogout }) {
   const [calculatedPrice, setCalculatedPrice] = useState(null);
   
   // Coupon State
+  const [availableCoupons, setAvailableCoupons] = useState([]);
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
