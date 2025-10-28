@@ -288,7 +288,6 @@ export default function Dashboard({ user, onLogout }) {
         template_id: selectedTemplate?.id,
         logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
         user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null,
-        color: selectedColor,
         view_angle: selectedViewAngle
       };
 
@@ -298,8 +297,7 @@ export default function Dashboard({ user, onLogout }) {
         image_base64: response.data.image_base64,
         prompt: finalPrompt,
         clothing_type: selectedTemplate?.type,
-        template_id: selectedTemplate?.id,
-        color: selectedColor
+        template_id: selectedTemplate?.id
       });
       
       toast.success("تم إنشاء التصميم بنجاح!");
