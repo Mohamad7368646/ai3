@@ -988,6 +988,184 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
+        {/* My Orders View */}
+        {activeView === "orders" && (
+          <div className="fade-in">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">طلباتي</h2>
+              <p className="text-lg text-[#5D4037]">تتبع حالة طلباتك ({orders.length})</p>
+            </div>
+
+            {orders.length === 0 ? (
+              <div className="glass rounded-3xl p-12 text-center">
+                <Truck className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
+                <p className="text-xl text-[#5D4037] mb-4">لا توجد طلبات بعد</p>
+                <Button
+                  onClick={() => setActiveView("showcase")}
+                  className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                >
+                  ابدأ الطلب الأول
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {orders.map((order) => (
+                  <Card key={order.id} className="glass overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex gap-6" dir="rtl">
+                        {/* Order Image */}
+                        <div className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-white">
+                          <img
+                            src={`data:image/png;base64,${order.design_image_base64}`}
+                            alt="Design"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Order Details */}
+                        <div className="flex-1 space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-bold text-[#3E2723] text-lg mb-1">
+                                طلب #{order.id.substring(0, 8)}
+                              </h3>
+                              <p className="text-sm text-[#5D4037] line-clamp-2">{order.prompt}</p>
+                            </div>
+                            <span
+                              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                                order.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : order.status === "processing"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : order.status === "completed"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {order.status === "pending"
+                                ? "قيد الانتظار"
+                                : order.status === "processing"
+                                ? "قيد التنفيذ"
+                                : order.status === "completed"
+                                ? "مكتمل"
+                                : "ملغي"}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-[#5D4037]">المقاس:</span>{" "}
+                              <span className="font-bold text-[#3E2723]">{order.size || "غير محدد"}</span>
+                            </div>
+                            <div>
+                              <span className="text-[#5D4037]">اللون:</span>{" "}
+                              <span className="font-bold text-[#3E2723]">{order.color || "غير محدد"}</span>
+                            </div>
+                            <div>
+                              <span className="text-[#5D4037]">رقم الهاتف:</span>{" "}
+                              <span className="font-bold text-[#3E2723]">{order.phone_number}</span>
+                            </div>
+                            <div>
+                              <span className="text-[#5D4037]">التاريخ:</span>{" "}
+                              <span className="font-bold text-[#3E2723]">
+                                {new Date(order.created_at).toLocaleDateString("ar-EG")}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-3 border-t border-[#3E2723]/10">
+                            <div>
+                              {order.coupon_code && (
+                                <div className="text-sm text-green-600 mb-1">
+                                  ✓ تم تطبيق كوبون: {order.coupon_code} (-{order.discount} ر.س)
+                                </div>
+                              )}
+                              <div className="text-2xl font-bold text-[#D4AF37]">
+                                {order.final_price} ر.س
+                                {order.discount > 0 && (
+                                  <span className="text-sm line-through text-[#5D4037] mr-2">
+                                    {order.price} ر.س
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {order.notes && (
+                              <div className="text-sm text-[#5D4037] italic">
+                                "{order.notes}"
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Coupons View */}
+        {activeView === "coupons" && (
+          <div className="fade-in">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">الكوبونات المتاحة</h2>
+              <p className="text-lg text-[#5D4037]">احصل على خصومات رائعة</p>
+            </div>
+
+            {availableCoupons.length === 0 ? (
+              <div className="glass rounded-3xl p-12 text-center">
+                <Tag className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
+                <p className="text-xl text-[#5D4037]">لا توجد كوبونات متاحة حالياً</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {availableCoupons.map((coupon, idx) => (
+                  <Card
+                    key={idx}
+                    className="glass overflow-hidden border-2 border-[#D4AF37] hover:shadow-2xl transition-all card-hover"
+                  >
+                    <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8941F] p-6 text-white">
+                      <Tag className="w-10 h-10 mb-3" />
+                      <div className="text-4xl font-bold mb-2">
+                        {coupon.discount_percentage}%
+                      </div>
+                      <div className="text-sm opacity-90">خصم على طلبك</div>
+                    </div>
+                    <CardContent className="p-6 space-y-4" dir="rtl">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-[#3E2723] bg-[#D4AF37]/10 py-3 px-4 rounded-lg inline-block tracking-wider">
+                          {coupon.code}
+                        </div>
+                      </div>
+                      <p className="text-[#5D4037] text-center">{coupon.description}</p>
+                      {coupon.min_purchase > 0 && (
+                        <p className="text-xs text-[#5D4037] text-center">
+                          الحد الأدنى للشراء: {coupon.min_purchase} ر.س
+                        </p>
+                      )}
+                      {coupon.expiry_date && (
+                        <p className="text-xs text-[#5D4037] text-center">
+                          صالح حتى: {new Date(coupon.expiry_date).toLocaleDateString("ar-EG")}
+                        </p>
+                      )}
+                      <Button
+                        onClick={() => {
+                          navigator.clipboard.writeText(coupon.code);
+                          toast.success("تم نسخ الكوبون!");
+                        }}
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                      >
+                        نسخ الكود
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Gallery View */}
         {activeView === "gallery" && (
           <div className="fade-in">
