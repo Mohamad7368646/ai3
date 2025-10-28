@@ -129,19 +129,19 @@ class FashionDesignAPITester:
         return success
 
     def test_generate_design(self, prompt):
-        """Test AI design generation"""
-        print(f"\n🎨 Testing AI Design Generation (this may take up to 60 seconds)...")
+        """Test AI design preview generation"""
+        print(f"\n🎨 Testing AI Design Preview (this may take up to 60 seconds)...")
         
         success, response = self.run_test(
-            "Generate AI Design",
+            "Generate AI Design Preview",
             "POST",
-            "designs/generate",
+            "designs/preview",
             200,
-            data={"prompt": prompt}
+            data={"prompt": prompt, "clothing_type": "shirt", "color": "blue"}
         )
         
-        if success and 'id' in response:
-            return response['id']
+        if success and 'image_base64' in response:
+            return response['image_base64']
         return None
 
     def test_get_designs(self):
