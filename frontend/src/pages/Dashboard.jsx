@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Sparkles, Heart, Trash2, LogOut, Loader2, Download, Upload, Wand2, Save, Edit, X } from "lucide-react";
+import { Sparkles, Heart, Trash2, LogOut, Loader2, Download, Upload, Wand2, Save, Edit, X, Phone, ShoppingCart, Package } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent } from "../components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -26,15 +24,18 @@ export default function Dashboard({ user, onLogout }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [enhancedPrompt, setEnhancedPrompt] = useState("");
-  const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
-  const [userPhotoFile, setUserPhotoFile] = useState(null);
   const [userPhotoPreview, setUserPhotoPreview] = useState(null);
   const [enhancing, setEnhancing] = useState(false);
   
-  // Preview State
-  const [previewDesign, setPreviewDesign] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
+  // Preview State (in-page)
+  const [generatedDesign, setGeneratedDesign] = useState(null);
+  
+  // Order State
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [orderImagePreview, setOrderImagePreview] = useState(null);
+  const [submittingOrder, setSubmittingOrder] = useState(false);
 
   useEffect(() => {
     fetchDesigns();
@@ -65,13 +66,14 @@ export default function Dashboard({ user, onLogout }) {
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
     setPrompt(template.prompt);
+    setGeneratedDesign(null);
+    setShowOrderForm(false);
     setActiveView("customize");
   };
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setLogoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result);
@@ -83,10 +85,20 @@ export default function Dashboard({ user, onLogout }) {
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUserPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setUserPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleOrderImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setOrderImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -134,16 +146,13 @@ export default function Dashboard({ user, onLogout }) {
 
       const response = await axios.post(`${API}/designs/preview`, payload);
       
-      setPreviewDesign({
+      setGeneratedDesign({
         image_base64: response.data.image_base64,
         prompt: finalPrompt,
         clothing_type: selectedTemplate?.type,
-        template_id: selectedTemplate?.id,
-        logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
-        user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null
+        template_id: selectedTemplate?.id
       });
       
-      setShowPreview(true);
       toast.success("تم إنشاء التصميم بنجاح!");
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل في إنشاء التصميم");
@@ -152,14 +161,20 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const handleSaveDesign = async () => {
-    if (!previewDesign) return;
+  const handleSaveToGallery = async () => {
+    if (!generatedDesign) return;
     
     try {
-      const response = await axios.post(`${API}/designs/save`, previewDesign);
+      const response = await axios.post(`${API}/designs/save`, {
+        prompt: generatedDesign.prompt,
+        image_base64: generatedDesign.image_base64,
+        clothing_type: generatedDesign.clothing_type,
+        template_id: generatedDesign.template_id,
+        logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
+        user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null
+      });
+      
       setDesigns([response.data, ...designs]);
-      setShowPreview(false);
-      resetDesigner();
       toast.success("تم حفظ التصميم في معرضك!");
       setActiveView("gallery");
     } catch (error) {
@@ -167,15 +182,45 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  const handleSubmitOrder = async () => {
+    if (!phoneNumber.trim()) {
+      toast.error("الرجاء إدخال رقم الهاتف");
+      return;
+    }
+    
+    if (!orderImagePreview) {
+      toast.error("الرجاء رفع صورة");
+      return;
+    }
+
+    setSubmittingOrder(true);
+    try {
+      await axios.post(`${API}/orders/create`, {
+        design_image_base64: generatedDesign.image_base64,
+        prompt: generatedDesign.prompt,
+        phone_number: phoneNumber,
+        uploaded_image_base64: orderImagePreview.split(',')[1]
+      });
+      
+      toast.success("تم إرسال الطلب بنجاح! سنتواصل معك قريباً");
+      setShowOrderForm(false);
+      setPhoneNumber("");
+      setOrderImagePreview(null);
+    } catch (error) {
+      toast.error("فشل في إرسال الطلب");
+    } finally {
+      setSubmittingOrder(false);
+    }
+  };
+
   const resetDesigner = () => {
     setSelectedTemplate(null);
     setPrompt("");
     setEnhancedPrompt("");
-    setLogoFile(null);
     setLogoPreview(null);
-    setUserPhotoFile(null);
     setUserPhotoPreview(null);
-    setPreviewDesign(null);
+    setGeneratedDesign(null);
+    setShowOrderForm(false);
   };
 
   const toggleFavorite = async (designId, currentStatus) => {
@@ -327,8 +372,7 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              ))}</div>
           </div>
         )}
 
@@ -402,10 +446,7 @@ export default function Dashboard({ user, onLogout }) {
                           <div className="relative w-full h-full">
                             <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
                             <button
-                              onClick={() => {
-                                setLogoFile(null);
-                                setLogoPreview(null);
-                              }}
+                              onClick={() => setLogoPreview(null)}
                               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                             >
                               <X className="w-4 h-4" />
@@ -435,10 +476,7 @@ export default function Dashboard({ user, onLogout }) {
                           <div className="relative w-full h-full">
                             <img src={userPhotoPreview} alt="User" className="w-full h-full object-cover rounded" />
                             <button
-                              onClick={() => {
-                                setUserPhotoFile(null);
-                                setUserPhotoPreview(null);
-                              }}
+                              onClick={() => setUserPhotoPreview(null)}
                               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                             >
                               <X className="w-4 h-4" />
@@ -460,37 +498,159 @@ export default function Dashboard({ user, onLogout }) {
                       </div>
                     </div>
                   </div>
+
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={generating || !prompt.trim()}
+                    className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-6 text-lg"
+                    data-testid="generate-design-btn"
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                        جاري إنشاء تصميمك... (قد يستغرق دقيقة)
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="ml-2 w-5 h-5" />
+                        إنشاء التصميم الآن
+                      </>
+                    )}
+                  </Button>
                 </div>
 
-                {/* Right: Preview Placeholder */}
-                <div className="flex flex-col items-center justify-center">
-                  <div className="w-full aspect-square bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center">
-                    <div className="text-center">
-                      <Sparkles className="w-20 h-20 text-[#D4AF37] mx-auto mb-4 opacity-50" />
-                      <p className="text-[#5D4037] text-lg">سيظهر تصميمك هنا</p>
-                    </div>
+                {/* Right: Design Preview */}
+                <div className="space-y-4">
+                  <div className="w-full aspect-square bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center overflow-hidden">
+                    {generatedDesign ? (
+                      <img 
+                        src={`data:image/png;base64,${generatedDesign.image_base64}`}
+                        alt="Generated Design" 
+                        className="w-full h-full object-contain"
+                        data-testid="generated-design-preview"
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <Sparkles className="w-20 h-20 text-[#D4AF37] mx-auto mb-4 opacity-50" />
+                        <p className="text-[#5D4037] text-lg">سيظهر تصميمك هنا</p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Actions when design is generated */}
+                  {generatedDesign && !showOrderForm && (
+                    <div className="space-y-3">
+                      <Button
+                        onClick={handleSaveToGallery}
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
+                        data-testid="save-to-gallery-btn"
+                      >
+                        <Save className="ml-2 w-5 h-5" />
+                        حفظ في معرضي
+                      </Button>
+                      <Button
+                        onClick={() => setShowOrderForm(true)}
+                        variant="outline"
+                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-4"
+                        data-testid="order-design-btn"
+                      >
+                        <ShoppingCart className="ml-2 w-5 h-5" />
+                        أعجبني! أريد طلبه
+                      </Button>
+                      <Button
+                        onClick={() => downloadImage(generatedDesign.image_base64, generatedDesign.prompt)}
+                        variant="outline"
+                        className="w-full py-4"
+                        data-testid="download-design-btn"
+                      >
+                        <Download className="ml-2 w-5 h-5" />
+                        تحميل التصميم
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Order Form */}
+                  {showOrderForm && (
+                    <div className="glass rounded-2xl p-6 space-y-4 fade-in" data-testid="order-form">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-bold text-[#3E2723]">إتمام الطلب</h3>
+                        <button 
+                          onClick={() => setShowOrderForm(false)}
+                          className="text-[#5D4037] hover:text-[#3E2723]"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-semibold text-[#3E2723] mb-2 block">
+                          رقم الهاتف
+                        </Label>
+                        <Input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="05xxxxxxxx"
+                          className="w-full"
+                          data-testid="phone-input"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-semibold text-[#3E2723] mb-2 block">
+                          رفع صورة توضيحية
+                        </Label>
+                        <div className="border-2 border-dashed border-[#D4AF37]/50 rounded-xl p-4 text-center hover:border-[#D4AF37] transition-colors">
+                          {orderImagePreview ? (
+                            <div className="relative">
+                              <img src={orderImagePreview} alt="Order" className="w-full h-32 object-cover rounded mb-2" />
+                              <Button
+                                onClick={() => setOrderImagePreview(null)}
+                                variant="destructive"
+                                size="sm"
+                              >
+                                <X className="ml-2 w-4 h-4" />
+                                إزالة
+                              </Button>
+                            </div>
+                          ) : (
+                            <label className="cursor-pointer">
+                              <Upload className="w-12 h-12 text-[#D4AF37] mx-auto mb-2" />
+                              <p className="text-sm text-[#5D4037]">اضغط لرفع صورة</p>
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleOrderImageUpload}
+                                className="hidden"
+                                data-testid="order-image-upload"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={handleSubmitOrder}
+                        disabled={submittingOrder || !phoneNumber.trim() || !orderImagePreview}
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
+                        data-testid="submit-order-btn"
+                      >
+                        {submittingOrder ? (
+                          <>
+                            <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                            جاري الإرسال...
+                          </>
+                        ) : (
+                          <>
+                            <Package className="ml-2 w-5 h-5" />
+                            إرسال الطلب
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <Button
-                onClick={handleGenerate}
-                disabled={generating || !prompt.trim()}
-                className="w-full mt-8 bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-8 text-xl shadow-2xl"
-                data-testid="generate-design-btn"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="ml-2 w-6 h-6 animate-spin" />
-                    جاري إنشاء تصميمك... (قد يستغرق دقيقة)
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="ml-2 w-6 h-6" />
-                    إنشاء التصميم الآن
-                  </>
-                )}
-              </Button>
             </div>
           </div>
         )}
@@ -578,61 +738,6 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
       </div>
-
-      {/* Preview Dialog */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-4xl" dir="rtl" data-testid="preview-dialog">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-bold text-[#3E2723]">معاينة التصميم</DialogTitle>
-          </DialogHeader>
-          {previewDesign && (
-            <div className="space-y-6">
-              <div className="relative aspect-square bg-white rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={`data:image/png;base64,${previewDesign.image_base64}`}
-                  alt="Preview"
-                  className="w-full h-full object-contain"
-                  data-testid="preview-image"
-                />
-              </div>
-              <div className="bg-[#D4AF37]/10 rounded-xl p-4">
-                <p className="text-[#3E2723] font-semibold mb-2">الوصف:</p>
-                <p className="text-[#5D4037]">{previewDesign.prompt}</p>
-              </div>
-              <div className="flex gap-4">
-                <Button
-                  onClick={handleSaveDesign}
-                  className="flex-1 bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-6 text-lg"
-                  data-testid="save-design-btn"
-                >
-                  <Save className="ml-2 w-5 h-5" />
-                  حفظ في معرضي
-                </Button>
-                <Button
-                  onClick={() => downloadImage(previewDesign.image_base64, previewDesign.prompt)}
-                  variant="outline"
-                  className="flex-1 border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-6 text-lg"
-                  data-testid="download-preview-btn"
-                >
-                  <Download className="ml-2 w-5 h-5" />
-                  تحميل فقط
-                </Button>
-                <Button
-                  onClick={() => {
-                    setShowPreview(false);
-                    setPreviewDesign(null);
-                  }}
-                  variant="outline"
-                  className="border-gray-300 text-gray-600 hover:bg-gray-100 py-6 px-6"
-                  data-testid="close-preview-btn"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, designId: null })}>
