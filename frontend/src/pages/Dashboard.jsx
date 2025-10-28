@@ -339,7 +339,6 @@ export default function Dashboard({ user, onLogout }) {
         prompt: generatedDesign.prompt,
         phone_number: phoneNumber,
         size: selectedSize,
-        color: selectedColor,
         design_id: generatedDesign.template_id
       });
       
