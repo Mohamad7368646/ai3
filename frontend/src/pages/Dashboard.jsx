@@ -24,8 +24,13 @@ const VIEW_ANGLES = [
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export default function Dashboard({ user, onLogout }) {
+  const { isDark, toggleTheme } = useTheme();
+  
   const [designs, setDesigns] = useState([]);
   const [showcaseDesigns, setShowcaseDesigns] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, designId: null });
@@ -33,6 +38,7 @@ export default function Dashboard({ user, onLogout }) {
   const [colorPalettes, setColorPalettes] = useState({});
   const [sizeChart, setSizeChart] = useState({});
   const [activeView, setActiveView] = useState("showcase");
+  const [showNotifications, setShowNotifications] = useState(false);
   
   // Design State
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -49,6 +55,11 @@ export default function Dashboard({ user, onLogout }) {
   // Preview State
   const [generatedDesign, setGeneratedDesign] = useState(null);
   const [calculatedPrice, setCalculatedPrice] = useState(null);
+  
+  // Coupon State
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
   
   // Order State
   const [showOrderForm, setShowOrderForm] = useState(false);
