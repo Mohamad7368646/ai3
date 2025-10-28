@@ -190,9 +190,27 @@ class OrderResponse(BaseModel):
     size: Optional[str]
     color: Optional[str]
     price: float
+    discount: float
+    final_price: float
+    coupon_code: Optional[str]
     status: str
     created_at: str
     notes: Optional[str] = None
+
+class NotificationResponse(BaseModel):
+    id: str
+    title: str
+    message: str
+    type: str
+    is_read: bool
+    related_order_id: Optional[str]
+    created_at: str
+
+class CouponValidation(BaseModel):
+    valid: bool
+    discount_percentage: float
+    discount_amount: Optional[float]
+    message: str
 
 class DesignResponse(BaseModel):
     id: str
