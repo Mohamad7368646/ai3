@@ -202,23 +202,6 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const calculatePrice = async () => {
-    if (!selectedTemplate) return;
-    
-    try {
-      const response = await axios.post(`${API}/calculate-price`, null, {
-        params: {
-          template_id: selectedTemplate.id,
-          size: selectedSize,
-          has_logo: !!logoPreview
-        }
-      });
-      setCalculatedPrice(response.data);
-    } catch (error) {
-      console.error("Failed to calculate price");
-    }
-  };
-
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
     setPrompt(template.prompt);
