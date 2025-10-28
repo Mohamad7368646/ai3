@@ -362,8 +362,10 @@ def main():
     tester.test_unauthorized_access()
     
     # 9. Test delete design (if we have one)
-    if design_id:
-        tester.test_delete_design(design_id)
+    if designs and len(designs) > 0:
+        first_design_id = designs[0].get('id')
+        if first_design_id:
+            tester.test_delete_design(first_design_id)
     
     # 10. Test new features - Coupons
     print("\n🎫 Testing Coupons API...")
