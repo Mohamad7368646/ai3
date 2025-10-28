@@ -84,6 +84,9 @@ export default function Dashboard({ user, onLogout }) {
     fetchShowcase();
     fetchColorPalettes();
     fetchSizeChart();
+    fetchOrders();
+    fetchNotifications();
+    fetchCoupons();
   }, []);
 
   useEffect(() => {
