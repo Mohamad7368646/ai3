@@ -339,12 +339,12 @@ def main():
     # 3. Test get current user
     tester.test_get_me()
     
-    # 4. Test AI design generation with Arabic prompt
+    # 4. Test AI design preview generation with Arabic prompt
     arabic_prompt = "قميص كاجوال باللون الأزرق الفاتح مع طبعة ورود صغيرة"
-    design_id = tester.test_generate_design(arabic_prompt)
+    design_image = tester.test_generate_design(arabic_prompt)
     
-    if not design_id:
-        print("⚠️  Design generation failed, continuing with other tests...")
+    if not design_image:
+        print("⚠️  Design preview generation failed, continuing with other tests...")
     
     # 5. Test get designs
     designs = tester.test_get_designs()
