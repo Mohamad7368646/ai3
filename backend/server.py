@@ -647,6 +647,41 @@ async def create_order(order_data: OrderCreate, current_user: User = Depends(get
         template = next((t for t in TEMPLATES if t["type"] == order_data.design_id), TEMPLATES[0])
         price_calc = calculate_price(template["id"], order_data.size or "M", False)
         
+        # Apply coupon if provided
+        discount = 0
+        final_price = price_calc.total_price
+        
+        if order_data.coupon_code:
+            coupon = await db.coupons.find_one({
+                "code": order_data.coupon_code.upper(),
+                "is_active": True
+            })
+            
+            if coupon:
+                # Check expiry
+                if coupon.get("expiry_date"):
+                    expiry = datetime.fromisoformat(coupon["expiry_date"]) if isinstance(coupon["expiry_date"], str) else coupon["expiry_date"]
+                    if expiry < datetime.now(timezone.utc):
+                        raise HTTPException(status_code=400, detail="انتهت صلاحية الكوبون")
+                
+                # Check max uses
+                if coupon.get("max_uses") and coupon.get("current_uses", 0) >= coupon["max_uses"]:
+                    raise HTTPException(status_code=400, detail="تم استخدام الكوبون بالكامل")
+                
+                # Calculate discount
+                if coupon.get("discount_percentage"):
+                    discount = (price_calc.total_price * coupon["discount_percentage"]) / 100
+                elif coupon.get("discount_amount"):
+                    discount = coupon["discount_amount"]
+                
+                final_price = max(0, price_calc.total_price - discount)
+                
+                # Update coupon usage
+                await db.coupons.update_one(
+                    {"code": order_data.coupon_code.upper()},
+                    {"$inc": {"current_uses": 1}}
+                )
+        
         order = Order(
             user_id=current_user.id,
             design_id=order_data.design_id,
@@ -656,6 +691,9 @@ async def create_order(order_data: OrderCreate, current_user: User = Depends(get
             size=order_data.size,
             color=order_data.color,
             price=price_calc.total_price,
+            discount=discount,
+            final_price=final_price,
+            coupon_code=order_data.coupon_code,
             notes=order_data.notes
         )
         
@@ -663,6 +701,19 @@ async def create_order(order_data: OrderCreate, current_user: User = Depends(get
         order_dict['created_at'] = order_dict['created_at'].isoformat()
         
         await db.orders.insert_one(order_dict)
+        
+        # Create notification
+        notification = Notification(
+            user_id=current_user.id,
+            title="تم استلام طلبك",
+            message=f"تم استلام طلبك بنجاح! سنتواصل معك قريباً على الرقم {order_data.phone_number}",
+            type="order_status",
+            related_order_id=order.id
+        )
+        
+        notification_dict = notification.model_dump()
+        notification_dict['created_at'] = notification_dict['created_at'].isoformat()
+        await db.notifications.insert_one(notification_dict)
         
         return OrderResponse(
             id=order.id,
@@ -673,6 +724,9 @@ async def create_order(order_data: OrderCreate, current_user: User = Depends(get
             size=order.size,
             color=order.color,
             price=order.price,
+            discount=order.discount,
+            final_price=order.final_price,
+            coupon_code=order.coupon_code,
             status=order.status,
             created_at=order_dict['created_at'],
             notes=order.notes
