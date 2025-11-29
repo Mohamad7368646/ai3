@@ -655,26 +655,29 @@ export default function Dashboard({ user, onLogout }) {
         {/* Customize View */}
         {activeView === "customize" && selectedTemplate && (
           <div className="fade-in">
-            <div className="glass rounded-3xl p-8 shadow-2xl">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-3xl font-bold text-[#3E2723]">تخصيص: {selectedTemplate.name}</h2>
-                  <p className="text-[#5D4037]">{selectedTemplate.description}</p>
+            <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+                <div className="w-full sm:w-auto">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3E2723]">تخصيص: {selectedTemplate.name}</h2>
+                  <p className="text-sm sm:text-base text-[#5D4037]">{selectedTemplate.description}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     onClick={() => setShowSizeChart(true)}
-                    className="border-[#D4AF37] text-[#D4AF37]"
+                    className="border-[#D4AF37] text-[#D4AF37] flex-1 sm:flex-none text-xs sm:text-sm h-9 sm:h-10"
                   >
-                    <Ruler className="ml-2 w-4 h-4" />
-                    جدول المقاسات
+                    <Ruler className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">جدول المقاسات</span>
+                    <span className="sm:hidden">المقاسات</span>
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setActiveView("templates")}
+                    className="flex-1 sm:flex-none text-xs sm:text-sm h-9 sm:h-10"
                   >
-                    تغيير القالب
+                    <span className="hidden sm:inline">تغيير القالب</span>
+                    <span className="sm:hidden">تغيير</span>
                   </Button>
                 </div>
               </div>
