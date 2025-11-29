@@ -267,11 +267,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Coupons Tab and View"
-  stuck_tasks:
-    - "Coupons Tab and View"
+    - "All features tested and working"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
