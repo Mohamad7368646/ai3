@@ -158,6 +158,9 @@ class DesignSave(BaseModel):
     clothing_type: Optional[str] = None
     template_id: Optional[str] = None
     color: Optional[str] = None
+    phone_number: Optional[str] = None
+    user_photo_base64: Optional[str] = None
+    logo_base64: Optional[str] = None
 
 class OrderCreate(BaseModel):
     design_image_base64: str
