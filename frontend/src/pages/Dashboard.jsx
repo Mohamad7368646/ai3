@@ -824,15 +824,23 @@ export default function Dashboard({ user, onLogout }) {
                   {/* Upload Images Section */}
                   <div className="space-y-3">
                     <Label className="text-base sm:text-lg font-semibold text-[#3E2723] block">
-                      إضافات اختيارية (اختياري)
+                      إضافات احترافية 🎨
                     </Label>
+                    
+                    {/* Info Banner */}
+                    <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#B8941F]/10 border border-[#D4AF37]/30 rounded-lg p-3">
+                      <p className="text-xs sm:text-sm text-[#5D4037]">
+                        💡 <span className="font-semibold">نصيحة احترافية:</span> ارفع صورتك لرؤية التصميم عليك بشكل واقعي، وارفع شعارك ليُطبع على الملابس بجودة عالية
+                      </p>
+                    </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* User Photo Upload */}
                       <div>
                         <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
-                          صورتك الشخصية
+                          📸 صورتك الشخصية
                         </Label>
+                        <p className="text-[10px] text-[#5D4037]/70 mb-2">جرّب التصميم عليك بشكل واقعي</p>
                         <div className="relative">
                           <Input
                             type="file"
