@@ -1055,29 +1055,29 @@ export default function Dashboard({ user, onLogout }) {
         {/* Gallery View */}
         {activeView === "gallery" && (
           <div className="fade-in">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">معرض تصاميمي</h2>
-              <p className="text-lg text-[#5D4037]">جميع تصاميمك المحفوظة ({designs.length})</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">معرض تصاميمي</h2>
+              <p className="text-base sm:text-lg text-[#5D4037]">جميع تصاميمك المحفوظة ({designs.length})</p>
             </div>
             
             {loading ? (
-              <div className="flex justify-center items-center py-20">
-                <Loader2 className="w-12 h-12 text-[#D4AF37] animate-spin" />
+              <div className="flex justify-center items-center py-12 sm:py-20">
+                <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-[#D4AF37] animate-spin" />
               </div>
             ) : designs.length === 0 ? (
-              <div className="glass rounded-3xl p-12 text-center">
-                <Sparkles className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-                <p className="text-xl text-[#5D4037] mb-4">لا توجد تصاميم محفوظة بعد</p>
+              <div className="glass rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center">
+                <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 text-[#D4AF37] mx-auto mb-3 sm:mb-4" />
+                <p className="text-lg sm:text-xl text-[#5D4037] mb-3 sm:mb-4">لا توجد تصاميم محفوظة بعد</p>
                 <Button
                   onClick={() => setActiveView("showcase")}
-                  className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                  className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-sm sm:text-base"
                 >
-                  <Sparkles className="ml-2 w-5 h-5" />
+                  <Sparkles className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                   ابدأ التصميم الآن
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {designs.map((design) => (
                   <Card key={design.id} className="glass overflow-hidden card-hover">
                     <div className="relative aspect-square bg-white">
@@ -1088,10 +1088,10 @@ export default function Dashboard({ user, onLogout }) {
                       />
                       <button
                         onClick={() => toggleFavorite(design.id, design.is_favorite)}
-                        className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-transform"
+                        className="absolute top-2 sm:top-4 left-2 sm:left-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-transform"
                       >
                         <Heart
-                          className={`w-6 h-6 ${
+                          className={`w-5 h-5 sm:w-6 sm:h-6 ${
                             design.is_favorite
                               ? "fill-red-500 text-red-500"
                               : "text-[#5D4037]"
@@ -1099,15 +1099,15 @@ export default function Dashboard({ user, onLogout }) {
                         />
                       </button>
                     </div>
-                    <CardContent className="p-4 space-y-3">
-                      <p className="text-[#3E2723] line-clamp-2">{design.prompt}</p>
+                    <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                      <p className="text-[#3E2723] line-clamp-2 text-sm sm:text-base">{design.prompt}</p>
                       <Button
                         onClick={() => setDeleteDialog({ open: true, designId: design.id })}
                         variant="outline"
                         size="sm"
-                        className="w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        className="w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs sm:text-sm h-8 sm:h-9"
                       >
-                        <Trash2 className="ml-2 w-4 h-4" />
+                        <Trash2 className="ml-1.5 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                         حذف
                       </Button>
                     </CardContent>
