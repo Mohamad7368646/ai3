@@ -764,6 +764,113 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                   </div>
 
+                  {/* Upload Images Section */}
+                  <div className="space-y-3">
+                    <Label className="text-base sm:text-lg font-semibold text-[#3E2723] block">
+                      إضافات اختيارية (اختياري)
+                    </Label>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* User Photo Upload */}
+                      <div>
+                        <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
+                          صورتك الشخصية
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setUserPhotoPreview(reader.result);
+                                  toast.success("تم رفع صورتك");
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="hidden"
+                            id="user-photo-upload"
+                          />
+                          <label
+                            htmlFor="user-photo-upload"
+                            className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-[#D4AF37]/50 rounded-lg hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 cursor-pointer transition-all"
+                          >
+                            {userPhotoPreview ? (
+                              <div className="flex items-center gap-2">
+                                <img src={userPhotoPreview} alt="Preview" className="w-8 h-8 rounded-full object-cover" />
+                                <span className="text-xs sm:text-sm text-[#D4AF37]">تم الرفع ✓</span>
+                              </div>
+                            ) : (
+                              <>
+                                <Phone className="w-4 h-4 text-[#D4AF37]" />
+                                <span className="text-xs sm:text-sm text-[#5D4037]">ارفع صورتك</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Logo Upload */}
+                      <div>
+                        <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
+                          شعار/لوجو مخصص
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setLogoPreview(reader.result);
+                                  toast.success("تم رفع الشعار");
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="hidden"
+                            id="logo-upload"
+                          />
+                          <label
+                            htmlFor="logo-upload"
+                            className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-[#D4AF37]/50 rounded-lg hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 cursor-pointer transition-all"
+                          >
+                            {logoPreview ? (
+                              <div className="flex items-center gap-2">
+                                <img src={logoPreview} alt="Logo" className="w-8 h-8 rounded object-cover" />
+                                <span className="text-xs sm:text-sm text-[#D4AF37]">تم الرفع ✓</span>
+                              </div>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                                <span className="text-xs sm:text-sm text-[#5D4037]">ارفع الشعار</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Phone Number Input */}
+                    <div>
+                      <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
+                        رقم الهاتف للتواصل
+                      </Label>
+                      <Input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="05xxxxxxxx"
+                        className="border-2 border-[#D4AF37]/30 focus:border-[#D4AF37]"
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <Button
                       onClick={enhancePrompt}
