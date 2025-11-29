@@ -563,11 +563,11 @@ export default function Dashboard({ user, onLogout }) {
         {/* Showcase View */}
         {activeView === "showcase" && (
           <div className="fade-in">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">تصاميم ناجحة تلهمك</h2>
-              <p className="text-lg text-[#5D4037]">اكتشف أفضل التصاميم من مصممين آخرين</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">تصاميم ناجحة تلهمك</h2>
+              <p className="text-base sm:text-lg text-[#5D4037]">اكتشف أفضل التصاميم من مصممين آخرين</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {showcaseDesigns.map((design) => (
                 <Card key={design.id} className="glass overflow-hidden card-hover group">
                   <div className="relative aspect-square bg-white">
@@ -577,20 +577,20 @@ export default function Dashboard({ user, onLogout }) {
                       className="w-full h-full object-cover"
                     />
                     {design.is_featured && (
-                      <div className="absolute top-2 right-2 bg-[#D4AF37] text-white px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="absolute top-2 right-2 bg-[#D4AF37] text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold">
                         مميز
                       </div>
                     )}
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-bold text-[#3E2723] mb-1">{design.title}</h3>
-                    <p className="text-sm text-[#5D4037] line-clamp-2 mb-2">{design.description}</p>
+                  <CardContent className="p-3 sm:p-4">
+                    <h3 className="font-bold text-[#3E2723] mb-1 text-sm sm:text-base">{design.title}</h3>
+                    <p className="text-xs sm:text-sm text-[#5D4037] line-clamp-2 mb-2">{design.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#5D4037]">❤️ {design.likes_count} إعجاب</span>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-[#D4AF37] hover:text-white hover:bg-[#D4AF37]"
+                        className="text-[#D4AF37] hover:text-white hover:bg-[#D4AF37] text-xs sm:text-sm h-8"
                         onClick={() => setActiveView("templates")}
                       >
                         ابدأ التصميم
@@ -601,12 +601,12 @@ export default function Dashboard({ user, onLogout }) {
               ))}
             </div>
             
-            <div className="mt-12 text-center">
+            <div className="mt-8 sm:mt-12 text-center">
               <Button
                 onClick={() => setActiveView("templates")}
-                className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-lg px-12 py-6"
+                className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6"
               >
-                <Sparkles className="ml-2 w-5 h-5" />
+                <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                 ابدأ تصميمك الخاص
               </Button>
             </div>
