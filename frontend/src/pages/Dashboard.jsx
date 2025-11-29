@@ -1037,8 +1037,46 @@ export default function Dashboard({ user, onLogout }) {
                       )}
                       <Button
                         onClick={() => {
-                          navigator.clipboard.writeText(coupon.code);
-                          toast.success("تم نسخ الكوبون!");
+                          // Try modern clipboard API first, fallback to textarea method
+                          if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(coupon.code)
+                              .then(() => {
+                                toast.success("تم نسخ الكوبون!");
+                              })
+                              .catch(() => {
+                                // Fallback method
+                                const textArea = document.createElement("textarea");
+                                textArea.value = coupon.code;
+                                textArea.style.position = "fixed";
+                                textArea.style.left = "-999999px";
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                  document.execCommand('copy');
+                                  toast.success("تم نسخ الكوبون!");
+                                } catch (err) {
+                                  toast.error("فشل نسخ الكوبون");
+                                }
+                                document.body.removeChild(textArea);
+                              });
+                          } else {
+                            // Fallback for older browsers
+                            const textArea = document.createElement("textarea");
+                            textArea.value = coupon.code;
+                            textArea.style.position = "fixed";
+                            textArea.style.left = "-999999px";
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try {
+                              document.execCommand('copy');
+                              toast.success("تم نسخ الكوبون!");
+                            } catch (err) {
+                              toast.error("فشل نسخ الكوبون");
+                            }
+                            document.body.removeChild(textArea);
+                          }
                         }}
                         className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-sm sm:text-base h-10 sm:h-11"
                       >
