@@ -451,19 +451,6 @@ async def get_me(current_user: User = Depends(get_current_user)):
 # Measurements Routes
 @api_router.put("/user/measurements")
 async def update_measurements(measurements: MeasurementsUpdate, current_user: User = Depends(get_current_user)):
-
-@api_router.get("/user/designs-quota")
-async def get_designs_quota(current_user: User = Depends(get_current_user)):
-    """Get user's design quota information"""
-    remaining = current_user.designs_limit - current_user.designs_used if current_user.designs_limit != -1 else -1
-    
-    return {
-        "designs_limit": current_user.designs_limit,
-        "designs_used": current_user.designs_used,
-        "designs_remaining": remaining,
-        "is_unlimited": current_user.designs_limit == -1
-    }
-
     measurements_dict = measurements.model_dump(exclude_none=True)
     
     await db.users.update_one(
@@ -477,6 +464,18 @@ async def get_designs_quota(current_user: User = Depends(get_current_user)):
         "message": "تم حفظ المقاسات بنجاح",
         "suggested_size": suggested_size,
         "measurements": measurements_dict
+    }
+
+@api_router.get("/user/designs-quota")
+async def get_designs_quota(current_user: User = Depends(get_current_user)):
+    """Get user's design quota information"""
+    remaining = current_user.designs_limit - current_user.designs_used if current_user.designs_limit != -1 else -1
+    
+    return {
+        "designs_limit": current_user.designs_limit,
+        "designs_used": current_user.designs_used,
+        "designs_remaining": remaining,
+        "is_unlimited": current_user.designs_limit == -1
     }
 
 @api_router.get("/size-chart")
