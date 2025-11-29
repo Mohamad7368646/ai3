@@ -908,9 +908,10 @@ export default function Dashboard({ user, onLogout }) {
                             className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-[#D4AF37]/50 rounded-lg hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 cursor-pointer transition-all"
                           >
                             {logoPreview ? (
-                              <div className="flex items-center gap-2">
-                                <img src={logoPreview} alt="Logo" className="w-8 h-8 rounded object-cover" />
-                                <span className="text-xs sm:text-sm text-[#D4AF37]">تم الرفع ✓</span>
+                              <div className="flex flex-col items-center gap-1 w-full">
+                                <img src={logoPreview} alt="Logo" className="w-16 h-16 rounded object-contain border-2 border-[#D4AF37] bg-white p-1" />
+                                <span className="text-xs text-[#D4AF37] font-semibold">✓ جاهز</span>
+                                <span className="text-[9px] text-[#5D4037]">سيُطبع على الصدر</span>
                               </div>
                             ) : (
                               <>
