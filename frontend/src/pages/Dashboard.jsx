@@ -758,12 +758,12 @@ export default function Dashboard({ user, onLogout }) {
                       onClick={enhancePrompt}
                       disabled={enhancing || !prompt.trim()}
                       variant="outline"
-                      className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+                      className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white h-10 sm:h-11 text-sm sm:text-base"
                     >
                       {enhancing ? (
-                        <Loader2 className="ml-2 w-4 h-4 animate-spin" />
+                        <Loader2 className="ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                       ) : (
-                        <Sparkles className="ml-2 w-4 h-4" />
+                        <Sparkles className="ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       )}
                       تحسين الوصف
                     </Button>
@@ -771,28 +771,28 @@ export default function Dashboard({ user, onLogout }) {
                     <Button
                       onClick={handleGenerate}
                       disabled={generating || !prompt.trim()}
-                      className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                      className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white h-10 sm:h-11 text-sm sm:text-base"
                     >
                       {generating ? (
-                        <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                        <Loader2 className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                       ) : (
-                        <Sparkles className="ml-2 w-5 h-5" />
+                        <Sparkles className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                       )}
                       إنشاء التصميم
                     </Button>
                   </div>
 
                   {enhancedPrompt && (
-                    <div className="p-4 bg-[#D4AF37]/10 rounded-xl border border-[#D4AF37]/30">
-                      <p className="text-sm font-semibold text-[#3E2723] mb-2">الوصف المحسّن:</p>
-                      <p className="text-[#5D4037] text-sm">{enhancedPrompt}</p>
+                    <div className="p-3 sm:p-4 bg-[#D4AF37]/10 rounded-lg sm:rounded-xl border border-[#D4AF37]/30">
+                      <p className="text-xs sm:text-sm font-semibold text-[#3E2723] mb-1 sm:mb-2">الوصف المحسّن:</p>
+                      <p className="text-[#5D4037] text-xs sm:text-sm">{enhancedPrompt}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Right: Design Preview */}
-                <div className="space-y-4">
-                  <div className="w-full aspect-square bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center overflow-hidden">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="w-full aspect-square bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center overflow-hidden">
                     {generatedDesign ? (
                       <img 
                         src={`data:image/png;base64,${generatedDesign.image_base64}`}
@@ -800,22 +800,22 @@ export default function Dashboard({ user, onLogout }) {
                         className="w-full h-full object-contain"
                       />
                     ) : (
-                      <div className="text-center">
-                        <Sparkles className="w-20 h-20 text-[#D4AF37] mx-auto mb-4 opacity-50" />
-                        <p className="text-[#5D4037] text-lg">سيظهر تصميمك هنا</p>
+                      <div className="text-center p-4">
+                        <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#D4AF37] mx-auto mb-3 sm:mb-4 opacity-50" />
+                        <p className="text-[#5D4037] text-sm sm:text-base md:text-lg">سيظهر تصميمك هنا</p>
                       </div>
                     )}
                   </div>
 
                   {/* Actions when design is generated */}
                   {generatedDesign && !showOrderForm && (
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       <Button
                         onClick={handleSaveToGallery}
-                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4 hover:scale-105 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden"
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-3 sm:py-4 hover:scale-105 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden text-sm sm:text-base"
                       >
                         <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                        <Save className="ml-2 w-5 h-5 group-hover:animate-bounce" />
+                        <Save className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:animate-bounce" />
                         <span className="font-bold">حفظ في معرضي</span>
                       </Button>
                       <Button
