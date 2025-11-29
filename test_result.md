@@ -264,13 +264,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dark/Light Mode Toggle"
-    - "Notifications Bell Icon with Dropdown"
-    - "My Orders Tab and View"
     - "Coupons Tab and View"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Coupons Tab and View"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "main"
@@ -279,3 +277,5 @@ agent_communication:
     message: "✅ BACKEND TESTING COMPLETE - All 6 backend APIs tested successfully with 100% pass rate (16/16 tests passed). Key findings: 1) User authentication working with JWT tokens, 2) Coupons API correctly filtering expired/used coupons and returning 3 active coupons, 3) Orders API returning complete data structure with all required fields, 4) Notifications system working with automatic creation on order placement and read/unread tracking, 5) Coupon validation working for both valid and invalid codes. All endpoints using correct HTTP status codes and authentication. Backend ready for frontend integration testing."
   - agent: "main"
     message: "✅ UI IMPROVEMENTS COMPLETED - Removed color selection entirely, removed all pricing from templates and orders, made save button more interactive with animations and hover effects. Changes: 1) Removed color picker/palette from customize view, 2) Removed price display from templates, preview, and order form, 3) Enhanced save button with scale animation, bounce icon, gradient overlay on hover, 4) Removed color display badges from design gallery cards, 5) Simplified order details view without pricing. All changes tested with ESLint - no errors found."
+  - agent: "testing"
+    message: "✅ FRONTEND TESTING MOSTLY COMPLETE - Comprehensive E2E testing completed with 3/4 high-priority tasks PASSING. RESULTS: 1) ✅ Dark/Light Mode Toggle - Working perfectly, theme switches correctly and persists in localStorage, 2) ✅ Notifications Bell - Working correctly, dropdown opens/closes, shows proper empty state for new users, 3) ✅ My Orders Tab - Working correctly, shows proper empty state with call-to-action, 4) ❌ Coupons Tab - Has issues with clipboard permissions and webpack overlay blocking interactions. ADDITIONAL FINDINGS: Landing page, authentication, dashboard navigation, responsive design, and logout all working correctly. Arabic RTL layout rendering properly throughout."
