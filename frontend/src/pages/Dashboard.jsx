@@ -75,6 +75,14 @@ export default function Dashboard({ user, onLogout }) {
     weight: ""
   });
   const [suggestedSize, setSuggestedSize] = useState("");
+  
+  // Designs quota state
+  const [designsQuota, setDesignsQuota] = useState({
+    designs_limit: 10,
+    designs_used: 0,
+    designs_remaining: 10,
+    is_unlimited: false
+  });
 
   useEffect(() => {
     fetchDesigns();
