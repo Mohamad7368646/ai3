@@ -994,37 +994,37 @@ export default function Dashboard({ user, onLogout }) {
         {/* Coupons View */}
         {activeView === "coupons" && (
           <div className="fade-in">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">الكوبونات المتاحة</h2>
-              <p className="text-lg text-[#5D4037]">احصل على خصومات رائعة</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">الكوبونات المتاحة</h2>
+              <p className="text-base sm:text-lg text-[#5D4037]">احصل على خصومات رائعة</p>
             </div>
 
             {availableCoupons.length === 0 ? (
-              <div className="glass rounded-3xl p-12 text-center">
-                <Tag className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-                <p className="text-xl text-[#5D4037]">لا توجد كوبونات متاحة حالياً</p>
+              <div className="glass rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center">
+                <Tag className="w-12 h-12 sm:w-16 sm:h-16 text-[#D4AF37] mx-auto mb-3 sm:mb-4" />
+                <p className="text-lg sm:text-xl text-[#5D4037]">لا توجد كوبونات متاحة حالياً</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {availableCoupons.map((coupon, idx) => (
                   <Card
                     key={idx}
                     className="glass overflow-hidden border-2 border-[#D4AF37] hover:shadow-2xl transition-all card-hover"
                   >
-                    <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8941F] p-6 text-white">
-                      <Tag className="w-10 h-10 mb-3" />
-                      <div className="text-4xl font-bold mb-2">
+                    <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8941F] p-4 sm:p-6 text-white">
+                      <Tag className="w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3" />
+                      <div className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
                         {coupon.discount_percentage}%
                       </div>
-                      <div className="text-sm opacity-90">خصم على طلبك</div>
+                      <div className="text-xs sm:text-sm opacity-90">خصم على طلبك</div>
                     </div>
-                    <CardContent className="p-6 space-y-4" dir="rtl">
+                    <CardContent className="p-4 sm:p-6 space-y-3 sm:space-y-4" dir="rtl">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-[#3E2723] bg-[#D4AF37]/10 py-3 px-4 rounded-lg inline-block tracking-wider">
+                        <div className="text-xl sm:text-2xl font-bold text-[#3E2723] bg-[#D4AF37]/10 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg inline-block tracking-wider">
                           {coupon.code}
                         </div>
                       </div>
-                      <p className="text-[#5D4037] text-center">{coupon.description}</p>
+                      <p className="text-[#5D4037] text-center text-sm sm:text-base">{coupon.description}</p>
                       {coupon.min_purchase > 0 && (
                         <p className="text-xs text-[#5D4037] text-center">
                           الحد الأدنى للشراء: {coupon.min_purchase} ر.س
@@ -1040,7 +1040,7 @@ export default function Dashboard({ user, onLogout }) {
                           navigator.clipboard.writeText(coupon.code);
                           toast.success("تم نسخ الكوبون!");
                         }}
-                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-sm sm:text-base h-10 sm:h-11"
                       >
                         نسخ الكود
                       </Button>
