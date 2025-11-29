@@ -708,24 +708,29 @@ async def preview_design(design_data: DesignCreatePreview, current_user: User = 
                     detail=f"لقد وصلت إلى الحد الأقصى لعدد التصاميم ({current_user.designs_limit}). تبقى لديك {remaining} تصميم."
                 )
         
-        base_prompt = f"Professional fashion design: {design_data.prompt}"
-        
-        if design_data.clothing_type:
-            base_prompt = f"{design_data.clothing_type} design: {design_data.prompt}"
-        
-        if design_data.color:
-            base_prompt += f", {design_data.color} color"
-        
-        if design_data.view_angle and design_data.view_angle != "front":
-            base_prompt += f", {design_data.view_angle} view"
+        # Process uploaded images for better quality
+        processed_logo = None
+        processed_photo = None
         
         if design_data.logo_base64:
-            base_prompt += ", with custom logo on chest"
+            logger.info("Processing logo image...")
+            processed_logo = process_logo_for_clothing(design_data.logo_base64)
         
         if design_data.user_photo_base64:
-            base_prompt += ", on a person, realistic fit"
+            logger.info("Processing user photo...")
+            processed_photo = process_user_photo(design_data.user_photo_base64)
         
-        enhanced_prompt = f"{base_prompt}. High quality, detailed clothing design, modern style, clean background, professional photography"
+        # Create advanced prompt using helper function
+        enhanced_prompt = create_advanced_prompt(
+            base_prompt=design_data.prompt,
+            clothing_type=design_data.clothing_type or "clothing",
+            color=design_data.color,
+            view_angle=design_data.view_angle or "front",
+            has_logo=bool(design_data.logo_base64),
+            has_user_photo=bool(design_data.user_photo_base64)
+        )
+        
+        logger.info(f"Generated advanced prompt: {enhanced_prompt[:200]}...")
         
         images = await image_gen.generate_images(
             prompt=enhanced_prompt,
