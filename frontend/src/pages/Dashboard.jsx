@@ -173,7 +173,7 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const validateCouponCode = async () => {
-    if (!couponCode.trim() || !calculatedPrice) {
+    if (!couponCode.trim()) {
       toast.error("الرجاء إدخال كود الكوبون");
       return;
     }
@@ -183,7 +183,7 @@ export default function Dashboard({ user, onLogout }) {
       const response = await axios.post(`${API}/coupons/validate`, null, {
         params: {
           code: couponCode,
-          amount: calculatedPrice.total_price
+          amount: 100 // Default amount for validation
         }
       });
 
