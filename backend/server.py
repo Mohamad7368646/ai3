@@ -360,6 +360,13 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     return User(**user)
 
+async def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Verify that the current user is an admin"""
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="غير مصرح لك بالوصول - مطلوب صلاحيات المدير")
+    return current_user
+
+
 def suggest_size(measurements: UserMeasurements) -> str:
     """Suggest best size based on user measurements"""
     if not measurements or not measurements.chest:
