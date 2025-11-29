@@ -860,6 +860,193 @@ async def get_notifications(current_user: User = Depends(get_current_user)):
             id=n['id'],
             title=n['title'],
             message=n['message'],
+
+
+# ============================================
+# ADMIN PANEL APIs
+# ============================================
+
+@api_router.get("/admin/users")
+async def admin_get_all_users(admin: User = Depends(get_current_admin)):
+    """Get all users - Admin only"""
+    users = await db.users.find({}, {"_id": 0, "password": 0}).sort("created_at", -1).to_list(1000)
+    
+    for user in users:
+        if isinstance(user.get('created_at'), datetime):
+            user['created_at'] = user['created_at'].isoformat()
+    
+    return users
+
+@api_router.get("/admin/orders")
+async def admin_get_all_orders(admin: User = Depends(get_current_admin)):
+    """Get all orders with user details - Admin only"""
+    orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Enrich orders with user information
+    for order in orders:
+        if isinstance(order.get('created_at'), datetime):
+            order['created_at'] = order['created_at'].isoformat()
+        
+        # Get user details
+        user = await db.users.find_one({"id": order['user_id']}, {"_id": 0, "username": 1, "email": 1})
+        if user:
+            order['user_info'] = {
+                "username": user.get('username'),
+                "email": user.get('email')
+            }
+    
+    return orders
+
+@api_router.put("/admin/orders/{order_id}/status")
+async def admin_update_order_status(
+    order_id: str, 
+    status: str,
+    admin: User = Depends(get_current_admin)
+):
+    """Update order status - Admin only"""
+    valid_statuses = ["pending", "processing", "completed", "cancelled"]
+    if status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"حالة غير صالحة. الحالات المتاحة: {', '.join(valid_statuses)}")
+    
+    result = await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {"status": status}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # Get order to send notification
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if order:
+        # Create notification for user
+        notification = Notification(
+            user_id=order['user_id'],
+            title="تحديث حالة الطلب",
+            message=f"تم تحديث حالة طلبك إلى: {status}",
+            type="order_status",
+            related_order_id=order_id
+        )
+        
+        notification_dict = notification.model_dump()
+        notification_dict['created_at'] = notification_dict['created_at'].isoformat()
+        await db.notifications.insert_one(notification_dict)
+    
+    return {"message": "تم تحديث حالة الطلب بنجاح", "status": status}
+
+@api_router.get("/admin/designs")
+async def admin_get_all_designs(admin: User = Depends(get_current_admin)):
+    """Get all designs with user details and phone numbers - Admin only"""
+    designs = await db.designs.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Enrich designs with user information
+    for design in designs:
+        if isinstance(design.get('created_at'), datetime):
+            design['created_at'] = design['created_at'].isoformat()
+        
+        # Get user details
+        user = await db.users.find_one({"id": design['user_id']}, {"_id": 0, "username": 1, "email": 1})
+        if user:
+            design['user_info'] = {
+                "username": user.get('username'),
+                "email": user.get('email')
+            }
+    
+    return designs
+
+@api_router.post("/admin/coupons")
+async def admin_create_coupon(
+    code: str,
+    discount_percentage: float,
+    expiry_date: Optional[str] = None,
+    max_uses: Optional[int] = None,
+    admin: User = Depends(get_current_admin)
+):
+    """Create new coupon - Admin only"""
+    # Check if coupon code already exists
+    existing = await db.coupons.find_one({"code": code}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="كود الكوبون موجود بالفعل")
+    
+    coupon = Coupon(
+        code=code.upper(),
+        discount_percentage=discount_percentage,
+        max_uses=max_uses,
+        expiry_date=datetime.fromisoformat(expiry_date) if expiry_date else None
+    )
+    
+    coupon_dict = coupon.model_dump()
+    if coupon_dict.get('created_at'):
+        coupon_dict['created_at'] = coupon_dict['created_at'].isoformat()
+    if coupon_dict.get('expiry_date') and isinstance(coupon_dict['expiry_date'], datetime):
+        coupon_dict['expiry_date'] = coupon_dict['expiry_date'].isoformat()
+    
+    await db.coupons.insert_one(coupon_dict)
+    
+    return {"message": "تم إنشاء الكوبون بنجاح", "coupon": coupon_dict}
+
+@api_router.put("/admin/coupons/{coupon_id}")
+async def admin_update_coupon(
+    coupon_id: str,
+    is_active: Optional[bool] = None,
+    discount_percentage: Optional[float] = None,
+    max_uses: Optional[int] = None,
+    admin: User = Depends(get_current_admin)
+):
+    """Update coupon - Admin only"""
+    update_data = {}
+    if is_active is not None:
+        update_data['is_active'] = is_active
+    if discount_percentage is not None:
+        update_data['discount_percentage'] = discount_percentage
+    if max_uses is not None:
+        update_data['max_uses'] = max_uses
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="لا توجد بيانات للتحديث")
+    
+    result = await db.coupons.update_one(
+        {"id": coupon_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="الكوبون غير موجود")
+    
+    return {"message": "تم تحديث الكوبون بنجاح"}
+
+@api_router.delete("/admin/coupons/{coupon_id}")
+async def admin_delete_coupon(coupon_id: str, admin: User = Depends(get_current_admin)):
+    """Delete coupon - Admin only"""
+    result = await db.coupons.delete_one({"id": coupon_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="الكوبون غير موجود")
+    
+    return {"message": "تم حذف الكوبون بنجاح"}
+
+@api_router.get("/admin/stats")
+async def admin_get_stats(admin: User = Depends(get_current_admin)):
+    """Get dashboard statistics - Admin only"""
+    total_users = await db.users.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    total_designs = await db.designs.count_documents({})
+    pending_orders = await db.orders.count_documents({"status": "pending"})
+    completed_orders = await db.orders.count_documents({"status": "completed"})
+    
+    # Calculate total revenue (sum of final_price)
+    orders = await db.orders.find({}, {"_id": 0, "final_price": 1}).to_list(10000)
+    total_revenue = sum(order.get('final_price', 0) for order in orders)
+    
+    return {
+        "total_users": total_users,
+        "total_orders": total_orders,
+        "total_designs": total_designs,
+        "pending_orders": pending_orders,
+        "completed_orders": completed_orders,
+        "total_revenue": total_revenue
+    }
+
             type=n['type'],
             is_read=n.get('is_read', False),
             related_order_id=n.get('related_order_id'),
