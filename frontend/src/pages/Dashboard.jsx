@@ -391,17 +391,17 @@ export default function Dashboard({ user, onLogout }) {
     <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-[#E8DCC8] to-[#F5F0E8]" data-testid="dashboard-page">
       {/* Header */}
       <header className="glass border-b border-[#3E2723]/10 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-xl shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl shadow-lg">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#3E2723]">استوديو التصميم</h1>
-              <p className="text-sm text-[#5D4037]">مرحباً، {user?.username}</p>
+              <h1 className="text-lg sm:text-2xl font-bold text-[#3E2723]">استوديو التصميم</h1>
+              <p className="text-xs sm:text-sm text-[#5D4037] hidden sm:block">مرحباً، {user?.username}</p>
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-1.5 sm:gap-3">
             {/* Notifications Bell */}
             <div className="relative">
               <Button
