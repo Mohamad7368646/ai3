@@ -576,7 +576,10 @@ async def save_design(design_data: DesignSave, current_user: User = Depends(get_
             image_base64=design_data.image_base64,
             clothing_type=design_data.clothing_type,
             template_id=design_data.template_id,
-            color=design_data.color
+            color=design_data.color,
+            phone_number=design_data.phone_number,
+            user_photo_base64=design_data.user_photo_base64,
+            logo_base64=design_data.logo_base64
         )
         
         design_dict = design.model_dump()
