@@ -1085,6 +1085,64 @@ async def admin_delete_coupon(coupon_id: str, admin: User = Depends(get_current_
     
     return {"message": "تم حذف الكوبون بنجاح"}
 
+
+@api_router.put("/admin/users/{user_id}/designs-limit")
+async def admin_update_user_designs_limit(
+    user_id: str,
+    designs_limit: int,
+    admin: User = Depends(get_current_admin)
+):
+    """Update user's design limit - Admin only"""
+    if designs_limit < -1:
+        raise HTTPException(status_code=400, detail="الحد يجب أن يكون -1 (غير محدود) أو أكبر من أو يساوي 0")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"designs_limit": designs_limit}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم تحديث حد التصاميم بنجاح", "new_limit": designs_limit}
+
+@api_router.put("/admin/users/{user_id}/reset-designs-count")
+async def admin_reset_user_designs_count(
+    user_id: str,
+    admin: User = Depends(get_current_admin)
+):
+    """Reset user's designs used count - Admin only"""
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"designs_used": 0}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم إعادة تعيين عداد التصاميم بنجاح"}
+
+@api_router.post("/admin/users/{user_id}/add-designs")
+async def admin_add_designs_to_user(
+    user_id: str,
+    amount: int,
+    admin: User = Depends(get_current_admin)
+):
+    """Add more designs to user's limit - Admin only"""
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="الكمية يجب أن تكون أكبر من 0")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$inc": {"designs_limit": amount}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": f"تم إضافة {amount} تصميم للمستخدم بنجاح"}
+
+
 @api_router.get("/admin/stats")
 async def admin_get_stats(admin: User = Depends(get_current_admin)):
     """Get dashboard statistics - Admin only"""
