@@ -881,8 +881,9 @@ export default function Dashboard({ user, onLogout }) {
                       {/* Logo Upload */}
                       <div>
                         <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
-                          شعار/لوجو مخصص
+                          🎨 شعار/لوجو مخصص
                         </Label>
+                        <p className="text-[10px] text-[#5D4037]/70 mb-2">سيُطبع بجودة احترافية على الملابس</p>
                         <div className="relative">
                           <Input
                             type="file"
