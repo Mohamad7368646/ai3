@@ -1069,30 +1069,6 @@ async def admin_get_stats(admin: User = Depends(get_current_admin)):
         "total_revenue": total_revenue
     }
 
-            type=n['type'],
-            is_read=n.get('is_read', False),
-            related_order_id=n.get('related_order_id'),
-            created_at=n['created_at'] if isinstance(n['created_at'], str) else n['created_at'].isoformat()
-        )
-        for n in notifications
-    ]
-
-@api_router.put("/notifications/{notification_id}/read")
-async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
-    await db.notifications.update_one(
-        {"id": notification_id, "user_id": current_user.id},
-        {"$set": {"is_read": True}}
-    )
-    return {"message": "تم تحديث الإشعار"}
-
-@api_router.get("/notifications/unread-count")
-async def get_unread_count(current_user: User = Depends(get_current_user)):
-    count = await db.notifications.count_documents({
-        "user_id": current_user.id,
-        "is_read": False
-    })
-    return {"count": count}
-
 @api_router.get("/")
 async def root():
     return {"message": "مرحباً بك في استوديو تصميم الأزياء بالذكاء الاصطناعي"}
