@@ -896,30 +896,30 @@ export default function Dashboard({ user, onLogout }) {
         {/* My Orders View */}
         {activeView === "orders" && (
           <div className="fade-in">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">طلباتي</h2>
-              <p className="text-lg text-[#5D4037]">تتبع حالة طلباتك ({orders.length})</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">طلباتي</h2>
+              <p className="text-base sm:text-lg text-[#5D4037]">تتبع حالة طلباتك ({orders.length})</p>
             </div>
 
             {orders.length === 0 ? (
-              <div className="glass rounded-3xl p-12 text-center">
-                <Truck className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-                <p className="text-xl text-[#5D4037] mb-4">لا توجد طلبات بعد</p>
+              <div className="glass rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center">
+                <Truck className="w-12 h-12 sm:w-16 sm:h-16 text-[#D4AF37] mx-auto mb-3 sm:mb-4" />
+                <p className="text-lg sm:text-xl text-[#5D4037] mb-3 sm:mb-4">لا توجد طلبات بعد</p>
                 <Button
                   onClick={() => setActiveView("showcase")}
-                  className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                  className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-sm sm:text-base"
                 >
                   ابدأ الطلب الأول
                 </Button>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {orders.map((order) => (
                   <Card key={order.id} className="glass overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex gap-6" dir="rtl">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6" dir="rtl">
                         {/* Order Image */}
-                        <div className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-white">
+                        <div className="w-full sm:w-24 md:w-32 h-24 sm:h-24 md:h-32 flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden bg-white">
                           <img
                             src={`data:image/png;base64,${order.design_image_base64}`}
                             alt="Design"
@@ -928,16 +928,16 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
 
                         {/* Order Details */}
-                        <div className="flex-1 space-y-3">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-bold text-[#3E2723] text-lg mb-1">
+                        <div className="flex-1 space-y-2 sm:space-y-3 min-w-0">
+                          <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-[#3E2723] text-base sm:text-lg mb-1">
                                 طلب #{order.id.substring(0, 8)}
                               </h3>
-                              <p className="text-sm text-[#5D4037] line-clamp-2">{order.prompt}</p>
+                              <p className="text-xs sm:text-sm text-[#5D4037] line-clamp-2">{order.prompt}</p>
                             </div>
                             <span
-                              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap ${
                                 order.status === "pending"
                                   ? "bg-yellow-100 text-yellow-700"
                                   : order.status === "processing"
@@ -957,7 +957,7 @@ export default function Dashboard({ user, onLogout }) {
                             </span>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
                             <div>
                               <span className="text-[#5D4037]">المقاس:</span>{" "}
                               <span className="font-bold text-[#3E2723]">{order.size || "غير محدد"}</span>
