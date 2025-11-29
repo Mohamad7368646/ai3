@@ -821,9 +821,9 @@ export default function Dashboard({ user, onLogout }) {
                       <Button
                         onClick={() => setShowOrderForm(true)}
                         variant="outline"
-                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-4 hover:scale-105 transition-all duration-300"
+                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white py-3 sm:py-4 hover:scale-105 transition-all duration-300 text-sm sm:text-base"
                       >
-                        <ShoppingCart className="ml-2 w-5 h-5" />
+                        <ShoppingCart className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                         أعجبني! أريد طلبه
                       </Button>
                     </div>
@@ -831,27 +831,27 @@ export default function Dashboard({ user, onLogout }) {
 
                   {/* Simple Order Form */}
                   {showOrderForm && (
-                    <div className="glass rounded-2xl p-6 space-y-4 fade-in">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-bold text-[#3E2723]">إتمام الطلب</h3>
+                    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4 fade-in">
+                      <div className="flex items-center justify-between mb-1 sm:mb-2">
+                        <h3 className="text-lg sm:text-xl font-bold text-[#3E2723]">إتمام الطلب</h3>
                         <button 
                           onClick={() => setShowOrderForm(false)}
-                          className="text-[#5D4037] hover:text-[#3E2723]"
+                          className="text-[#5D4037] hover:text-[#3E2723] p-1"
                         >
                           <X className="w-5 h-5" />
                         </button>
                       </div>
 
-                      <div className="p-4 bg-[#D4AF37]/10 rounded-lg">
-                        <div className="flex justify-between mb-2">
-                          <span className="text-[#5D4037]">المقاس:</span>
-                          <span className="font-bold text-[#3E2723]">{selectedSize}</span>
+                      <div className="p-3 sm:p-4 bg-[#D4AF37]/10 rounded-lg">
+                        <div className="flex justify-between">
+                          <span className="text-[#5D4037] text-sm sm:text-base">المقاس:</span>
+                          <span className="font-bold text-[#3E2723] text-sm sm:text-base">{selectedSize}</span>
                         </div>
                       </div>
 
                       <div>
-                        <Label className="text-sm font-semibold text-[#3E2723] mb-2 block">
-                          <Phone className="inline ml-2 w-4 h-4" />
+                        <Label className="text-xs sm:text-sm font-semibold text-[#3E2723] mb-2 block">
+                          <Phone className="inline ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           رقم الهاتف للتواصل
                         </Label>
                         <Input
@@ -859,7 +859,7 @@ export default function Dashboard({ user, onLogout }) {
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                           placeholder="05xxxxxxxx"
-                          className="w-full text-lg"
+                          className="w-full text-base sm:text-lg h-11 sm:h-12"
                           dir="ltr"
                         />
                       </div>
@@ -867,16 +867,16 @@ export default function Dashboard({ user, onLogout }) {
                       <Button
                         onClick={handleSubmitOrder}
                         disabled={submittingOrder || !phoneNumber.trim()}
-                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-4"
+                        className="w-full bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white py-3 sm:py-4 text-sm sm:text-base"
                       >
                         {submittingOrder ? (
                           <>
-                            <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                            <Loader2 className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                             جاري الإرسال...
                           </>
                         ) : (
                           <>
-                            <Package className="ml-2 w-5 h-5" />
+                            <Package className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                             إرسال الطلب
                           </>
                         )}
