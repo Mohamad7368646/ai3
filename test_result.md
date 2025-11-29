@@ -198,51 +198,63 @@ backend:
 frontend:
   - task: "Dark/Light Mode Toggle"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Dashboard.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added theme toggle button in header with Moon/Sun icons"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Dark/Light mode toggle working perfectly. Theme toggle button (Moon/Sun icon) successfully switches between dark and light modes. Dark mode adds 'dark' class to document.documentElement, light mode removes it. Theme preference is persisted in localStorage via ThemeContext."
 
   - task: "Notifications Bell Icon with Dropdown"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Dashboard.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added notifications bell with unread count badge and dropdown showing notifications list"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Notifications system working correctly. Bell icon displays in header, dropdown opens on click showing 'الإشعارات' heading. For new users, shows 'لا توجد إشعارات' message as expected. Unread count badge hidden when no unread notifications (correct behavior). Dropdown closes when clicking elsewhere."
 
   - task: "My Orders Tab and View"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Dashboard.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added Orders tab in navigation and complete orders view with order details, status, and pricing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - My Orders tab working correctly. Navigation tab 'طلباتي' is visible and clickable. Orders view displays proper heading 'طلباتي' and shows 'لا توجد طلبات بعد' message for new users with call-to-action button 'ابدأ الطلب الأول'. Layout and Arabic text rendering correctly."
 
   - task: "Coupons Tab and View"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/Dashboard.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added Coupons tab showing available coupons with copy-to-clipboard functionality"
+      - working: false
+        agent: "testing"
+        comment: "❌ FAILED - Coupons tab has issues. Navigation tab 'الكوبونات' is visible but clicking sometimes fails due to webpack dev server overlay blocking interactions. When accessible, SUMMER25 coupon is visible but copy functionality fails with 'Failed to execute writeText on Clipboard: Write permission denied' error. Need to fix clipboard permissions and overlay blocking issues."
 
 metadata:
   created_by: "main_agent"
