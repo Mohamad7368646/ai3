@@ -616,19 +616,19 @@ export default function Dashboard({ user, onLogout }) {
         {/* Templates View */}
         {activeView === "templates" && (
           <div className="fade-in">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-[#3E2723] mb-3">اختر قالبك المفضل</h2>
-              <p className="text-lg text-[#5D4037]">ابدأ بقالب جاهز وخصصه حسب ذوقك</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">اختر قالبك المفضل</h2>
+              <p className="text-base sm:text-lg text-[#5D4037]">ابدأ بقالب جاهز وخصصه حسب ذوقك</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {templates.map((template) => (
                 <Card
                   key={template.id}
                   className="glass overflow-hidden card-hover cursor-pointer group"
                   onClick={() => handleTemplateSelect(template)}
                 >
-                  <div className="relative h-64 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 flex items-center justify-center">
-                    <div className="text-6xl">
+                  <div className="relative h-48 sm:h-64 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 flex items-center justify-center">
+                    <div className="text-5xl sm:text-6xl">
                       {template.type === "shirt" && "👔"}
                       {template.type === "tshirt" && "👕"}
                       {template.type === "hoodie" && "🧥"}
@@ -636,15 +636,15 @@ export default function Dashboard({ user, onLogout }) {
                       {template.type === "jacket" && "🧥"}
                     </div>
                     <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 transition-all flex items-center justify-center">
-                      <Button className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#3E2723] hover:bg-[#D4AF37] hover:text-white">
-                        <Edit className="ml-2 w-4 h-4" />
+                      <Button className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#3E2723] hover:bg-[#D4AF37] hover:text-white text-sm">
+                        <Edit className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                         تخصيص الآن
                       </Button>
                     </div>
                   </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-2xl font-bold text-[#3E2723] mb-2">{template.name}</h3>
-                    <p className="text-[#5D4037] mb-4">{template.description}</p>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#3E2723] mb-2">{template.name}</h3>
+                    <p className="text-sm sm:text-base text-[#5D4037] mb-4">{template.description}</p>
                   </CardContent>
                 </Card>
               ))}
