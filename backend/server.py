@@ -61,6 +61,8 @@ class User(BaseModel):
     measurements: Optional[UserMeasurements] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_admin: bool = False
+    designs_limit: int = 10  # -1 means unlimited
+    designs_used: int = 0
 
 class UserCreate(BaseModel):
     username: str
