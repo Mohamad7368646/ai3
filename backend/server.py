@@ -43,6 +43,151 @@ app = FastAPI()
 # Create API router
 api_router = APIRouter(prefix="/api")
 
+
+# ============================================
+# IMAGE PROCESSING HELPER FUNCTIONS
+# ============================================
+
+def process_logo_for_clothing(logo_base64: str, target_size: tuple = (200, 200)) -> str:
+    """
+    Process logo to be placed on clothing design
+    - Resize to appropriate size
+    - Enhance contrast
+    - Add slight shadow for depth
+    """
+    try:
+        # Decode base64 to image
+        logo_data = base64.b64decode(logo_base64)
+        logo_img = Image.open(io.BytesIO(logo_data))
+        
+        # Convert to RGBA to handle transparency
+        if logo_img.mode != 'RGBA':
+            logo_img = logo_img.convert('RGBA')
+        
+        # Resize maintaining aspect ratio
+        logo_img.thumbnail(target_size, Image.Resampling.LANCZOS)
+        
+        # Enhance the logo
+        enhancer = ImageEnhance.Contrast(logo_img)
+        logo_img = enhancer.enhance(1.2)
+        
+        # Convert back to base64
+        buffered = io.BytesIO()
+        logo_img.save(buffered, format="PNG")
+        return base64.b64encode(buffered.getvalue()).decode('utf-8')
+    except Exception as e:
+        logger.error(f"Error processing logo: {str(e)}")
+        return logo_base64
+
+def process_user_photo(photo_base64: str, target_size: tuple = (512, 512)) -> str:
+    """
+    Process user photo for realistic clothing try-on
+    - Resize to standard size
+    - Enhance quality
+    - Optimize for AI processing
+    """
+    try:
+        # Decode base64 to image
+        photo_data = base64.b64decode(photo_base64)
+        photo_img = Image.open(io.BytesIO(photo_data))
+        
+        # Convert to RGB
+        if photo_img.mode != 'RGB':
+            photo_img = photo_img.convert('RGB')
+        
+        # Resize maintaining aspect ratio
+        photo_img.thumbnail(target_size, Image.Resampling.LANCZOS)
+        
+        # Enhance sharpness for better AI recognition
+        enhancer = ImageEnhance.Sharpness(photo_img)
+        photo_img = enhancer.enhance(1.1)
+        
+        # Enhance color
+        enhancer = ImageEnhance.Color(photo_img)
+        photo_img = enhancer.enhance(1.1)
+        
+        # Convert back to base64
+        buffered = io.BytesIO()
+        photo_img.save(buffered, format="JPEG", quality=95)
+        return base64.b64encode(buffered.getvalue()).decode('utf-8')
+    except Exception as e:
+        logger.error(f"Error processing user photo: {str(e)}")
+        return photo_base64
+
+def create_advanced_prompt(base_prompt: str, clothing_type: str, color: str = None, 
+                          view_angle: str = "front", has_logo: bool = False, 
+                          has_user_photo: bool = False) -> str:
+    """
+    Create highly detailed and professional prompt for realistic clothing design
+    """
+    # Base structure
+    prompt_parts = []
+    
+    # User photo section - most realistic approach
+    if has_user_photo:
+        prompt_parts.append(
+            f"Professional photograph of a person wearing {clothing_type}, "
+            f"{base_prompt}, "
+            f"the clothing fits perfectly on the person's body, "
+            f"realistic fabric texture and wrinkles, "
+            f"natural body posture and proportions, "
+            f"studio lighting with soft shadows, "
+            f"high-resolution fashion photography style"
+        )
+    else:
+        # Without user photo - create realistic mannequin or model
+        prompt_parts.append(
+            f"Professional {clothing_type} design mockup, "
+            f"{base_prompt}, "
+            f"displayed on professional mannequin or fashion model, "
+            f"realistic fabric texture and draping, "
+            f"studio photography lighting"
+        )
+    
+    # Add color if specified
+    if color:
+        prompt_parts.append(f"primary color: {color}")
+    
+    # Add view angle details
+    view_descriptions = {
+        "front": "front view, centered composition, full garment visible",
+        "side": "side profile view, showing garment silhouette and fit",
+        "back": "back view, showing rear design details and fit"
+    }
+    prompt_parts.append(view_descriptions.get(view_angle, "front view"))
+    
+    # Logo placement details
+    if has_logo:
+        logo_positions = {
+            "shirt": "custom logo printed on chest area, centered, professional heat-transfer quality",
+            "hoodie": "custom logo embroidered on chest, premium quality stitching",
+            "tshirt": "custom logo screen-printed on center chest, vibrant colors",
+            "jacket": "custom logo patch on chest or shoulder, high-end branding",
+            "dress": "custom logo subtle embroidery on chest or shoulder area"
+        }
+        logo_desc = logo_positions.get(clothing_type, "custom logo professionally applied on chest area")
+        prompt_parts.append(logo_desc)
+    
+    # Quality and style modifiers
+    prompt_parts.extend([
+        "8K resolution",
+        "photorealistic rendering",
+        "professional fashion photography",
+        "soft natural lighting with subtle rim light",
+        "clean white or neutral background",
+        "sharp focus on garment details",
+        "high-end fashion catalog quality",
+        "realistic fabric materials (cotton, polyester, etc.)",
+        "accurate clothing proportions and fit",
+        "commercial product photography style"
+    ])
+    
+    # Join all parts
+    final_prompt = ", ".join(prompt_parts)
+    
+    return final_prompt
+
+
 # AI Clients
 image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
