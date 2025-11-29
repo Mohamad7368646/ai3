@@ -60,6 +60,7 @@ class User(BaseModel):
     email: str
     measurements: Optional[UserMeasurements] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_admin: bool = False
 
 class UserCreate(BaseModel):
     username: str
