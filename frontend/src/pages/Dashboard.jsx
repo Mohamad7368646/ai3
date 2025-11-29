@@ -430,7 +430,32 @@ export default function Dashboard({ user, onLogout }) {
               <p className="text-xs sm:text-sm text-[#5D4037] hidden sm:block">مرحباً، {user?.username}</p>
             </div>
           </div>
-          <div className="flex gap-1.5 sm:gap-3">
+          
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Designs Quota Badge */}
+            {!designsQuota.is_unlimited && (
+              <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg ${
+                designsQuota.designs_remaining === 0 
+                  ? 'bg-red-100 border border-red-300' 
+                  : designsQuota.designs_remaining <= 3
+                  ? 'bg-orange-100 border border-orange-300'
+                  : 'bg-green-100 border border-green-300'
+              }`}>
+                <p className="text-[10px] sm:text-xs font-bold text-center">
+                  {designsQuota.designs_remaining === 0 ? (
+                    <span className="text-red-600">انتهت التصاميم</span>
+                  ) : (
+                    <>
+                      <span className={designsQuota.designs_remaining <= 3 ? 'text-orange-600' : 'text-green-600'}>
+                        {designsQuota.designs_remaining}
+                      </span>
+                      <span className="text-[#5D4037]"> / {designsQuota.designs_limit}</span>
+                    </>
+                  )}
+                </p>
+                <p className="text-[9px] sm:text-[10px] text-[#5D4037] text-center hidden sm:block">تصميم متبقي</p>
+              </div>
+            )}
             {/* Notifications Bell */}
             <div className="relative">
               <Button
