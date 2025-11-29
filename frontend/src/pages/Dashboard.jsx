@@ -311,16 +311,27 @@ export default function Dashboard({ user, onLogout }) {
   const handleSaveToGallery = async () => {
     if (!generatedDesign) return;
     
+    // Ask for phone number if not provided
+    if (!phoneNumber.trim()) {
+      toast.error("الرجاء إدخال رقم هاتفك للتواصل معك لاحقاً");
+      setShowOrderForm(true);
+      return;
+    }
+    
     try {
       const response = await axios.post(`${API}/designs/save`, {
         prompt: generatedDesign.prompt,
         image_base64: generatedDesign.image_base64,
         clothing_type: generatedDesign.clothing_type,
-        template_id: generatedDesign.template_id
+        template_id: generatedDesign.template_id,
+        phone_number: phoneNumber,
+        user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null,
+        logo_base64: logoPreview ? logoPreview.split(',')[1] : null
       });
       
       setDesigns([response.data, ...designs]);
       toast.success("✨ تم حفظ التصميم في معرضك بنجاح!");
+      setPhoneNumber(""); // Reset phone number after save
     } catch (error) {
       toast.error("فشل في حفظ التصميم");
     }
