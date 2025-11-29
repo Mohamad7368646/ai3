@@ -92,7 +92,17 @@ export default function Dashboard({ user, onLogout }) {
     fetchOrders();
     fetchNotifications();
     fetchCoupons();
+    fetchDesignsQuota();
   }, []);
+  
+  const fetchDesignsQuota = async () => {
+    try {
+      const response = await axios.get(`${API}/user/designs-quota`);
+      setDesignsQuota(response.data);
+    } catch (error) {
+      console.error("Failed to fetch designs quota:", error);
+    }
+  };
 
   useEffect(() => {
     // Remove price calculation since we don't need pricing anymore
