@@ -324,7 +324,15 @@ export default function Dashboard({ user, onLogout }) {
         template_id: selectedTemplate?.id
       });
       
+      // Update quota after successful generation
+      await fetchDesignsQuota();
+      
       toast.success("تم إنشاء التصميم بنجاح!");
+      
+      // Show warning if running low on designs
+      if (!designsQuota.is_unlimited && designsQuota.designs_remaining - 1 <= 3 && designsQuota.designs_remaining - 1 > 0) {
+        toast.warning(`⚠️ تبقى لديك ${designsQuota.designs_remaining - 1} تصاميم فقط`);
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل في إنشاء التصميم");
     } finally {
