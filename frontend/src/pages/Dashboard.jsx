@@ -489,23 +489,24 @@ export default function Dashboard({ user, onLogout }) {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Navigation Tabs */}
-        <div className="glass rounded-2xl p-2 mb-8 flex gap-2 overflow-x-auto">
+        <div className="glass rounded-xl sm:rounded-2xl p-1.5 sm:p-2 mb-6 sm:mb-8 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1.5 sm:gap-2 min-w-max sm:min-w-0">
           <button
             onClick={() => setActiveView("showcase")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "showcase"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
           >
-            <TrendingUp className="inline ml-2 w-4 h-4" />
+            <TrendingUp className="inline ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
             تصاميم ملهمة
           </button>
           <button
             onClick={() => setActiveView("templates")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "templates"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
@@ -516,7 +517,7 @@ export default function Dashboard({ user, onLogout }) {
           <button
             onClick={() => setActiveView("customize")}
             disabled={!selectedTemplate}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "customize"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -526,7 +527,7 @@ export default function Dashboard({ user, onLogout }) {
           </button>
           <button
             onClick={() => setActiveView("gallery")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "gallery"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
@@ -536,26 +537,27 @@ export default function Dashboard({ user, onLogout }) {
           </button>
           <button
             onClick={() => setActiveView("orders")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "orders"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
           >
-            <Truck className="inline ml-2 w-4 h-4" />
+            <Truck className="inline ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
             طلباتي ({orders.length})
           </button>
           <button
             onClick={() => setActiveView("coupons")}
-            className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 sm:flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold transition-all whitespace-nowrap text-sm sm:text-base ${
               activeView === "coupons"
                 ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                 : "text-[#5D4037] hover:bg-white/50"
             }`}
           >
-            <Tag className="inline ml-2 w-4 h-4" />
+            <Tag className="inline ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
             الكوبونات
           </button>
+          </div>
         </div>
 
         {/* Showcase View */}
