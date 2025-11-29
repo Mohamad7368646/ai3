@@ -15,6 +15,8 @@ from passlib.context import CryptContext
 import base64
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 from emergentintegrations.llm.openai import LlmChat
+from PIL import Image, ImageEnhance, ImageFilter
+import io
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
