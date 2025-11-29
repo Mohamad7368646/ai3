@@ -87,6 +87,9 @@ class Design(BaseModel):
     template_id: Optional[str] = None
     color: Optional[str] = None
     view_angle: Optional[str] = "front"  # front, side, back
+    phone_number: Optional[str] = None
+    user_photo_base64: Optional[str] = None
+    logo_base64: Optional[str] = None
 
 class ShowcaseDesign(BaseModel):
     model_config = ConfigDict(extra="ignore")
