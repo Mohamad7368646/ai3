@@ -540,6 +540,15 @@ async def enhance_prompt(request: PromptEnhanceRequest, current_user: User = Dep
 @api_router.post("/designs/preview", response_model=PreviewResponse)
 async def preview_design(design_data: DesignCreatePreview, current_user: User = Depends(get_current_user)):
     try:
+        # Check if user has reached design limit
+        if current_user.designs_limit != -1:  # -1 means unlimited
+            if current_user.designs_used >= current_user.designs_limit:
+                remaining = current_user.designs_limit - current_user.designs_used
+                raise HTTPException(
+                    status_code=403, 
+                    detail=f"لقد وصلت إلى الحد الأقصى لعدد التصاميم ({current_user.designs_limit}). تبقى لديك {remaining} تصميم."
+                )
+        
         base_prompt = f"Professional fashion design: {design_data.prompt}"
         
         if design_data.clothing_type:
@@ -570,8 +579,16 @@ async def preview_design(design_data: DesignCreatePreview, current_user: User = 
         
         image_base64 = base64.b64encode(images[0]).decode('utf-8')
         
+        # Increment designs_used count
+        await db.users.update_one(
+            {"id": current_user.id},
+            {"$inc": {"designs_used": 1}}
+        )
+        
         return PreviewResponse(image_base64=image_base64)
     
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error generating design preview: {str(e)}")
         raise HTTPException(status_code=500, detail=f"خطأ في توليد التصميم: {str(e)}")
