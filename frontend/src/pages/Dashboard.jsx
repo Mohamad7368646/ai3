@@ -295,6 +295,12 @@ export default function Dashboard({ user, onLogout }) {
       toast.error("الرجاء إدخال وصف التصميم");
       return;
     }
+    
+    // Check designs quota
+    if (!designsQuota.is_unlimited && designsQuota.designs_remaining <= 0) {
+      toast.error("لقد وصلت إلى الحد الأقصى لعدد التصاميم. تواصل مع الإدارة لزيادة الحد.");
+      return;
+    }
 
     setGenerating(true);
     try {
