@@ -1008,7 +1008,10 @@ async def admin_create_coupon(
     
     await db.coupons.insert_one(coupon_dict)
     
-    return {"message": "تم إنشاء الكوبون بنجاح", "coupon": coupon_dict}
+    # Remove _id from response
+    response_dict = {k: v for k, v in coupon_dict.items() if k != '_id'}
+    
+    return {"message": "تم إنشاء الكوبون بنجاح", "coupon": response_dict}
 
 @api_router.put("/admin/coupons/{coupon_id}")
 async def admin_update_coupon(
