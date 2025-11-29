@@ -408,11 +408,11 @@ export default function Dashboard({ user, onLogout }) {
                 onClick={() => setShowNotifications(!showNotifications)}
                 variant="outline"
                 size="icon"
-                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white relative"
+                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white relative h-9 w-9 sm:h-10 sm:w-10"
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
                     {unreadCount}
                   </span>
                 )}
@@ -420,12 +420,12 @@ export default function Dashboard({ user, onLogout }) {
               
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute left-0 mt-2 w-80 glass rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto" dir="rtl">
-                  <div className="p-4 border-b border-[#3E2723]/10">
-                    <h3 className="font-bold text-[#3E2723]">الإشعارات</h3>
+                <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 glass rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto" dir="rtl">
+                  <div className="p-3 sm:p-4 border-b border-[#3E2723]/10">
+                    <h3 className="font-bold text-[#3E2723] text-sm sm:text-base">الإشعارات</h3>
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-[#5D4037]">
+                    <div className="p-6 text-center text-[#5D4037] text-sm">
                       لا توجد إشعارات
                     </div>
                   ) : (
@@ -433,16 +433,16 @@ export default function Dashboard({ user, onLogout }) {
                       {notifications.map((notif) => (
                         <div
                           key={notif.id}
-                          className={`p-4 cursor-pointer hover:bg-[#D4AF37]/10 transition-colors ${
+                          className={`p-3 sm:p-4 cursor-pointer hover:bg-[#D4AF37]/10 transition-colors ${
                             !notif.is_read ? 'bg-[#D4AF37]/5' : ''
                           }`}
                           onClick={() => markNotificationAsRead(notif.id)}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`mt-1 w-2 h-2 rounded-full ${!notif.is_read ? 'bg-[#D4AF37]' : 'bg-gray-300'}`} />
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-[#3E2723] mb-1">{notif.title}</h4>
-                              <p className="text-sm text-[#5D4037]">{notif.message}</p>
+                          <div className="flex items-start gap-2 sm:gap-3">
+                            <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${!notif.is_read ? 'bg-[#D4AF37]' : 'bg-gray-300'}`} />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-[#3E2723] mb-1 text-sm">{notif.title}</h4>
+                              <p className="text-xs sm:text-sm text-[#5D4037]">{notif.message}</p>
                               <p className="text-xs text-[#5D4037] mt-1">
                                 {new Date(notif.created_at).toLocaleDateString('ar-EG')}
                               </p>
@@ -461,9 +461,9 @@ export default function Dashboard({ user, onLogout }) {
               onClick={toggleTheme}
               variant="outline"
               size="icon"
-              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white h-9 w-9 sm:h-10 sm:w-10"
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
 
             <Button
@@ -472,18 +472,18 @@ export default function Dashboard({ user, onLogout }) {
                 setActiveView("showcase");
               }}
               variant="outline"
-              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white hidden md:flex h-9 sm:h-10 text-sm"
             >
-              <Sparkles className="ml-2 w-4 h-4" />
+              <Sparkles className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
               تصميم جديد
             </Button>
             <Button
               onClick={onLogout}
               variant="outline"
-              className="border-[#3E2723] text-[#3E2723] hover:bg-[#3E2723] hover:text-white"
+              className="border-[#3E2723] text-[#3E2723] hover:bg-[#3E2723] hover:text-white h-9 sm:h-10 text-sm"
             >
-              <LogOut className="ml-2 w-4 h-4" />
-              خروج
+              <LogOut className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">خروج</span>
             </Button>
           </div>
         </div>
