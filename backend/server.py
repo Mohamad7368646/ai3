@@ -976,25 +976,28 @@ async def admin_get_all_designs(admin: User = Depends(get_current_admin)):
     
     return designs
 
+class CouponCreate(BaseModel):
+    code: str
+    discount_percentage: float
+    expiry_date: Optional[str] = None
+    max_uses: Optional[int] = None
+
 @api_router.post("/admin/coupons")
 async def admin_create_coupon(
-    code: str,
-    discount_percentage: float,
-    expiry_date: Optional[str] = None,
-    max_uses: Optional[int] = None,
+    coupon_data: CouponCreate,
     admin: User = Depends(get_current_admin)
 ):
     """Create new coupon - Admin only"""
     # Check if coupon code already exists
-    existing = await db.coupons.find_one({"code": code}, {"_id": 0})
+    existing = await db.coupons.find_one({"code": coupon_data.code}, {"_id": 0})
     if existing:
         raise HTTPException(status_code=400, detail="كود الكوبون موجود بالفعل")
     
     coupon = Coupon(
-        code=code.upper(),
-        discount_percentage=discount_percentage,
-        max_uses=max_uses,
-        expiry_date=datetime.fromisoformat(expiry_date) if expiry_date else None
+        code=coupon_data.code.upper(),
+        discount_percentage=coupon_data.discount_percentage,
+        max_uses=coupon_data.max_uses,
+        expiry_date=datetime.fromisoformat(coupon_data.expiry_date) if coupon_data.expiry_date else None
     )
     
     coupon_dict = coupon.model_dump()
