@@ -977,7 +977,7 @@ export default function Dashboard({ user, onLogout }) {
                           {order.notes && (
                             <div className="pt-3 border-t border-[#3E2723]/10">
                               <div className="text-sm text-[#5D4037] italic">
-                                "{order.notes}"
+                                &ldquo;{order.notes}&rdquo;
                               </div>
                             </div>
                           )}
