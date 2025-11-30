@@ -362,6 +362,9 @@ class User(BaseModel):
     is_admin: bool = False
     designs_limit: int = 3  # -1 means unlimited
     designs_used: int = 0
+    email_verified: bool = False
+    verification_code: Optional[str] = None
+    verification_code_expires: Optional[datetime] = None
 
 class UserCreate(BaseModel):
     username: str
