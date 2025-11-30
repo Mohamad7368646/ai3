@@ -716,16 +716,31 @@ async def register(user_data: UserCreate):
     if existing_email:
         raise HTTPException(status_code=400, detail="البريد الإلكتروني مسجل بالفعل")
     
+    # Generate verification code
+    verification_code = email_service.generate_verification_code()
+    verification_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+    
     user = User(
         username=user_data.username,
-        email=user_data.email
+        email=user_data.email,
+        email_verified=False,
+        verification_code=verification_code,
+        verification_code_expires=verification_expires
     )
     
     user_dict = user.model_dump()
     user_dict['created_at'] = user_dict['created_at'].isoformat()
+    user_dict['verification_code_expires'] = user_dict['verification_code_expires'].isoformat()
     user_dict['password'] = hash_password(user_data.password)
     
     await db.users.insert_one(user_dict)
+    
+    # Send verification email (async, don't wait)
+    try:
+        await email_service.send_verification_email(user.email, verification_code, user.username)
+        logger.info(f"Verification email sent to {user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send verification email: {str(e)}")
     
     access_token = create_access_token(data={"sub": user.id})
     
