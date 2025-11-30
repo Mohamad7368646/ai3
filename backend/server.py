@@ -765,6 +765,91 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+
+# Email Verification Endpoints
+@api_router.post("/auth/verify-email")
+async def verify_email(code: str, current_user: User = Depends(get_current_user)):
+    """Verify email with code"""
+    # Get user from DB
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    if user.get('email_verified'):
+        return {"message": "البريد الإلكتروني مفعّل بالفعل", "verified": True}
+    
+    # Check code
+    if user.get('verification_code') != code:
+        raise HTTPException(status_code=400, detail="كود التفعيل غير صحيح")
+    
+    # Check expiration
+    expires = user.get('verification_code_expires')
+    if expires:
+        if isinstance(expires, str):
+            expires = datetime.fromisoformat(expires)
+        if datetime.now(timezone.utc) > expires:
+            raise HTTPException(status_code=400, detail="كود التفعيل منتهي الصلاحية. اطلب كود جديد")
+    
+    # Update user
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "email_verified": True,
+            "verification_code": None,
+            "verification_code_expires": None
+        }}
+    )
+    
+    return {"message": "تم تفعيل البريد الإلكتروني بنجاح! ✅", "verified": True}
+
+@api_router.post("/auth/resend-verification")
+async def resend_verification_code(current_user: User = Depends(get_current_user)):
+    """Resend verification code"""
+    # Get user from DB
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    if user.get('email_verified'):
+        return {"message": "البريد الإلكتروني مفعّل بالفعل"}
+    
+    # Generate new code
+    verification_code = email_service.generate_verification_code()
+    verification_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+    
+    # Update user
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "verification_code": verification_code,
+            "verification_code_expires": verification_expires.isoformat()
+        }}
+    )
+    
+    # Send email
+    try:
+        await email_service.send_verification_email(
+            user['email'], 
+            verification_code, 
+            user['username']
+        )
+        return {"message": "تم إرسال كود التفعيل الجديد إلى بريدك الإلكتروني 📧"}
+    except Exception as e:
+        logger.error(f"Failed to send verification email: {str(e)}")
+        raise HTTPException(status_code=500, detail="فشل في إرسال البريد الإلكتروني")
+
+@api_router.get("/auth/verification-status")
+async def get_verification_status(current_user: User = Depends(get_current_user)):
+    """Check if email is verified"""
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0, "email_verified": 1, "email": 1})
+    return {
+        "email": user.get('email'),
+        "verified": user.get('email_verified', False)
+    }
+
+
 # Measurements Routes
 @api_router.put("/user/measurements")
 async def update_measurements(measurements: MeasurementsUpdate, current_user: User = Depends(get_current_user)):
