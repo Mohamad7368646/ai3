@@ -17,6 +17,11 @@ from emergentintegrations.llm.openai.image_generation import OpenAIImageGenerati
 from emergentintegrations.llm.openai import LlmChat
 from PIL import Image, ImageEnhance, ImageFilter
 import io
+import aiosmtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
+import string
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
