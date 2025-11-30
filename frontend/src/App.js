@@ -83,9 +83,23 @@ function App() {
               path="/dashboard"
               element={
                 isAuthenticated ? (
-                  <Dashboard user={user} onLogout={handleLogout} />
+                  user?.is_admin ? (
+                    <Navigate to="/admin" replace />
+                  ) : (
+                    <Dashboard user={user} onLogout={handleLogout} />
+                  )
                 ) : (
                   <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                isAuthenticated && user?.is_admin ? (
+                  <AdminDashboard user={user} onLogout={handleLogout} />
+                ) : (
+                  <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
                 )
               }
             />
