@@ -198,6 +198,153 @@ image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
 # Models
 class UserMeasurements(BaseModel):
+
+
+# ============================================
+# EMAIL SERVICE
+# ============================================
+
+class EmailService:
+    def __init__(self):
+        self.smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+        self.smtp_port = int(os.getenv("SMTP_PORT", 587))
+        self.smtp_user = os.getenv("SMTP_USER")
+        self.smtp_password = os.getenv("SMTP_PASSWORD")
+    
+    def generate_verification_code(self, length=6):
+        """Generate random verification code"""
+        return ''.join(random.choices(string.digits, k=length))
+    
+    async def send_verification_email(self, to_email: str, code: str, username: str):
+        """Send verification email with code"""
+        try:
+            # Create message
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "تفعيل حسابك - استوديو التصميم"
+            message["From"] = self.smtp_user
+            message["To"] = to_email
+            
+            # HTML content
+            html_content = f"""
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body {{ font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }}
+                    .container {{ max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                    .header {{ text-align: center; margin-bottom: 30px; }}
+                    .logo {{ font-size: 32px; font-weight: bold; color: #D4AF37; }}
+                    .code-box {{ background: linear-gradient(135deg, #D4AF37, #B8941F); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 30px 0; }}
+                    .code {{ font-size: 36px; font-weight: bold; letter-spacing: 8px; }}
+                    .footer {{ text-align: center; color: #666; margin-top: 30px; font-size: 14px; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">✨ استوديو التصميم</div>
+                    </div>
+                    <h2 style="color: #3E2723;">مرحباً {username}! 👋</h2>
+                    <p style="color: #5D4037; font-size: 16px;">شكراً لتسجيلك في استوديو التصميم. استخدم الكود التالي لتفعيل حسابك:</p>
+                    
+                    <div class="code-box">
+                        <div style="font-size: 14px; margin-bottom: 10px;">كود التفعيل</div>
+                        <div class="code">{code}</div>
+                    </div>
+                    
+                    <p style="color: #5D4037; font-size: 14px;">
+                        ⏰ هذا الكود صالح لمدة 15 دقيقة فقط.<br>
+                        🔒 لا تشارك هذا الكود مع أي شخص.
+                    </p>
+                    
+                    <p style="color: #5D4037; font-size: 14px;">
+                        إذا لم تقم بإنشاء حساب، يرجى تجاهل هذا البريد.
+                    </p>
+                    
+                    <div class="footer">
+                        <p>استوديو التصميم - تصميم ملابسك بالذكاء الاصطناعي</p>
+                        <p>© 2025 جميع الحقوق محفوظة</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Attach HTML
+            html_part = MIMEText(html_content, "html")
+            message.attach(html_part)
+            
+            # Send email
+            await aiosmtplib.send(
+                message,
+                hostname=self.smtp_host,
+                port=self.smtp_port,
+                username=self.smtp_user,
+                password=self.smtp_password,
+                start_tls=True
+            )
+            
+            logger.info(f"Verification email sent to {to_email}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send email: {str(e)}")
+            return False
+    
+    async def send_password_reset_email(self, to_email: str, reset_token: str, username: str):
+        """Send password reset email"""
+        try:
+            reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
+            
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "إعادة تعيين كلمة المرور - استوديو التصميم"
+            message["From"] = self.smtp_user
+            message["To"] = to_email
+            
+            html_content = f"""
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body {{ font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }}
+                    .container {{ max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                    .button {{ display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #D4AF37, #B8941F); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2 style="color: #3E2723;">إعادة تعيين كلمة المرور 🔑</h2>
+                    <p>مرحباً {username},</p>
+                    <p>لقد طلبت إعادة تعيين كلمة المرور. اضغط على الزر أدناه:</p>
+                    <a href="{reset_link}" class="button">إعادة تعيين كلمة المرور</a>
+                    <p style="color: #666; font-size: 14px;">أو انسخ الرابط التالي في المتصفح:</p>
+                    <p style="color: #D4AF37; word-break: break-all;">{reset_link}</p>
+                    <p style="color: #999; font-size: 12px;">⏰ هذا الرابط صالح لمدة ساعة واحدة.</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            html_part = MIMEText(html_content, "html")
+            message.attach(html_part)
+            
+            await aiosmtplib.send(
+                message,
+                hostname=self.smtp_host,
+                port=self.smtp_port,
+                username=self.smtp_user,
+                password=self.smtp_password,
+                start_tls=True
+            )
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send reset email: {str(e)}")
+            return False
+
+email_service = EmailService()
+
     chest: Optional[float] = None  # cm
     waist: Optional[float] = None
     hips: Optional[float] = None
