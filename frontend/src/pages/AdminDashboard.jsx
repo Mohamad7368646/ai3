@@ -134,11 +134,27 @@ export default function AdminDashboard({ user, onLogout }) {
   };
 
   const createCoupon = async (couponData) => {
+    // Validate inputs
+    if (!couponData.code || !couponData.code.trim()) {
+      toast.error("الرجاء إدخال كود الكوبون");
+      return;
+    }
+    
+    if (!couponData.discount_percentage || couponData.discount_percentage <= 0 || couponData.discount_percentage > 100) {
+      toast.error("الرجاء إدخال نسبة خصم صحيحة (1-100)");
+      return;
+    }
+    
     try {
       await axios.post(`${API}/admin/coupons`, couponData);
       toast.success("تم إنشاء الكوبون بنجاح");
       fetchCoupons();
       setCreateCouponModal(false);
+      
+      // Clear inputs
+      document.getElementById('couponCode').value = '';
+      document.getElementById('couponDiscount').value = '';
+      document.getElementById('couponExpiry').value = '';
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل في إنشاء الكوبون");
     }
