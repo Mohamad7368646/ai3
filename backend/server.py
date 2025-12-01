@@ -1625,6 +1625,21 @@ async def admin_update_coupon(
     
     return {"message": "تم تحديث الكوبون بنجاح"}
 
+
+
+@api_router.get("/admin/coupons")
+async def admin_get_all_coupons(admin: User = Depends(get_current_admin)):
+    """Get all coupons - Admin only"""
+    coupons = await db.coupons.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for coupon in coupons:
+        if isinstance(coupon.get('created_at'), datetime):
+            coupon['created_at'] = coupon['created_at'].isoformat()
+        if isinstance(coupon.get('expiry_date'), datetime):
+            coupon['expiry_date'] = coupon['expiry_date'].isoformat()
+    
+    return coupons
+
 @api_router.delete("/admin/coupons/{coupon_id}")
 async def admin_delete_coupon(coupon_id: str, admin: User = Depends(get_current_admin)):
     """Delete coupon - Admin only"""
