@@ -351,14 +351,6 @@ class EmailService:
 
 email_service = EmailService()
 
-    chest: Optional[float] = None  # cm
-    waist: Optional[float] = None
-    hips: Optional[float] = None
-    height: Optional[float] = None
-    weight: Optional[float] = None
-    preferred_size: Optional[str] = None  # S, M, L, XL, XXL
-
-
 class SessionData(BaseModel):
     session_token: str
     user_id: str
