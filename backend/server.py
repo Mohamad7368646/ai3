@@ -199,7 +199,12 @@ image_gen = OpenAIImageGeneration(api_key=os.environ.get('EMERGENT_LLM_KEY'))
 
 # Models
 class UserMeasurements(BaseModel):
-
+    chest: Optional[float] = None  # cm
+    waist: Optional[float] = None  # cm
+    hips: Optional[float] = None  # cm
+    height: Optional[float] = None  # cm
+    weight: Optional[float] = None  # kg
+    preferred_size: Optional[str] = None  # S, M, L, XL
 
 # ============================================
 # EMAIL SERVICE
