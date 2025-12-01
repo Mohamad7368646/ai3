@@ -775,6 +775,144 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+# Google OAuth Endpoints
+@api_router.post("/auth/google/session")
+async def process_google_session(session_id: str = Header(None, alias="X-Session-ID")):
+    """Process Google OAuth session and create user"""
+    if not session_id:
+        raise HTTPException(status_code=400, detail="Session ID مطلوب")
+    
+    try:
+        # Call Emergent Auth API to get user data
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id},
+                timeout=10.0
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=401, detail="Session ID غير صالح")
+            
+            data = response.json()
+            google_email = data.get('email')
+            google_name = data.get('name')
+            google_picture = data.get('picture')
+            session_token = data.get('session_token')
+            
+            if not google_email:
+                raise HTTPException(status_code=400, detail="فشل في الحصول على بيانات المستخدم")
+        
+        # Check if user exists
+        existing_user = await db.users.find_one({"email": google_email}, {"_id": 0})
+        
+        if existing_user:
+            # User exists, return existing user
+            if isinstance(existing_user.get('created_at'), str):
+                existing_user['created_at'] = datetime.fromisoformat(existing_user['created_at'])
+            
+            user_obj = User(**{k: v for k, v in existing_user.items() if k != 'password'})
+            user_id = user_obj.id
+        else:
+            # Create new user from Google data
+            new_user = User(
+                username=google_name.replace(" ", "_").lower() if google_name else google_email.split('@')[0],
+                email=google_email,
+                email_verified=True  # Google emails are pre-verified
+            )
+            
+            user_dict = new_user.model_dump()
+            user_dict['created_at'] = user_dict['created_at'].isoformat()
+            user_dict['password'] = hash_password(str(uuid.uuid4()))  # Random password for OAuth users
+            user_dict['google_picture'] = google_picture
+            
+            await db.users.insert_one(user_dict)
+            user_obj = new_user
+            user_id = new_user.id
+        
+        # Store session in database
+        session_expires = datetime.now(timezone.utc) + timedelta(days=7)
+        session_data = SessionData(
+            session_token=session_token,
+            user_id=user_id,
+            expires_at=session_expires
+        )
+        
+        session_dict = session_data.model_dump()
+        session_dict['expires_at'] = session_dict['expires_at'].isoformat()
+        session_dict['created_at'] = session_dict['created_at'].isoformat()
+        
+        # Upsert session
+        await db.sessions.update_one(
+            {"session_token": session_token},
+            {"$set": session_dict},
+            upsert=True
+        )
+        
+        # Create JWT token as well for consistency
+        access_token = create_access_token(data={"sub": user_id})
+        
+        return {
+            "session_token": session_token,
+            "access_token": access_token,
+            "user": user_obj,
+            "token_type": "bearer"
+        }
+        
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="انتهت مهلة الاتصال بخادم المصادقة")
+    except Exception as e:
+        logger.error(f"Google OAuth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في المصادقة: {str(e)}")
+
+@api_router.get("/auth/session")
+async def check_session(session_token: str = Cookie(None)):
+    """Check if session token is valid"""
+    if not session_token:
+        raise HTTPException(status_code=401, detail="لا يوجد session token")
+    
+    # Find session in database
+    session = await db.sessions.find_one({"session_token": session_token}, {"_id": 0})
+    
+    if not session:
+        raise HTTPException(status_code=401, detail="Session غير صالح")
+    
+    # Check if expired
+    expires_at = session.get('expires_at')
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    
+    if datetime.now(timezone.utc) > expires_at:
+        # Delete expired session
+        await db.sessions.delete_one({"session_token": session_token})
+        raise HTTPException(status_code=401, detail="Session منتهي الصلاحية")
+    
+    # Get user
+    user = await db.users.find_one({"id": session['user_id']}, {"_id": 0, "password": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    if isinstance(user.get('created_at'), str):
+        user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    user_obj = User(**user)
+    
+    return {
+        "user": user_obj,
+        "valid": True
+    }
+
+@api_router.post("/auth/logout")
+async def logout(session_token: str = Cookie(None)):
+    """Logout and clear session"""
+    if session_token:
+        await db.sessions.delete_one({"session_token": session_token})
+    
+    return {"message": "تم تسجيل الخروج بنجاح"}
+
+
+
 # Email Verification Endpoints
 @api_router.post("/auth/verify-email")
 async def verify_email(code: str, current_user: User = Depends(get_current_user)):
