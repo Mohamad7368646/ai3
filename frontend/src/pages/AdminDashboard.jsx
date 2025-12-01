@@ -103,10 +103,12 @@ export default function AdminDashboard({ user, onLogout }) {
   const fetchCoupons = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/coupons`);
+      // Admin should see all coupons, not just active ones
+      const response = await axios.get(`${API}/admin/coupons`);
       setCoupons(response.data);
     } catch (error) {
       toast.error("فشل في تحميل الكوبونات");
+      console.error("Fetch coupons error:", error);
     } finally {
       setLoading(false);
     }
