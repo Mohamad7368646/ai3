@@ -353,6 +353,14 @@ email_service = EmailService()
     weight: Optional[float] = None
     preferred_size: Optional[str] = None  # S, M, L, XL, XXL
 
+
+class SessionData(BaseModel):
+    session_token: str
+    user_id: str
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
