@@ -27,7 +27,36 @@ function App() {
 
   useEffect(() => {
     checkAuth();
+    handleGoogleCallback();
   }, []);
+
+  const handleGoogleCallback = async () => {
+    // Check for session_id in URL (Google OAuth callback)
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      try {
+        // Call backend to process Google session
+        const response = await axios.post(
+          `${API}/auth/google/session`,
+          {},
+          { headers: { 'X-Session-ID': sessionId } }
+        );
+        
+        const { access_token, user: userData } = response.data;
+        localStorage.setItem('token', access_token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (error) {
+        console.error('Google OAuth error:', error);
+      }
+    }
+  };
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
