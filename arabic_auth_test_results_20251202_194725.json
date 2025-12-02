@@ -1,0 +1,66 @@
+{
+  "summary": {
+    "total_tests": 4,
+    "passed_tests": 4,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "test_timestamp": "2025-12-02T19:47:25.974665"
+  },
+  "detailed_results": [
+    {
+      "test": "التسجيل التقليدي",
+      "success": true,
+      "details": "تم التسجيل بنجاح والحصول على access_token",
+      "data": {
+        "access_token": "موجود",
+        "user_object": "موجود",
+        "email_verified": false,
+        "username": "testuser123_194725",
+        "email": "test_194725@example.com"
+      },
+      "timestamp": "2025-12-02T19:47:25.635697"
+    },
+    {
+      "test": "التحقق من حالة البريد الإلكتروني",
+      "success": true,
+      "details": "email_verified = false كما هو مطلوب (التحقق اختياري)",
+      "data": null,
+      "timestamp": "2025-12-02T19:47:25.635750"
+    },
+    {
+      "test": "تسجيل الدخول",
+      "success": true,
+      "details": "تم تسجيل الدخول بنجاح والحصول على token",
+      "data": {
+        "access_token": "موجود",
+        "user_id": "55d7d521-a128-4ffc-b7d6-c4c92756fd78",
+        "username": "testuser123_194725"
+      },
+      "timestamp": "2025-12-02T19:47:25.897769"
+    },
+    {
+      "test": "الوصول إلى /auth/me",
+      "success": true,
+      "details": "تم الوصول بنجاح دون الحاجة للتحقق من البريد",
+      "data": {
+        "user_id": "55d7d521-a128-4ffc-b7d6-c4c92756fd78",
+        "username": "testuser123_194725",
+        "email": "test_194725@example.com",
+        "email_verified": false
+      },
+      "timestamp": "2025-12-02T19:47:25.935536"
+    },
+    {
+      "test": "حصة التصميم",
+      "success": true,
+      "details": "المستخدم الجديد لديه 3 تصميمات متاحة",
+      "data": {
+        "designs_limit": 3,
+        "designs_used": 0,
+        "designs_remaining": 3,
+        "is_unlimited": false
+      },
+      "timestamp": "2025-12-02T19:47:25.973861"
+    }
+  ]
+}
