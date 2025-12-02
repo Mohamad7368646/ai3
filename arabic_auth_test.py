@@ -145,9 +145,17 @@ class ArabicAuthTester:
         """
         print("🔑 اختبار تسجيل الدخول...")
         
+        if not hasattr(self, 'test_username'):
+            self.log_result(
+                "تسجيل الدخول",
+                False,
+                "لم يتم تسجيل مستخدم للاختبار"
+            )
+            return False
+        
         login_data = {
-            "username": "testuser123",
-            "password": "password123"
+            "username": self.test_username,
+            "password": self.test_password
         }
         
         try:
