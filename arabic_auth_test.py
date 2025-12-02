@@ -45,12 +45,17 @@ class ArabicAuthTester:
         """
         print("🔐 اختبار التسجيل التقليدي...")
         
-        # Exact data as requested
+        # Generate unique username and email to avoid conflicts
+        timestamp = datetime.now().strftime('%H%M%S')
         registration_data = {
-            "username": "testuser123",
-            "email": "test@example.com", 
+            "username": f"testuser123_{timestamp}",
+            "email": f"test_{timestamp}@example.com", 
             "password": "password123"
         }
+        
+        # Store for login test
+        self.test_username = registration_data["username"]
+        self.test_password = registration_data["password"]
         
         try:
             response = requests.post(
