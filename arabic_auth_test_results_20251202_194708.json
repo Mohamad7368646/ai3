@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "total_tests": 4,
+    "passed_tests": 0,
+    "failed_tests": 4,
+    "success_rate": 0.0,
+    "test_timestamp": "2025-12-02T19:47:08.525213"
+  },
+  "detailed_results": [
+    {
+      "test": "التسجيل التقليدي",
+      "success": false,
+      "details": "كود الحالة: 400, الخطأ: {'detail': 'اسم المستخدم موجود بالفعل'}",
+      "data": null,
+      "timestamp": "2025-12-02T19:47:08.244016"
+    },
+    {
+      "test": "تسجيل الدخول",
+      "success": false,
+      "details": "كود الحالة: 401, الخطأ: {'detail': 'اسم المستخدم أو كلمة المرور غير صحيحة'}",
+      "data": null,
+      "timestamp": "2025-12-02T19:47:08.524197"
+    },
+    {
+      "test": "الوصول إلى /auth/me",
+      "success": false,
+      "details": "لا يوجد token للاختبار",
+      "data": null,
+      "timestamp": "2025-12-02T19:47:08.524913"
+    },
+    {
+      "test": "حصة التصميم",
+      "success": false,
+      "details": "لا يوجد token للاختبار",
+      "data": null,
+      "timestamp": "2025-12-02T19:47:08.524930"
+    }
+  ]
+}
