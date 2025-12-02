@@ -49,6 +49,9 @@ export default function LandingPage({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-[#E8DCC8] to-[#F5F0E8] relative overflow-hidden">
+      {/* WhatsApp Button */}
+      <WhatsAppButton />
+      
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-[#3E2723]/10 to-transparent rounded-full blur-3xl"></div>
