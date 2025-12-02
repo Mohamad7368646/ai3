@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Both registration and login endpoints working correctly. JWT token generation and validation working. Authentication required for protected endpoints (403/401 responses correct)."
+      - working: true
+        agent: "testing"
+        comment: "✅ ARABIC REQUEST TESTING COMPLETE - Traditional registration working perfectly with optional email verification. Key findings: 1) POST /api/auth/register creates user and returns access_token immediately, 2) email_verified=false but user can access all protected endpoints, 3) POST /api/auth/login works with username/password, 4) GET /api/auth/me accessible without email verification, 5) GET /api/user/designs-quota shows new users have 3 designs available. All tests passed with 100% success rate using both Python requests and curl."
 
   - task: "Get Available Coupons API"
     implemented: true
