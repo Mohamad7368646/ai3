@@ -1151,6 +1151,7 @@ async def preview_design(design_data: DesignCreatePreview, current_user: User = 
 @api_router.post("/designs/save", response_model=DesignResponse)
 async def save_design(design_data: DesignSave, current_user: User = Depends(get_current_user)):
     try:
+        # Create design
         design = Design(
             user_id=current_user.id,
             prompt=design_data.prompt,
@@ -1167,6 +1168,28 @@ async def save_design(design_data: DesignSave, current_user: User = Depends(get_
         design_dict['created_at'] = design_dict['created_at'].isoformat()
         
         await db.designs.insert_one(design_dict)
+        
+        # Automatically create an order for this design
+        order = Order(
+            user_id=current_user.id,
+            design_id=design.id,
+            design_image_base64=design_data.image_base64,
+            prompt=design_data.prompt,
+            phone_number=design_data.phone_number or "غير محدد",
+            size="M",  # Default size
+            color=design_data.color,
+            price=0,  # No price for now
+            discount=0,
+            final_price=0,
+            status="pending"
+        )
+        
+        order_dict = order.model_dump()
+        order_dict['created_at'] = order_dict['created_at'].isoformat()
+        
+        await db.orders.insert_one(order_dict)
+        
+        logger.info(f"Design and order created: design_id={design.id}, order_id={order.id}")
         
         return DesignResponse(
             id=design.id,
