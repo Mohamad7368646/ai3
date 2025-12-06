@@ -434,40 +434,40 @@ export default function Dashboard({ user, onLogout }) {
     <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-[#E8DCC8] to-[#F5F0E8]" data-testid="dashboard-page">
       {/* Header */}
       <header className="glass border-b border-[#3E2723]/10 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl shadow-lg">
+        <div className="container mx-auto px-3 sm:px-6 py-2.5 sm:py-4 flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl shadow-lg flex-shrink-0">
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-lg sm:text-2xl font-bold text-[#3E2723]">استوديو التصميم</h1>
-              <p className="text-xs sm:text-sm text-[#5D4037] hidden sm:block">مرحباً، {user?.username}</p>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl md:text-2xl font-bold text-[#3E2723] truncate">استوديو التصميم</h1>
+              <p className="text-xs text-[#5D4037] hidden sm:block truncate">مرحباً، {user?.username}</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Designs Quota Badge */}
             {!designsQuota.is_unlimited && (
-              <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg ${
+              <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex-shrink-0 ${
                 designsQuota.designs_remaining === 0 
                   ? 'bg-red-100 border border-red-300' 
                   : designsQuota.designs_remaining <= 3
                   ? 'bg-orange-100 border border-orange-300'
                   : 'bg-green-100 border border-green-300'
               }`}>
-                <p className="text-[10px] sm:text-xs font-bold text-center">
+                <p className="text-[10px] sm:text-xs font-bold text-center whitespace-nowrap">
                   {designsQuota.designs_remaining === 0 ? (
-                    <span className="text-red-600">انتهت التصاميم</span>
+                    <span className="text-red-600">انتهت</span>
                   ) : (
                     <>
                       <span className={designsQuota.designs_remaining <= 3 ? 'text-orange-600' : 'text-green-600'}>
                         {designsQuota.designs_remaining}
                       </span>
-                      <span className="text-[#5D4037]"> / {designsQuota.designs_limit}</span>
+                      <span className="text-[#5D4037]">/{designsQuota.designs_limit}</span>
                     </>
                   )}
                 </p>
-                <p className="text-[9px] sm:text-[10px] text-[#5D4037] text-center hidden sm:block">تصميم متبقي</p>
+                <p className="text-[9px] sm:text-[10px] text-[#5D4037] text-center hidden lg:block">تصميم متبقي</p>
               </div>
             )}
             {/* Notifications Bell */}
