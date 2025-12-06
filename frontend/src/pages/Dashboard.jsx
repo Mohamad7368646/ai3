@@ -480,44 +480,112 @@ export default function Dashboard({ user, onLogout }) {
               >
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs animate-pulse">
                     {unreadCount}
                   </span>
                 )}
               </Button>
               
+              {/* Notifications Backdrop (Mobile) */}
+              {showNotifications && (
+                <div 
+                  className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                  onClick={() => setShowNotifications(false)}
+                />
+              )}
+              
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 glass rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto" dir="rtl">
-                  <div className="p-3 sm:p-4 border-b border-[#3E2723]/10">
-                    <h3 className="font-bold text-[#3E2723] text-sm sm:text-base">الإشعارات</h3>
-                  </div>
-                  {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-[#5D4037] text-sm">
-                      لا توجد إشعارات
+                <div className="fixed md:absolute bottom-0 md:bottom-auto left-0 md:left-auto right-0 md:right-0 md:mt-2 w-full md:w-96 glass rounded-t-2xl md:rounded-xl shadow-2xl z-50 max-h-[70vh] md:max-h-[32rem] overflow-hidden flex flex-col" dir="rtl">
+                  {/* Header with Close Button */}
+                  <div className="flex items-center justify-between p-4 border-b border-[#3E2723]/10 bg-gradient-to-l from-[#D4AF37]/10 to-[#B8941F]/10">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-5 h-5 text-[#D4AF37]" />
+                      <h3 className="font-bold text-[#3E2723] text-base">الإشعارات</h3>
+                      {unreadCount > 0 && (
+                        <span className="bg-[#D4AF37] text-white text-xs px-2 py-0.5 rounded-full">
+                          {unreadCount} جديد
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <div className="divide-y divide-[#3E2723]/10">
-                      {notifications.map((notif) => (
-                        <div
-                          key={notif.id}
-                          className={`p-3 sm:p-4 cursor-pointer hover:bg-[#D4AF37]/10 transition-colors ${
-                            !notif.is_read ? 'bg-[#D4AF37]/5' : ''
-                          }`}
-                          onClick={() => markNotificationAsRead(notif.id)}
-                        >
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${!notif.is_read ? 'bg-[#D4AF37]' : 'bg-gray-300'}`} />
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-[#3E2723] mb-1 text-sm">{notif.title}</h4>
-                              <p className="text-xs sm:text-sm text-[#5D4037]">{notif.message}</p>
-                              <p className="text-xs text-[#5D4037] mt-1">
-                                {new Date(notif.created_at).toLocaleDateString('ar-EG')}
-                              </p>
+                    <Button
+                      onClick={() => setShowNotifications(false)}
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full md:hidden"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  {/* Notifications List */}
+                  <div className="overflow-y-auto flex-1">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <Bell className="w-12 h-12 mx-auto mb-3 text-[#5D4037]/30" />
+                        <p className="text-[#5D4037] text-sm">لا توجد إشعارات حالياً</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-[#3E2723]/10">
+                        {notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            className={`p-4 cursor-pointer hover:bg-[#D4AF37]/10 active:bg-[#D4AF37]/20 transition-colors ${
+                              !notif.is_read ? 'bg-[#D4AF37]/5' : ''
+                            }`}
+                            onClick={() => {
+                              markNotificationAsRead(notif.id);
+                              setShowNotifications(false);
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`mt-1.5 w-2.5 h-2.5 rounded-full flex-shrink-0 ${!notif.is_read ? 'bg-[#D4AF37] animate-pulse' : 'bg-gray-300'}`} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <h4 className="font-semibold text-[#3E2723] text-sm leading-tight">{notif.title}</h4>
+                                  {!notif.is_read && (
+                                    <span className="text-[10px] bg-[#D4AF37] text-white px-1.5 py-0.5 rounded-full flex-shrink-0">جديد</span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-[#5D4037] leading-relaxed mb-2">{notif.message}</p>
+                                <p className="text-xs text-[#5D4037]/70 flex items-center gap-1">
+                                  <span>🕐</span>
+                                  {new Date(notif.created_at).toLocaleDateString('ar-EG', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Footer with Mark All as Read */}
+                  {notifications.some(n => !n.is_read) && (
+                    <div className="p-3 border-t border-[#3E2723]/10 bg-white/50">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await Promise.all(
+                              notifications
+                                .filter(n => !n.is_read)
+                                .map(n => markNotificationAsRead(n.id))
+                            );
+                            setShowNotifications(false);
+                          } catch (error) {
+                            console.error('Error marking all as read:', error);
+                          }
+                        }}
+                        className="w-full text-center text-sm text-[#D4AF37] hover:text-[#B8941F] font-semibold py-2"
+                      >
+                        وضع علامة مقروء على الكل
+                      </button>
                     </div>
                   )}
                 </div>
