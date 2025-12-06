@@ -597,18 +597,20 @@ export default function Dashboard({ user, onLogout }) {
               onClick={toggleTheme}
               variant="outline"
               size="icon"
-              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white h-9 w-9 sm:h-10 sm:w-10"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0"
+              aria-label="تبديل الوضع الليلي"
             >
               {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
 
+            {/* Desktop Buttons */}
             <Button
               onClick={() => {
                 resetDesigner();
                 setActiveView("showcase");
               }}
               variant="outline"
-              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white hidden md:flex h-9 sm:h-10 text-sm"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white hidden lg:flex h-9 sm:h-10 text-sm whitespace-nowrap"
             >
               <Sparkles className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
               تصميم جديد
@@ -616,10 +618,21 @@ export default function Dashboard({ user, onLogout }) {
             <Button
               onClick={onLogout}
               variant="outline"
-              className="border-[#3E2723] text-[#3E2723] hover:bg-[#3E2723] hover:text-white h-9 sm:h-10 text-sm"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white hidden lg:flex h-9 sm:h-10 text-sm whitespace-nowrap"
             >
               <LogOut className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">خروج</span>
+              خروج
+            </Button>
+            
+            {/* Mobile Logout Button (Icon Only) */}
+            <Button
+              onClick={onLogout}
+              variant="outline"
+              size="icon"
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white h-9 w-9 sm:h-10 sm:w-10 lg:hidden flex-shrink-0"
+              aria-label="تسجيل الخروج"
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         </div>
