@@ -1763,6 +1763,7 @@ async def admin_get_stats(admin: User = Depends(get_current_admin)):
     total_users = await db.users.count_documents({})
     total_orders = await db.orders.count_documents({})
     total_designs = await db.designs.count_documents({})
+    total_showcase = await db.showcase_designs.count_documents({})
     pending_orders = await db.orders.count_documents({"status": "pending"})
     completed_orders = await db.orders.count_documents({"status": "completed"})
     
@@ -1774,10 +1775,147 @@ async def admin_get_stats(admin: User = Depends(get_current_admin)):
         "total_users": total_users,
         "total_orders": total_orders,
         "total_designs": total_designs,
+        "total_showcase": total_showcase,
         "pending_orders": pending_orders,
         "completed_orders": completed_orders,
         "total_revenue": total_revenue
     }
+
+# ===== Showcase Designs Management (Admin) =====
+
+@api_router.get("/admin/showcase-designs")
+async def admin_get_showcase_designs(admin: User = Depends(get_current_admin)):
+    """Get all showcase designs - Admin only"""
+    designs = await db.showcase_designs.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for design in designs:
+        if isinstance(design.get('created_at'), datetime):
+            design['created_at'] = design['created_at'].isoformat()
+        if isinstance(design.get('updated_at'), datetime):
+            design['updated_at'] = design['updated_at'].isoformat()
+    
+    return designs
+
+@api_router.post("/admin/showcase-designs")
+async def admin_create_showcase_design(
+    design_data: ShowcaseDesignCreate,
+    admin: User = Depends(get_current_admin)
+):
+    """Create new showcase design - Admin only"""
+    try:
+        design = ShowcaseDesign(
+            title=design_data.title,
+            description=design_data.description,
+            prompt=design_data.prompt,
+            image_base64=design_data.image_base64,
+            clothing_type=design_data.clothing_type,
+            color=design_data.color,
+            template_id=design_data.template_id,
+            tags=design_data.tags,
+            is_featured=design_data.is_featured
+        )
+        
+        design_dict = design.model_dump()
+        design_dict['created_at'] = design_dict['created_at'].isoformat()
+        if design_dict.get('updated_at'):
+            design_dict['updated_at'] = design_dict['updated_at'].isoformat()
+        
+        await db.showcase_designs.insert_one(design_dict)
+        
+        logger.info(f"Showcase design created by admin: {design.id}")
+        
+        return {"message": "تم إضافة التصميم الملهم بنجاح", "id": design.id}
+    except Exception as e:
+        logger.error(f"Error creating showcase design: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في إضافة التصميم: {str(e)}")
+
+@api_router.put("/admin/showcase-designs/{design_id}")
+async def admin_update_showcase_design(
+    design_id: str,
+    update_data: ShowcaseDesignUpdate,
+    admin: User = Depends(get_current_admin)
+):
+    """Update showcase design - Admin only"""
+    try:
+        # Check if design exists
+        existing_design = await db.showcase_designs.find_one({"id": design_id}, {"_id": 0})
+        if not existing_design:
+            raise HTTPException(status_code=404, detail="التصميم غير موجود")
+        
+        # Prepare update dict (only non-None values)
+        update_dict = {k: v for k, v in update_data.model_dump().items() if v is not None}
+        
+        if update_dict:
+            update_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+            
+            result = await db.showcase_designs.update_one(
+                {"id": design_id},
+                {"$set": update_dict}
+            )
+            
+            if result.modified_count == 0:
+                return {"message": "لا توجد تغييرات للحفظ"}
+            
+            logger.info(f"Showcase design updated by admin: {design_id}")
+            return {"message": "تم تحديث التصميم بنجاح"}
+        else:
+            return {"message": "لا توجد بيانات للتحديث"}
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating showcase design: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في تحديث التصميم: {str(e)}")
+
+@api_router.delete("/admin/showcase-designs/{design_id}")
+async def admin_delete_showcase_design(
+    design_id: str,
+    admin: User = Depends(get_current_admin)
+):
+    """Delete showcase design - Admin only"""
+    try:
+        result = await db.showcase_designs.delete_one({"id": design_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="التصميم غير موجود")
+        
+        logger.info(f"Showcase design deleted by admin: {design_id}")
+        return {"message": "تم حذف التصميم بنجاح"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting showcase design: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في حذف التصميم: {str(e)}")
+
+@api_router.put("/admin/showcase-designs/{design_id}/toggle-featured")
+async def admin_toggle_featured_showcase_design(
+    design_id: str,
+    admin: User = Depends(get_current_admin)
+):
+    """Toggle featured status of showcase design - Admin only"""
+    try:
+        design = await db.showcase_designs.find_one({"id": design_id}, {"_id": 0})
+        if not design:
+            raise HTTPException(status_code=404, detail="التصميم غير موجود")
+        
+        new_featured_status = not design.get('is_featured', False)
+        
+        await db.showcase_designs.update_one(
+            {"id": design_id},
+            {"$set": {
+                "is_featured": new_featured_status,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        status_text = "مميز" if new_featured_status else "عادي"
+        logger.info(f"Showcase design featured status changed: {design_id} -> {new_featured_status}")
+        return {"message": f"تم تغيير حالة التصميم إلى {status_text}", "is_featured": new_featured_status}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error toggling featured status: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في تغيير الحالة: {str(e)}")
 
 @api_router.get("/")
 async def root():
