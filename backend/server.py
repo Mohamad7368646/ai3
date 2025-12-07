@@ -584,10 +584,16 @@ class ShowcaseResponse(BaseModel):
     id: str
     title: str
     description: str
+    prompt: str
     image_base64: str
     clothing_type: str
+    color: Optional[str] = None
+    template_id: Optional[str] = None
+    tags: List[str] = []
     likes_count: int
     is_featured: bool
+    is_active: bool = True
+    created_at: str
 
 # Templates with pricing info
 TEMPLATES = [
