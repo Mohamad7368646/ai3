@@ -1067,16 +1067,27 @@ async def get_color_palettes():
 # Showcase Designs
 @api_router.get("/showcase", response_model=List[ShowcaseResponse])
 async def get_showcase_designs():
-    designs = await db.showcase_designs.find({}, {"_id": 0}).sort("likes_count", -1).limit(12).to_list(12)
+    """Get active showcase designs for users"""
+    designs = await db.showcase_designs.find(
+        {"is_active": True}, 
+        {"_id": 0}
+    ).sort([("is_featured", -1), ("likes_count", -1)]).limit(20).to_list(20)
+    
     return [
         ShowcaseResponse(
             id=d['id'],
             title=d['title'],
             description=d['description'],
+            prompt=d.get('prompt', d.get('description', '')),
             image_base64=d['image_base64'],
             clothing_type=d['clothing_type'],
+            color=d.get('color'),
+            template_id=d.get('template_id'),
+            tags=d.get('tags', []),
             likes_count=d.get('likes_count', 0),
-            is_featured=d.get('is_featured', False)
+            is_featured=d.get('is_featured', False),
+            is_active=d.get('is_active', True),
+            created_at=d['created_at'] if isinstance(d['created_at'], str) else d['created_at'].isoformat()
         )
         for d in designs
     ]
