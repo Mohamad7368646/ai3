@@ -407,11 +407,40 @@ class ShowcaseDesign(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     description: str
+    prompt: str  # The design prompt for users to use
     image_base64: str
     clothing_type: str
+    color: Optional[str] = None
+    template_id: Optional[str] = None
+    tags: List[str] = []
     likes_count: int = 0
     is_featured: bool = False
+    is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+
+class ShowcaseDesignCreate(BaseModel):
+    title: str
+    description: str
+    prompt: str
+    image_base64: str
+    clothing_type: str
+    color: Optional[str] = None
+    template_id: Optional[str] = None
+    tags: List[str] = []
+    is_featured: bool = False
+
+class ShowcaseDesignUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    prompt: Optional[str] = None
+    image_base64: Optional[str] = None
+    clothing_type: Optional[str] = None
+    color: Optional[str] = None
+    template_id: Optional[str] = None
+    tags: Optional[List[str]] = None
+    is_featured: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 class Coupon(BaseModel):
     model_config = ConfigDict(extra="ignore")
