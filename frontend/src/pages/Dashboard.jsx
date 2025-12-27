@@ -75,6 +75,16 @@ export default function Dashboard({ user, onLogout }) {
   });
   const [suggestedSize, setSuggestedSize] = useState("");
   
+  // Clothing types
+  const CLOTHING_TYPES = [
+    { value: "tshirt", label: "تيشيرت", emoji: "👕" },
+    { value: "shirt", label: "قميص", emoji: "👔" },
+    { value: "hoodie", label: "هودي", emoji: "🧥" },
+    { value: "dress", label: "فستان", emoji: "👗" },
+    { value: "jacket", label: "جاكيت", emoji: "🧥" },
+    { value: "pants", label: "بنطلون", emoji: "👖" }
+  ];
+  
   // Designs quota state
   const [designsQuota, setDesignsQuota] = useState({
     designs_limit: 10,
