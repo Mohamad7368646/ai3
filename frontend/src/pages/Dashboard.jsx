@@ -46,6 +46,7 @@ export default function Dashboard({ user, onLogout }) {
   const [enhancing, setEnhancing] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState("classic");
   const [selectedViewAngle, setSelectedViewAngle] = useState("front");
+  const [selectedClothingType, setSelectedClothingType] = useState("tshirt");
   const [selectedSize, setSelectedSize] = useState("M");
   
   // Preview State
