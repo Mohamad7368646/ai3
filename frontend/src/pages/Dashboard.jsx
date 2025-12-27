@@ -751,53 +751,14 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* Templates View */}
-        {activeView === "templates" && (
-          <div className="fade-in">
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-2 sm:mb-3">اختر قالبك المفضل</h2>
-              <p className="text-base sm:text-lg text-[#5D4037]">ابدأ بقالب جاهز وخصصه حسب ذوقك</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {templates.map((template) => (
-                <Card
-                  key={template.id}
-                  className="glass overflow-hidden card-hover cursor-pointer group"
-                  onClick={() => handleTemplateSelect(template)}
-                >
-                  <div className="relative h-48 sm:h-64 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 flex items-center justify-center">
-                    <div className="text-5xl sm:text-6xl">
-                      {template.type === "shirt" && "👔"}
-                      {template.type === "tshirt" && "👕"}
-                      {template.type === "hoodie" && "🧥"}
-                      {template.type === "dress" && "👗"}
-                      {template.type === "jacket" && "🧥"}
-                    </div>
-                    <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 transition-all flex items-center justify-center">
-                      <Button className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#3E2723] hover:bg-[#D4AF37] hover:text-white text-sm">
-                        <Edit className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
-                        تخصيص الآن
-                      </Button>
-                    </div>
-                  </div>
-                  <CardContent className="p-4 sm:p-6">
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#3E2723] mb-2">{template.name}</h3>
-                    <p className="text-sm sm:text-base text-[#5D4037] mb-4">{template.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Customize View */}
-        {activeView === "customize" && selectedTemplate && (
+        {activeView === "customize" && (
           <div className="fade-in">
             <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
                 <div className="w-full sm:w-auto">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3E2723]">تخصيص: {selectedTemplate.name}</h2>
-                  <p className="text-sm sm:text-base text-[#5D4037]">{selectedTemplate.description}</p>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3E2723]">تخصيص التصميم</h2>
+                  <p className="text-sm sm:text-base text-[#5D4037]">صمم ملابسك الخاصة بلمسة من الذكاء الاصطناعي</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button
@@ -808,14 +769,6 @@ export default function Dashboard({ user, onLogout }) {
                     <Ruler className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">جدول المقاسات</span>
                     <span className="sm:hidden">المقاسات</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveView("templates")}
-                    className="flex-1 sm:flex-none text-xs sm:text-sm h-9 sm:h-10"
-                  >
-                    <span className="hidden sm:inline">تغيير القالب</span>
-                    <span className="sm:hidden">تغيير</span>
                   </Button>
                 </div>
               </div>
