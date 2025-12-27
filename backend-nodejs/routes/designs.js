@@ -5,6 +5,7 @@ import Order from '../models/Order.js';
 import User from '../models/User.js';
 import ShowcaseDesign from '../models/ShowcaseDesign.js';
 import { protect } from '../middleware/auth.js';
+import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
