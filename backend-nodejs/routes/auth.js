@@ -19,6 +19,23 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Validate Gmail email
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    if (!gmailRegex.test(email)) {
+      return res.status(400).json({ 
+        detail: 'يجب أن يكون البريد الإلكتروني من Gmail (مثال: example@gmail.com)' 
+      });
+    }
+
+    // Validate password (must contain letters and numbers, min 6 chars)
+    const hasLetters = /[a-zA-Z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    if (password.length < 6 || !hasLetters || !hasNumbers) {
+      return res.status(400).json({ 
+        detail: 'كلمة المرور يجب أن تحتوي على أحرف وأرقام (6 أحرف على الأقل)' 
+      });
+    }
+
     // Check if user exists
     const userExists = await User.findOne({ 
       $or: [{ email }, { username }] 
