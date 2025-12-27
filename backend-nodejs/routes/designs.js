@@ -173,6 +173,37 @@ router.post('/save', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/designs
+// @desc    Get user's designs
+// @access  Private
+router.get('/', protect, async (req, res) => {
+  try {
+    const designs = await Design.find({ user_id: req.user.id })
+      .select('-_id')
+      .sort({ created_at: -1 });
+
+    const response = designs.map(d => ({
+      id: d.id,
+      user_id: d.user_id,
+      prompt: d.prompt,
+      image_base64: d.image_base64,
+      clothing_type: d.clothing_type,
+      template_id: d.template_id,
+      color: d.color,
+      phone_number: d.phone_number,
+      is_favorite: d.is_favorite,
+      created_at: d.created_at.toISOString(),
+    }));
+
+    res.json(response);
+  } catch (error) {
+    console.error('Get Designs Error:', error);
+    res.status(500).json({ 
+      detail: 'خطأ في جلب التصاميم' 
+    });
+  }
+});
+
 // @route   PUT /api/designs/:id/favorite
 // @desc    Toggle favorite status of design
 // @access  Private
