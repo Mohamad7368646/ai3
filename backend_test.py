@@ -625,7 +625,7 @@ class NodeJSBackendTester:
         return success, response if success else []
 
 def main():
-    print("🚀 اختبار شامل للـ Node.js Backend - Fashion Design API")
+    print("🚀 اختبار شامل لميزة إدارة التصاميم الملهمة (Showcase Manager)")
     print("=" * 80)
     
     tester = NodeJSBackendTester()
@@ -657,10 +657,93 @@ def main():
     
     # Test admin login
     if not tester.test_admin_login(admin_username, admin_password):
-        print("❌ Admin login failed, continuing with user tests only")
+        print("❌ Admin login failed, stopping Showcase Manager tests")
+        return 1
     
-    # ===== 2. DESIGNS TESTS =====
-    print(f"\n{'='*20} 2. اختبارات التصاميم {'='*20}")
+    # ===== 2. SHOWCASE MANAGER TESTS =====
+    print(f"\n{'='*20} 2. اختبارات إدارة التصاميم الملهمة {'='*20}")
+    
+    # Test 1: Get existing showcase designs
+    print("\n🔍 1. جلب التصاميم الملهمة الحالية...")
+    success, existing_designs = tester.test_admin_get_showcase_designs()
+    if not success:
+        print("❌ Failed to get existing showcase designs")
+        return 1
+    
+    # Test 2: Create new showcase design
+    print("\n🔍 2. إضافة تصميم ملهم جديد...")
+    new_design_id = tester.test_admin_create_showcase_design(
+        title="تيشيرت كاجوال للاختبار",
+        description="تصميم تيشيرت كاجوال أنيق مناسب للاستخدام اليومي",
+        prompt="تيشيرت كاجوال أزرق مع طباعة بسيطة",
+        clothing_type="تيشيرت",
+        color="أزرق",
+        tags=["كاجوال", "تيشيرت", "اختبار"],
+        is_featured=False
+    )
+    
+    if not new_design_id:
+        print("❌ Failed to create new showcase design")
+        return 1
+    
+    # Test 3: Verify new design appears in list
+    print("\n🔍 3. التحقق من ظهور التصميم الجديد...")
+    success, updated_designs = tester.test_admin_get_showcase_designs()
+    if success:
+        new_count = len(updated_designs)
+        old_count = len(existing_designs)
+        if new_count > old_count:
+            print(f"   ✅ Design count increased: {old_count} → {new_count}")
+        else:
+            print(f"   ⚠️  Design count unchanged: {new_count}")
+    
+    # Test 4: Update the design (change title)
+    print("\n🔍 4. تعديل التصميم (تغيير العنوان)...")
+    new_title = "تيشيرت كاجوال محدث للاختبار"
+    if not tester.test_admin_update_showcase_design(new_design_id, new_title):
+        print("❌ Failed to update showcase design")
+    
+    # Test 5: Toggle featured status
+    print("\n🔍 5. تبديل حالة 'مميز'...")
+    success, is_featured = tester.test_admin_toggle_featured(new_design_id)
+    if success:
+        print(f"   ✅ Featured status: {is_featured}")
+        
+        # Toggle again to test both states
+        print("\n🔍 5b. تبديل حالة 'مميز' مرة أخرى...")
+        success2, is_featured2 = tester.test_admin_toggle_featured(new_design_id)
+        if success2:
+            print(f"   ✅ Featured status toggled: {is_featured2}")
+    
+    # Test 6: Test public showcase API
+    print("\n🔍 6. اختبار API العام للتصاميم الملهمة...")
+    success, public_designs = tester.test_public_showcase_designs()
+    if success:
+        print(f"   ✅ Public API working - {len(public_designs)} designs available")
+        # Check if our new design appears in public API
+        our_design = next((d for d in public_designs if d.get('id') == new_design_id), None)
+        if our_design:
+            print(f"   ✅ New design visible in public API: {our_design.get('title')}")
+        else:
+            print(f"   ⚠️  New design not found in public API (may be inactive)")
+    
+    # Test 7: Delete the test design
+    print("\n🔍 7. حذف التصميم التجريبي...")
+    if not tester.test_admin_delete_showcase_design(new_design_id):
+        print("❌ Failed to delete showcase design")
+    
+    # Test 8: Verify deletion
+    print("\n🔍 8. التحقق من الحذف...")
+    success, final_designs = tester.test_admin_get_showcase_designs()
+    if success:
+        final_count = len(final_designs)
+        if final_count == len(existing_designs):
+            print(f"   ✅ Design deleted successfully - Count back to: {final_count}")
+        else:
+            print(f"   ⚠️  Design count unexpected: {final_count}")
+    
+    # ===== 3. ADDITIONAL TESTS =====
+    print(f"\n{'='*20} 3. اختبارات إضافية {'='*20}")
     
     # Test designs quota
     tester.test_designs_quota()
@@ -688,12 +771,6 @@ def main():
     
     # Test get user designs (NEW ENDPOINT)
     designs = tester.test_get_designs()
-    
-    # ===== 3. USER TESTS =====
-    print(f"\n{'='*20} 3. اختبارات المستخدم {'='*20}")
-    
-    # Test designs quota again (should show updated count)
-    tester.test_designs_quota()
     
     # ===== 4. ADMIN TESTS =====
     print(f"\n{'='*20} 4. اختبارات لوحة الأدمن {'='*20}")
