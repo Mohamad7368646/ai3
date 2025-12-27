@@ -285,11 +285,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication (Login/Register) - Fixed DB connection"
-    - "User designs API - Added missing GET /api/designs endpoint"
-    - "Admin Panel functionality"
+    - "Showcase Manager APIs - Testing completed successfully"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
