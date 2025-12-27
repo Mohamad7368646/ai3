@@ -25,8 +25,35 @@ export default function LandingPage({ onLogin }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validateEmail = (email) => {
+    // يجب أن يكون البريد Gmail فقط
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    return gmailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // يجب أن تحتوي على أحرف وأرقام (6 أحرف على الأقل)
+    const hasLetters = /[a-zA-Z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    return password.length >= 6 && hasLetters && hasNumbers;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // التحقق عند التسجيل فقط
+    if (authMode === "register") {
+      if (!validateEmail(formData.email)) {
+        toast.error("يجب أن يكون البريد الإلكتروني من Gmail (مثال: example@gmail.com)");
+        return;
+      }
+      
+      if (!validatePassword(formData.password)) {
+        toast.error("كلمة المرور يجب أن تحتوي على أحرف وأرقام (6 أحرف على الأقل)");
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
