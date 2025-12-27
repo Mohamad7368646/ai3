@@ -1,0 +1,161 @@
+{
+  "test_type": "Coupon System Comprehensive Test",
+  "feature": "نظام الكوبونات (Coupon System)",
+  "backend_type": "Node.js/Express",
+  "database": "MongoDB (fashion_designer_db)",
+  "test_user": "coupontest_061131",
+  "admin_user": "mohamad",
+  "summary": {
+    "total_tests": 19,
+    "passed_tests": 16,
+    "failed_tests": 3,
+    "success_rate": 84.21052631578947,
+    "test_timestamp": "2025-12-27T06:11:32.969043"
+  },
+  "category_results": {
+    "authentication": {
+      "total": 2,
+      "passed": 2
+    },
+    "coupon_crud": {
+      "total": 9,
+      "passed": 9
+    },
+    "coupon_validation": {
+      "total": 7,
+      "passed": 4
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T06:11:31.876226"
+    },
+    {
+      "test_name": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.211429"
+    },
+    {
+      "test_name": "Get All Coupons (Admin)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.269027"
+    },
+    {
+      "test_name": "Create Coupon",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T06:11:32.317721"
+    },
+    {
+      "test_name": "Create Coupon",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T06:11:32.360618"
+    },
+    {
+      "test_name": "Get All Coupons (Admin)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.398792"
+    },
+    {
+      "test_name": "Update Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.460988"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.503741"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.544777"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.593798"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": false,
+      "details": "Expected 200, got 400. Error: {'detail': 'الكوبون منتهي الصلاحية'}",
+      "timestamp": "2025-12-27T06:11:32.633640"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": false,
+      "details": "Expected 200, got 400. Error: {'detail': 'الكوبون منتهي الصلاحية'}",
+      "timestamp": "2025-12-27T06:11:32.674814"
+    },
+    {
+      "test_name": "Validate Coupon",
+      "success": false,
+      "details": "Expected 200, got 400. Error: {'detail': 'الكوبون منتهي الصلاحية'}",
+      "timestamp": "2025-12-27T06:11:32.716223"
+    },
+    {
+      "test_name": "Validate Invalid Coupon",
+      "success": true,
+      "details": "Status: 404",
+      "timestamp": "2025-12-27T06:11:32.756422"
+    },
+    {
+      "test_name": "Delete Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.800573"
+    },
+    {
+      "test_name": "Delete Coupon",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.844325"
+    },
+    {
+      "test_name": "Get All Coupons (Admin)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:11:32.889981"
+    },
+    {
+      "test_name": "Create Duplicate Coupon",
+      "success": true,
+      "details": "Status: 400",
+      "timestamp": "2025-12-27T06:11:32.930735"
+    },
+    {
+      "test_name": "Validate Without Auth",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-12-27T06:11:32.968038"
+    }
+  ],
+  "apis_tested": [
+    "GET /api/coupons",
+    "POST /api/coupons",
+    "PUT /api/coupons/:id",
+    "DELETE /api/coupons/:id",
+    "POST /api/coupons/validate"
+  ],
+  "test_scenarios": [
+    "إنشاء كوبون مع تاريخ انتهاء",
+    "إنشاء كوبون بدون تاريخ انتهاء",
+    "التحقق من كوبون صالح",
+    "التحقق من كوبون غير موجود",
+    "تعديل كوبون",
+    "حذف كوبون",
+    "معالجة الأخطاء"
+  ]
+}
