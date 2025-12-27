@@ -147,6 +147,14 @@ router.post('/save', protect, async (req, res) => {
       status: 'pending',
     });
 
+    // Create notification for user
+    await createNotification(
+      req.user.id,
+      'تم حفظ التصميم بنجاح',
+      'تم حفظ تصميمك الجديد وإنشاء طلب. سنتواصل معك قريباً!',
+      'success'
+    );
+
     res.status(201).json({
       id: design.id,
       user_id: design.user_id,
