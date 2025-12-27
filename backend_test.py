@@ -96,7 +96,7 @@ class NodeJSBackendTester:
             "User Registration",
             "POST",
             "auth/register",
-            200,
+            201,  # Node.js returns 201 for creation
             data={"username": username, "email": email, "password": password}
         )
         
