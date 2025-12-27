@@ -729,7 +729,7 @@ export default function Dashboard({ user, onLogout }) {
                         size="sm"
                         variant="ghost"
                         className="text-[#D4AF37] hover:text-white hover:bg-[#D4AF37] text-xs sm:text-sm h-8"
-                        onClick={() => setActiveView("templates")}
+                        onClick={() => setActiveView("customize")}
                       >
                         ابدأ التصميم
                       </Button>
@@ -741,7 +741,7 @@ export default function Dashboard({ user, onLogout }) {
             
             <div className="mt-8 sm:mt-12 text-center">
               <Button
-                onClick={() => setActiveView("templates")}
+                onClick={() => setActiveView("customize")}
                 className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6"
               >
                 <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
