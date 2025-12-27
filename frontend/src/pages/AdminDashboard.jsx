@@ -168,7 +168,7 @@ export default function AdminDashboard({ user, onLogout }) {
     if (!window.confirm("هل أنت متأكد من حذف هذا الكوبون؟")) return;
     
     try {
-      await axios.delete(`${API}/admin/coupons/${couponId}`);
+      await axios.delete(`${API}/coupons/${couponId}`);
       toast.success("تم حذف الكوبون");
       fetchCoupons();
     } catch (error) {
