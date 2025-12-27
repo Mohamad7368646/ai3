@@ -122,7 +122,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const fetchShowcase = async () => {
     try {
-      const response = await axios.get(`${API}/showcase`);
+      const response = await axios.get(`${API}/designs/showcase`);
       setShowcaseDesigns(response.data);
     } catch (error) {
       console.error("Failed to fetch showcase");
