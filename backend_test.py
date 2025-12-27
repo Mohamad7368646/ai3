@@ -470,112 +470,150 @@ class NodeJSBackendTester:
         return None
 
 def main():
-    print("🚀 Starting Fashion Design API Testing...")
-    print("=" * 60)
+    print("🚀 اختبار شامل للـ Node.js Backend - Fashion Design API")
+    print("=" * 80)
     
-    tester = FashionDesignAPITester()
+    tester = NodeJSBackendTester()
     
     # Generate unique test user
     timestamp = datetime.now().strftime('%H%M%S')
-    test_username = f"test_user_{timestamp}"
+    test_username = f"testuser_{timestamp}"
     test_email = f"test_{timestamp}@example.com"
     test_password = "TestPass123!"
     
-    # Test sequence
+    # Admin credentials from request
+    admin_username = "mohamad"
+    admin_password = "mohamad271"
+    
     print(f"\n📝 Test User: {test_username}")
     print(f"📧 Test Email: {test_email}")
+    print(f"👑 Admin User: {admin_username}")
     
-    # 1. Test root endpoint
-    tester.test_root_endpoint()
+    # ===== 1. AUTHENTICATION TESTS =====
+    print(f"\n{'='*20} 1. اختبارات المصادقة {'='*20}")
     
-    # 2. Test user registration
+    # Test user registration
     if not tester.test_register(test_username, test_email, test_password):
         print("❌ Registration failed, stopping tests")
         return 1
     
-    # 3. Test get current user
+    # Test get current user
     tester.test_get_me()
     
-    # 4. Test AI design preview generation with Arabic prompt
-    arabic_prompt = "قميص كاجوال باللون الأزرق الفاتح مع طبعة ورود صغيرة"
-    design_image = tester.test_generate_design(arabic_prompt)
+    # Test admin login
+    if not tester.test_admin_login(admin_username, admin_password):
+        print("❌ Admin login failed, continuing with user tests only")
     
-    if not design_image:
-        print("⚠️  Design preview generation failed, continuing with other tests...")
+    # ===== 2. DESIGNS TESTS =====
+    print(f"\n{'='*20} 2. اختبارات التصاميم {'='*20}")
     
-    # 5. Test get designs
+    # Test designs quota
+    tester.test_designs_quota()
+    
+    # Test showcase designs
+    tester.test_designs_showcase()
+    
+    # Test design preview generation
+    arabic_prompt = "تيشيرت أحمر مع شعار جميل"
+    phone_number = "+963937938856"
+    
+    success, preview_response = tester.run_test(
+        "Generate Design Preview",
+        "POST",
+        "designs/preview",
+        200,
+        data={"prompt": arabic_prompt, "clothing_type": "shirt", "color": "أحمر"}
+    )
+    
+    if success:
+        print("   ✅ Design preview generated successfully")
+    
+    # Test save design with phone number (creates order automatically)
+    design_id = tester.test_save_design_with_phone(arabic_prompt, phone_number)
+    
+    # Test get user designs (NEW ENDPOINT)
     designs = tester.test_get_designs()
     
-    # 6. Test favorite toggle (if we have designs)
-    if designs and len(designs) > 0:
-        first_design_id = designs[0].get('id')
-        if first_design_id:
-            tester.test_toggle_favorite(first_design_id)
+    # ===== 3. USER TESTS =====
+    print(f"\n{'='*20} 3. اختبارات المستخدم {'='*20}")
     
-    # 7. Test security - invalid login
+    # Test designs quota again (should show updated count)
+    tester.test_designs_quota()
+    
+    # ===== 4. ADMIN TESTS =====
+    print(f"\n{'='*20} 4. اختبارات لوحة الأدمن {'='*20}")
+    
+    if tester.admin_token:
+        # Test admin dashboard stats
+        tester.test_admin_stats()
+        
+        # Test admin get all users
+        tester.test_admin_users()
+        
+        # Test admin get all orders
+        tester.test_admin_orders()
+    else:
+        print("⚠️  Admin tests skipped - Admin login failed")
+    
+    # ===== 5. SECURITY TESTS =====
+    print(f"\n{'='*20} 5. اختبارات الأمان {'='*20}")
+    
+    # Test invalid login
     tester.test_invalid_login()
     
-    # 8. Test security - unauthorized access
+    # Test unauthorized access
     tester.test_unauthorized_access()
     
-    # 9. Test delete design (if we have one)
-    if designs and len(designs) > 0:
-        first_design_id = designs[0].get('id')
-        if first_design_id:
-            tester.test_delete_design(first_design_id)
+    # ===== 6. FRONTEND INTEGRATION TEST =====
+    print(f"\n{'='*20} 6. اختبار تكامل الواجهة الأمامية {'='*20}")
     
-    # 10. Test new features - Coupons
-    print("\n🎫 Testing Coupons API...")
-    coupons = tester.test_get_coupons()
+    # Test login page functionality (simulate)
+    print("🔍 Testing Frontend Integration...")
     
-    # Test coupon validation with default test coupon
-    tester.test_validate_coupon("WELCOME10", 100)
+    # Test if we can access the frontend URL
+    try:
+        frontend_response = requests.get(tester.base_url, timeout=10)
+        if frontend_response.status_code == 200:
+            tester.log_test("Frontend Landing Page Access", True, "Frontend accessible")
+        else:
+            tester.log_test("Frontend Landing Page Access", False, f"Status: {frontend_response.status_code}")
+    except Exception as e:
+        tester.log_test("Frontend Landing Page Access", False, f"Error: {str(e)}")
     
-    # Test with invalid coupon
-    tester.test_validate_coupon("INVALID", 100)
+    # Test login with existing user (re-login)
+    print("\n🔄 Testing Re-login with Created User...")
+    tester.token = None  # Reset token
+    if tester.test_login(test_username, test_password):
+        print("   ✅ Re-login successful")
     
-    # 11. Test Orders API
-    print("\n📦 Testing Orders API...")
+    # ===== FINAL RESULTS =====
+    print("\n" + "=" * 80)
+    print("📊 ملخص نتائج الاختبار")
+    print("=" * 80)
+    print(f"إجمالي الاختبارات: {tester.tests_run}")
+    print(f"نجح: {tester.tests_passed}")
+    print(f"فشل: {tester.tests_run - tester.tests_passed}")
+    print(f"معدل النجاح: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
     
-    # Create a test order first
-    order_id = tester.test_create_order()
+    # Detailed results by category
+    print(f"\n📋 تفاصيل النتائج:")
+    auth_tests = [t for t in tester.test_results if 'auth' in t['test_name'].lower() or 'login' in t['test_name'].lower() or 'register' in t['test_name'].lower()]
+    design_tests = [t for t in tester.test_results if 'design' in t['test_name'].lower()]
+    admin_tests = [t for t in tester.test_results if 'admin' in t['test_name'].lower()]
     
-    # Get user orders
-    orders = tester.test_get_orders()
-    
-    # 12. Test Notifications API
-    print("\n🔔 Testing Notifications API...")
-    
-    # Get notifications
-    notifications = tester.test_get_notifications()
-    
-    # Get unread count
-    unread_count = tester.test_get_unread_notifications_count()
-    
-    # Mark first notification as read if any exist
-    if notifications and len(notifications) > 0:
-        first_notification_id = notifications[0].get('id')
-        if first_notification_id:
-            tester.test_mark_notification_read(first_notification_id)
-    
-    # 13. Test login with existing user
-    # Reset token to test login
-    tester.token = None
-    tester.test_login(test_username, test_password)
-    
-    # Print final results
-    print("\n" + "=" * 60)
-    print("📊 TEST SUMMARY")
-    print("=" * 60)
-    print(f"Total Tests: {tester.tests_run}")
-    print(f"Passed: {tester.tests_passed}")
-    print(f"Failed: {tester.tests_run - tester.tests_passed}")
-    print(f"Success Rate: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    print(f"   🔐 اختبارات المصادقة: {len([t for t in auth_tests if t['success']])}/{len(auth_tests)} نجح")
+    print(f"   🎨 اختبارات التصاميم: {len([t for t in design_tests if t['success']])}/{len(design_tests)} نجح")
+    print(f"   👑 اختبارات الأدمن: {len([t for t in admin_tests if t['success']])}/{len(admin_tests)} نجح")
     
     # Save detailed results
-    results_file = f"/app/test_reports/backend_test_results_{timestamp}.json"
+    results_file = f"/app/test_reports/nodejs_backend_test_{timestamp}.json"
     with open(results_file, 'w', encoding='utf-8') as f:
         json.dump({
+            "test_type": "Node.js Backend Comprehensive Test",
+            "backend_type": "Node.js/Express",
+            "database": "MongoDB (fashion_designer_db)",
+            "test_user": test_username,
+            "admin_user": admin_username,
             "summary": {
                 "total_tests": tester.tests_run,
                 "passed_tests": tester.tests_passed,
@@ -583,12 +621,39 @@ def main():
                 "success_rate": (tester.tests_passed/tester.tests_run)*100,
                 "test_timestamp": datetime.now().isoformat()
             },
-            "detailed_results": tester.test_results
+            "category_results": {
+                "authentication": {
+                    "total": len(auth_tests),
+                    "passed": len([t for t in auth_tests if t['success']])
+                },
+                "designs": {
+                    "total": len(design_tests),
+                    "passed": len([t for t in design_tests if t['success']])
+                },
+                "admin": {
+                    "total": len(admin_tests),
+                    "passed": len([t for t in admin_tests if t['success']])
+                }
+            },
+            "detailed_results": tester.test_results,
+            "created_resources": {
+                "designs": tester.created_designs,
+                "orders": tester.created_orders
+            }
         }, f, indent=2, ensure_ascii=False)
     
-    print(f"\n📄 Detailed results saved to: {results_file}")
+    print(f"\n📄 تم حفظ النتائج التفصيلية في: {results_file}")
     
-    return 0 if tester.tests_passed == tester.tests_run else 1
+    # Final status message
+    if tester.tests_passed == tester.tests_run:
+        print(f"\n🎉 جميع الاختبارات نجحت! النظام يعمل بشكل مثالي.")
+        return 0
+    else:
+        failed_tests = [t for t in tester.test_results if not t['success']]
+        print(f"\n⚠️  بعض الاختبارات فشلت:")
+        for test in failed_tests:
+            print(f"   ❌ {test['test_name']}: {test['details']}")
+        return 1
 
 if __name__ == "__main__":
     sys.exit(main())
