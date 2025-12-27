@@ -35,7 +35,6 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/designs', designRoutes);
-app.use('/api/user', designRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
@@ -46,7 +45,6 @@ app.get('/api', (req, res) => {
       health: '/health',
       auth: '/api/auth/*',
       designs: '/api/designs/*',
-      user: '/api/user/*',
     }
   });
 });
