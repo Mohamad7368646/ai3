@@ -34,13 +34,11 @@ export default function Dashboard({ user, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, designId: null });
-  const [templates, setTemplates] = useState([]);
   const [sizeChart, setSizeChart] = useState({});
   const [activeView, setActiveView] = useState("showcase");
   const [showNotifications, setShowNotifications] = useState(false);
   
   // Design State
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [enhancedPrompt, setEnhancedPrompt] = useState("");
   const [logoPreview, setLogoPreview] = useState(null);
