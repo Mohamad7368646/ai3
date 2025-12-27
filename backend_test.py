@@ -376,13 +376,14 @@ class NodeJSBackendTester:
             return response
         return []
 
-    def test_validate_coupon(self, code="WELCOME10", amount=100):
+    def test_validate_coupon(self, code="WELCOME10"):
         """Test coupon validation"""
         success, response = self.run_test(
             "Validate Coupon",
             "POST",
-            f"coupons/validate?code={code}&amount={amount}",
-            200
+            "coupons/validate",
+            200,
+            data={"code": code}
         )
         
         if success:
@@ -391,6 +392,130 @@ class NodeJSBackendTester:
             print(f"   Coupon {code}: {'Valid' if valid else 'Invalid'} - {message}")
             return response
         return {}
+
+    def test_create_coupon(self, code, discount_percentage, expiry_date=None, max_uses=None):
+        """Test creating a new coupon (Admin only)"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        coupon_data = {
+            "code": code,
+            "discount_percentage": discount_percentage
+        }
+        
+        if expiry_date:
+            coupon_data["expiry_date"] = expiry_date
+        if max_uses:
+            coupon_data["max_uses"] = max_uses
+        
+        success, response = self.run_test(
+            "Create Coupon",
+            "POST",
+            "coupons",
+            201,
+            data=coupon_data
+        )
+        
+        if success:
+            coupon_id = response.get('id')
+            print(f"   ✅ Created coupon: {code} ({discount_percentage}% discount)")
+            if coupon_id:
+                print(f"   📝 Coupon ID: {coupon_id[:8]}...")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response.get('id') if success else None
+
+    def test_update_coupon(self, coupon_id, discount_percentage=None, expiry_date=None, is_active=None, max_uses=None):
+        """Test updating a coupon (Admin only)"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        update_data = {}
+        if discount_percentage is not None:
+            update_data["discount_percentage"] = discount_percentage
+        if expiry_date is not None:
+            update_data["expiry_date"] = expiry_date
+        if is_active is not None:
+            update_data["is_active"] = is_active
+        if max_uses is not None:
+            update_data["max_uses"] = max_uses
+        
+        success, response = self.run_test(
+            "Update Coupon",
+            "PUT",
+            f"coupons/{coupon_id}",
+            200,
+            data=update_data
+        )
+        
+        if success:
+            print(f"   ✅ Updated coupon: {coupon_id[:8]}...")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_delete_coupon(self, coupon_id):
+        """Test deleting a coupon (Admin only)"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Delete Coupon",
+            "DELETE",
+            f"coupons/{coupon_id}",
+            200
+        )
+        
+        if success:
+            print(f"   ✅ Deleted coupon: {coupon_id[:8]}...")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_get_all_coupons(self):
+        """Test getting all coupons (Admin only)"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Get All Coupons (Admin)",
+            "GET",
+            "coupons",
+            200
+        )
+        
+        if success:
+            coupons = response
+            print(f"   📋 Found {len(coupons)} coupons in system")
+            for coupon in coupons[:5]:  # Show first 5 coupons
+                status = "فعال" if coupon.get('is_active') else "غير فعال"
+                print(f"      - {coupon.get('code')}: {coupon.get('discount_percentage')}% - {status}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response if success else []
+
+    def test_validate_invalid_coupon(self, code="INVALID123"):
+        """Test validation of invalid coupon"""
+        success, response = self.run_test(
+            "Validate Invalid Coupon",
+            "POST",
+            "coupons/validate",
+            404,
+            data={"code": code}
+        )
+        
+        if success:
+            print(f"   ✅ Invalid coupon {code} correctly rejected")
+        
+        return success
 
     def test_get_orders(self):
         """Test get user orders"""
