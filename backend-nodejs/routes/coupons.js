@@ -39,8 +39,8 @@ router.post('/', protect, admin, async (req, res) => {
   try {
     const { code, discount_percentage, expiry_date, max_uses } = req.body;
 
-    if (!code || !discount_percentage || !expiry_date) {
-      return res.status(400).json({ detail: 'يرجى إدخال جميع الحقول المطلوبة' });
+    if (!code || !discount_percentage) {
+      return res.status(400).json({ detail: 'يرجى إدخال كود الكوبون ونسبة الخصم' });
     }
 
     // Check if coupon code already exists
@@ -49,11 +49,14 @@ router.post('/', protect, admin, async (req, res) => {
       return res.status(400).json({ detail: 'كود الكوبون موجود بالفعل' });
     }
 
+    // Set default expiry date to 1 year from now if not provided
+    const expiryDateValue = expiry_date ? new Date(expiry_date) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
     const coupon = await Coupon.create({
       id: uuidv4(),
       code: code.toUpperCase(),
       discount_percentage,
-      expiry_date: new Date(expiry_date),
+      expiry_date: expiryDateValue,
       is_active: true,
       max_uses: max_uses || null,
       current_uses: 0,
