@@ -235,6 +235,7 @@ export default function AdminDashboard({ user, onLogout }) {
               { id: "users", label: "المستخدمين", icon: Users },
               { id: "orders", label: "الطلبات", icon: Package },
               { id: "designs", label: "التصاميم", icon: Image },
+              { id: "showcase", label: "التصاميم الملهمة", icon: Sparkles },
               { id: "coupons", label: "الكوبونات", icon: Tag }
             ].map(tab => (
               <button
