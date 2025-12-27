@@ -141,8 +141,8 @@ curl http://localhost:8002/api/user/designs-quota \
 |---------|---------|---------|--------|
 | Authentication | ✅ | ✅ | Migrated |
 | Design Management | ✅ | ✅ | Migrated |
-| Orders | ✅ | ⏳ | In Progress |
-| Admin Panel | ✅ | ⏳ | Pending |
+| Orders | ✅ | ✅ | Migrated |
+| Admin Panel | ✅ | ✅ | Migrated |
 | AI Integration | ✅ | ⏳ | Pending |
 | Email Service | ✅ | ⏳ | Pending |
 | Google OAuth | ✅ | ⏳ | Pending |
