@@ -1,0 +1,199 @@
+{
+  "test_type": "Showcase Manager Comprehensive Test",
+  "feature": "إدارة التصاميم الملهمة (Showcase Manager)",
+  "backend_type": "Node.js/Express",
+  "database": "MongoDB (fashion_designer_db)",
+  "test_user": "testuser_054838",
+  "admin_user": "mohamad",
+  "summary": {
+    "total_tests": 25,
+    "passed_tests": 24,
+    "failed_tests": 1,
+    "success_rate": 96.0,
+    "test_timestamp": "2025-12-27T05:48:40.342558"
+  },
+  "category_results": {
+    "authentication": {
+      "total": 4,
+      "passed": 3
+    },
+    "showcase_manager": {
+      "total": 8,
+      "passed": 8
+    },
+    "admin": {
+      "total": 12,
+      "passed": 12
+    },
+    "designs": {
+      "total": 5,
+      "passed": 5
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T05:48:38.766079"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:38.824219"
+    },
+    {
+      "test_name": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.173333"
+    },
+    {
+      "test_name": "Admin Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.227935"
+    },
+    {
+      "test_name": "Admin Create Showcase Design",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T05:48:39.275358"
+    },
+    {
+      "test_name": "Admin Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.316208"
+    },
+    {
+      "test_name": "Admin Update Showcase Design",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.363672"
+    },
+    {
+      "test_name": "Admin Toggle Featured Status",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.404050"
+    },
+    {
+      "test_name": "Admin Toggle Featured Status",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.444068"
+    },
+    {
+      "test_name": "Public Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.479956"
+    },
+    {
+      "test_name": "Admin Delete Showcase Design",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.520279"
+    },
+    {
+      "test_name": "Admin Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.564757"
+    },
+    {
+      "test_name": "Get User Designs Quota",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.608315"
+    },
+    {
+      "test_name": "Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.642682"
+    },
+    {
+      "test_name": "Generate Design Preview",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.681342"
+    },
+    {
+      "test_name": "Generate Design Preview for Save",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.720400"
+    },
+    {
+      "test_name": "Save Design with Phone Number",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T05:48:39.770531"
+    },
+    {
+      "test_name": "Get User Designs (NEW ENDPOINT)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.816103"
+    },
+    {
+      "test_name": "Admin Dashboard Stats",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.856992"
+    },
+    {
+      "test_name": "Admin Get All Users",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:39.897551"
+    },
+    {
+      "test_name": "Admin Get All Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:40.126220"
+    },
+    {
+      "test_name": "Invalid Login Test",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-12-27T05:48:40.163915"
+    },
+    {
+      "test_name": "Unauthorized Access Test",
+      "success": false,
+      "details": "Expected 403, got 401. Error: {'success': False, 'detail': 'غير مصرح، لا يوجد رمز'}",
+      "timestamp": "2025-12-27T05:48:40.199013"
+    },
+    {
+      "test_name": "Frontend Landing Page Access",
+      "success": true,
+      "details": "Frontend accessible",
+      "timestamp": "2025-12-27T05:48:40.233966"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:48:40.341571"
+    }
+  ],
+  "created_resources": {
+    "designs": [
+      "59f0b07f-a300-43bc-a116-1873cb60428e"
+    ],
+    "orders": []
+  },
+  "apis_tested": [
+    "GET /api/admin/showcase-designs",
+    "POST /api/admin/showcase-designs",
+    "PUT /api/admin/showcase-designs/:id",
+    "DELETE /api/admin/showcase-designs/:id",
+    "PUT /api/admin/showcase-designs/:id/toggle-featured",
+    "GET /api/designs/showcase"
+  ]
+}
