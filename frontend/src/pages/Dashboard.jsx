@@ -86,7 +86,6 @@ export default function Dashboard({ user, onLogout }) {
 
   useEffect(() => {
     fetchDesigns();
-    fetchTemplates();
     fetchShowcase();
     fetchSizeChart();
     fetchOrders();
@@ -106,7 +105,7 @@ export default function Dashboard({ user, onLogout }) {
 
   useEffect(() => {
     // Remove price calculation since we don't need pricing anymore
-  }, [selectedTemplate, selectedSize, logoPreview]);
+  }, [selectedSize, logoPreview]);
 
   const fetchDesigns = async () => {
     setLoading(true);
@@ -126,15 +125,6 @@ export default function Dashboard({ user, onLogout }) {
       setShowcaseDesigns(response.data);
     } catch (error) {
       console.error("Failed to fetch showcase");
-    }
-  };
-
-  const fetchTemplates = async () => {
-    try {
-      const response = await axios.get(`${API}/templates`);
-      setTemplates(response.data);
-    } catch (error) {
-      console.error("Failed to fetch templates");
     }
   };
 
