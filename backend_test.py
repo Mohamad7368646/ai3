@@ -267,16 +267,51 @@ class NodeJSBackendTester:
         return None
 
     def test_get_designs(self):
-        """Test get user designs"""
+        """Test get user designs (NEW ENDPOINT)"""
         success, response = self.run_test(
-            "Get User Designs",
+            "Get User Designs (NEW ENDPOINT)",
             "GET",
             "designs",
             200
         )
         
         if success:
-            return response
+            designs = response
+            print(f"   🎨 Found {len(designs)} designs for user")
+            return designs
+        return []
+
+    def test_designs_quota(self):
+        """Test get user designs quota"""
+        success, response = self.run_test(
+            "Get User Designs Quota",
+            "GET",
+            "user/designs-quota",
+            200
+        )
+        
+        if success:
+            quota = response
+            print(f"   📊 Designs Limit: {quota.get('designs_limit')}")
+            print(f"   📊 Designs Used: {quota.get('designs_used')}")
+            print(f"   📊 Designs Remaining: {quota.get('designs_remaining')}")
+            print(f"   📊 Is Unlimited: {quota.get('is_unlimited')}")
+            return quota
+        return {}
+
+    def test_designs_showcase(self):
+        """Test get showcase designs for homepage"""
+        success, response = self.run_test(
+            "Get Showcase Designs",
+            "GET",
+            "designs/showcase",
+            200
+        )
+        
+        if success:
+            designs = response
+            print(f"   🌟 Found {len(designs)} showcase designs")
+            return designs
         return []
 
     def test_toggle_favorite(self, design_id):
