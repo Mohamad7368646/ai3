@@ -820,7 +820,7 @@ def main():
     
     # ===== FINAL RESULTS =====
     print("\n" + "=" * 80)
-    print("📊 ملخص نتائج الاختبار")
+    print("📊 ملخص نتائج اختبار إدارة التصاميم الملهمة")
     print("=" * 80)
     print(f"إجمالي الاختبارات: {tester.tests_run}")
     print(f"نجح: {tester.tests_passed}")
@@ -830,18 +830,33 @@ def main():
     # Detailed results by category
     print(f"\n📋 تفاصيل النتائج:")
     auth_tests = [t for t in tester.test_results if 'auth' in t['test_name'].lower() or 'login' in t['test_name'].lower() or 'register' in t['test_name'].lower()]
-    design_tests = [t for t in tester.test_results if 'design' in t['test_name'].lower()]
+    showcase_tests = [t for t in tester.test_results if 'showcase' in t['test_name'].lower()]
     admin_tests = [t for t in tester.test_results if 'admin' in t['test_name'].lower()]
+    design_tests = [t for t in tester.test_results if 'design' in t['test_name'].lower() and 'showcase' not in t['test_name'].lower()]
     
     print(f"   🔐 اختبارات المصادقة: {len([t for t in auth_tests if t['success']])}/{len(auth_tests)} نجح")
-    print(f"   🎨 اختبارات التصاميم: {len([t for t in design_tests if t['success']])}/{len(design_tests)} نجح")
+    print(f"   🌟 اختبارات التصاميم الملهمة: {len([t for t in showcase_tests if t['success']])}/{len(showcase_tests)} نجح")
     print(f"   👑 اختبارات الأدمن: {len([t for t in admin_tests if t['success']])}/{len(admin_tests)} نجح")
+    print(f"   🎨 اختبارات التصاميم العامة: {len([t for t in design_tests if t['success']])}/{len(design_tests)} نجح")
+    
+    # Showcase Manager specific results
+    print(f"\n🌟 نتائج اختبار إدارة التصاميم الملهمة:")
+    showcase_passed = len([t for t in showcase_tests if t['success']])
+    showcase_total = len(showcase_tests)
+    if showcase_total > 0:
+        print(f"   📊 معدل نجاح التصاميم الملهمة: {(showcase_passed/showcase_total)*100:.1f}%")
+        
+        # List specific showcase tests
+        for test in showcase_tests:
+            status = "✅" if test['success'] else "❌"
+            print(f"   {status} {test['test_name']}")
     
     # Save detailed results
-    results_file = f"/app/test_reports/nodejs_backend_test_{timestamp}.json"
+    results_file = f"/app/test_reports/showcase_manager_test_{timestamp}.json"
     with open(results_file, 'w', encoding='utf-8') as f:
         json.dump({
-            "test_type": "Node.js Backend Comprehensive Test",
+            "test_type": "Showcase Manager Comprehensive Test",
+            "feature": "إدارة التصاميم الملهمة (Showcase Manager)",
             "backend_type": "Node.js/Express",
             "database": "MongoDB (fashion_designer_db)",
             "test_user": test_username,
@@ -858,33 +873,53 @@ def main():
                     "total": len(auth_tests),
                     "passed": len([t for t in auth_tests if t['success']])
                 },
-                "designs": {
-                    "total": len(design_tests),
-                    "passed": len([t for t in design_tests if t['success']])
+                "showcase_manager": {
+                    "total": len(showcase_tests),
+                    "passed": len([t for t in showcase_tests if t['success']])
                 },
                 "admin": {
                     "total": len(admin_tests),
                     "passed": len([t for t in admin_tests if t['success']])
+                },
+                "designs": {
+                    "total": len(design_tests),
+                    "passed": len([t for t in design_tests if t['success']])
                 }
             },
             "detailed_results": tester.test_results,
             "created_resources": {
                 "designs": tester.created_designs,
                 "orders": tester.created_orders
-            }
+            },
+            "apis_tested": [
+                "GET /api/admin/showcase-designs",
+                "POST /api/admin/showcase-designs", 
+                "PUT /api/admin/showcase-designs/:id",
+                "DELETE /api/admin/showcase-designs/:id",
+                "PUT /api/admin/showcase-designs/:id/toggle-featured",
+                "GET /api/designs/showcase"
+            ]
         }, f, indent=2, ensure_ascii=False)
     
     print(f"\n📄 تم حفظ النتائج التفصيلية في: {results_file}")
     
     # Final status message
     if tester.tests_passed == tester.tests_run:
-        print(f"\n🎉 جميع الاختبارات نجحت! النظام يعمل بشكل مثالي.")
+        print(f"\n🎉 جميع اختبارات إدارة التصاميم الملهمة نجحت! النظام يعمل بشكل مثالي.")
         return 0
     else:
         failed_tests = [t for t in tester.test_results if not t['success']]
         print(f"\n⚠️  بعض الاختبارات فشلت:")
         for test in failed_tests:
             print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        # Check if showcase manager tests specifically failed
+        failed_showcase = [t for t in failed_tests if 'showcase' in t['test_name'].lower()]
+        if failed_showcase:
+            print(f"\n🌟 اختبارات التصاميم الملهمة الفاشلة:")
+            for test in failed_showcase:
+                print(f"   ❌ {test['test_name']}: {test['details']}")
+        
         return 1
 
 if __name__ == "__main__":
