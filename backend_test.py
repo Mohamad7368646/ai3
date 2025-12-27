@@ -469,6 +469,161 @@ class NodeJSBackendTester:
             return response['id']
         return None
 
+    # ===== SHOWCASE MANAGER TESTS =====
+    
+    def test_admin_get_showcase_designs(self):
+        """Test admin get all showcase designs"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Get Showcase Designs",
+            "GET",
+            "admin/showcase-designs",
+            200
+        )
+        
+        if success:
+            designs = response
+            print(f"   🌟 Found {len(designs)} showcase designs")
+            for design in designs[:3]:  # Show first 3 designs
+                print(f"      - {design.get('title')} ({design.get('clothing_type')}) - Featured: {design.get('is_featured')}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response if success else []
+
+    def test_admin_create_showcase_design(self, title, description, prompt, clothing_type, color="أزرق", tags=None, is_featured=False):
+        """Test admin create new showcase design"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        # Mock base64 image for testing
+        mock_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        
+        design_data = {
+            "title": title,
+            "description": description,
+            "prompt": prompt,
+            "image_base64": mock_image,
+            "clothing_type": clothing_type,
+            "color": color,
+            "tags": tags or ["اختبار", "تصميم"],
+            "is_featured": is_featured
+        }
+        
+        success, response = self.run_test(
+            "Admin Create Showcase Design",
+            "POST",
+            "admin/showcase-designs",
+            201,
+            data=design_data
+        )
+        
+        if success and 'id' in response:
+            design_id = response['id']
+            print(f"   ✅ Created showcase design: {title} (ID: {design_id[:8]}...)")
+            # Restore user token
+            self.token = temp_token
+            return design_id
+        
+        # Restore user token
+        self.token = temp_token
+        return None
+
+    def test_admin_update_showcase_design(self, design_id, new_title):
+        """Test admin update showcase design"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        update_data = {
+            "title": new_title,
+            "description": "تصميم محدث للاختبار"
+        }
+        
+        success, response = self.run_test(
+            "Admin Update Showcase Design",
+            "PUT",
+            f"admin/showcase-designs/{design_id}",
+            200,
+            data=update_data
+        )
+        
+        if success:
+            print(f"   ✅ Updated design title to: {new_title}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_admin_toggle_featured(self, design_id):
+        """Test admin toggle featured status"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Toggle Featured Status",
+            "PUT",
+            f"admin/showcase-designs/{design_id}/toggle-featured",
+            200
+        )
+        
+        if success:
+            is_featured = response.get('is_featured', False)
+            status = "مميز" if is_featured else "عادي"
+            print(f"   ✅ Design status changed to: {status}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response.get('is_featured', False) if success else (False, False)
+
+    def test_admin_delete_showcase_design(self, design_id):
+        """Test admin delete showcase design"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Delete Showcase Design",
+            "DELETE",
+            f"admin/showcase-designs/{design_id}",
+            200
+        )
+        
+        if success:
+            print(f"   ✅ Deleted showcase design: {design_id[:8]}...")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_public_showcase_designs(self):
+        """Test public get showcase designs (for homepage)"""
+        # No authentication needed for public endpoint
+        temp_token = self.token
+        self.token = None
+        
+        success, response = self.run_test(
+            "Public Get Showcase Designs",
+            "GET",
+            "designs/showcase",
+            200
+        )
+        
+        if success:
+            designs = response
+            print(f"   🌟 Found {len(designs)} active showcase designs for homepage")
+            featured_count = len([d for d in designs if d.get('is_featured')])
+            print(f"   ⭐ Featured designs: {featured_count}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response if success else []
+
 def main():
     print("🚀 اختبار شامل للـ Node.js Backend - Fashion Design API")
     print("=" * 80)
