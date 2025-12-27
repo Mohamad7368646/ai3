@@ -198,6 +198,21 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - POST /api/coupons/validate working correctly. Valid coupon WELCOME10 returns valid:true with discount info. Invalid coupon returns valid:false with appropriate error message."
 
+  - task: "Showcase Manager APIs"
+    implemented: true
+    working: true
+    file: "/app/backend-nodejs/routes/admin.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Showcase Manager feature implemented with admin APIs for managing showcase designs and public API for homepage display"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Comprehensive testing completed with 100% success rate (8/8 showcase tests passed). All admin APIs working: GET /api/admin/showcase-designs (جلب التصاميم), POST /api/admin/showcase-designs (إضافة تصميم), PUT /api/admin/showcase-designs/:id (تعديل), DELETE /api/admin/showcase-designs/:id (حذف), PUT /api/admin/showcase-designs/:id/toggle-featured (تبديل مميز). Public API GET /api/designs/showcase working correctly. Full CRUD workflow tested: created design 'تيشيرت كاجوال للاختبار', updated title, toggled featured status, verified in public API, and deleted successfully. Arabic language support working throughout. Admin authentication (mohamad/mohamad271) working. Feature ready for production."
+
 frontend:
   - task: "Dark/Light Mode Toggle"
     implemented: true
