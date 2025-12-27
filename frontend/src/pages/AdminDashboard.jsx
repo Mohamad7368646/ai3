@@ -150,7 +150,7 @@ export default function AdminDashboard({ user, onLogout }) {
     }
     
     try {
-      await axios.post(`${API}/admin/coupons`, couponData);
+      await axios.post(`${API}/coupons`, couponData);
       toast.success("تم إنشاء الكوبون بنجاح");
       fetchCoupons();
       setCreateCouponModal(false);
