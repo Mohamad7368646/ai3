@@ -749,7 +749,283 @@ class NodeJSBackendTester:
         self.token = temp_token
         return success, response if success else []
 
-def main():
+def test_coupon_system_comprehensive():
+    """Comprehensive testing of the coupon system after fixes"""
+    print("🎫 اختبار شامل لنظام الكوبونات بعد الإصلاح")
+    print("=" * 80)
+    
+    tester = NodeJSBackendTester()
+    
+    # Generate unique test user
+    timestamp = datetime.now().strftime('%H%M%S')
+    test_username = f"coupontest_{timestamp}"
+    test_email = f"coupontest_{timestamp}@example.com"
+    test_password = "TestPass123!"
+    
+    # Admin credentials from request
+    admin_username = "mohamad"
+    admin_password = "mohamad271"
+    
+    print(f"\n📝 Test User: {test_username}")
+    print(f"📧 Test Email: {test_email}")
+    print(f"👑 Admin User: {admin_username}")
+    
+    # ===== 1. AUTHENTICATION TESTS =====
+    print(f"\n{'='*20} 1. اختبارات المصادقة {'='*20}")
+    
+    # Test user registration
+    if not tester.test_register(test_username, test_email, test_password):
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    # Test admin login
+    if not tester.test_admin_login(admin_username, admin_password):
+        print("❌ Admin login failed, stopping coupon tests")
+        return 1
+    
+    # ===== 2. COUPON CRUD OPERATIONS =====
+    print(f"\n{'='*20} 2. اختبارات CRUD للكوبونات {'='*20}")
+    
+    # Test 1: Get existing coupons
+    print("\n🔍 1. جلب جميع الكوبونات الموجودة...")
+    success, existing_coupons = tester.test_get_all_coupons()
+    if not success:
+        print("❌ Failed to get existing coupons")
+        return 1
+    
+    initial_count = len(existing_coupons)
+    print(f"   📊 عدد الكوبونات الحالية: {initial_count}")
+    
+    # Test 2: Create coupon with expiry date
+    print("\n🔍 2. إنشاء كوبون مع تاريخ انتهاء...")
+    from datetime import datetime, timedelta
+    future_date = (datetime.now() + timedelta(days=30)).isoformat()
+    
+    success, coupon_id_1 = tester.test_create_coupon(
+        code="TEST50",
+        discount_percentage=50,
+        expiry_date=future_date,
+        max_uses=100
+    )
+    
+    if not success:
+        print("❌ Failed to create coupon with expiry date")
+        return 1
+    
+    # Test 3: Create coupon without expiry date (should succeed)
+    print("\n🔍 3. إنشاء كوبون بدون تاريخ انتهاء...")
+    success, coupon_id_2 = tester.test_create_coupon(
+        code="NOEXPIRY25",
+        discount_percentage=25
+    )
+    
+    if not success:
+        print("❌ Failed to create coupon without expiry date")
+        return 1
+    
+    # Test 4: Verify coupons were created
+    print("\n🔍 4. التحقق من إنشاء الكوبونات...")
+    success, updated_coupons = tester.test_get_all_coupons()
+    if success:
+        new_count = len(updated_coupons)
+        if new_count > initial_count:
+            print(f"   ✅ Coupon count increased: {initial_count} → {new_count}")
+        else:
+            print(f"   ⚠️  Coupon count unchanged: {new_count}")
+    
+    # Test 5: Update coupon
+    print("\n🔍 5. تعديل كوبون...")
+    if coupon_id_1:
+        success = tester.test_update_coupon(
+            coupon_id_1,
+            discount_percentage=60,
+            is_active=True
+        )
+        if not success:
+            print("❌ Failed to update coupon")
+    
+    # ===== 3. COUPON VALIDATION TESTS =====
+    print(f"\n{'='*20} 3. اختبارات التحقق من الكوبونات {'='*20}")
+    
+    # Test 6: Validate valid coupon
+    print("\n🔍 6. التحقق من كوبون صالح...")
+    validation_result = tester.test_validate_coupon("TEST50")
+    if not validation_result:
+        print("❌ Failed to validate valid coupon")
+    
+    # Test 7: Validate existing coupons from the request
+    print("\n🔍 7. التحقق من الكوبونات الموجودة...")
+    existing_coupon_codes = ["WINTER50", "NEWYEAR25", "NEW5631", "DAMAS21", "MLHAM20"]
+    
+    for code in existing_coupon_codes:
+        print(f"\n   🔍 Testing coupon: {code}")
+        result = tester.test_validate_coupon(code)
+        if result:
+            print(f"   ✅ {code}: Valid")
+        else:
+            print(f"   ⚠️  {code}: May not exist or be inactive")
+    
+    # Test 8: Validate invalid coupon
+    print("\n🔍 8. التحقق من كوبون غير موجود...")
+    tester.test_validate_invalid_coupon("INVALID999")
+    
+    # ===== 4. COUPON DELETION TESTS =====
+    print(f"\n{'='*20} 4. اختبارات حذف الكوبونات {'='*20}")
+    
+    # Test 9: Delete test coupons
+    print("\n🔍 9. حذف الكوبونات التجريبية...")
+    
+    if coupon_id_1:
+        success = tester.test_delete_coupon(coupon_id_1)
+        if not success:
+            print("❌ Failed to delete first test coupon")
+    
+    if coupon_id_2:
+        success = tester.test_delete_coupon(coupon_id_2)
+        if not success:
+            print("❌ Failed to delete second test coupon")
+    
+    # Test 10: Verify deletion
+    print("\n🔍 10. التحقق من الحذف...")
+    success, final_coupons = tester.test_get_all_coupons()
+    if success:
+        final_count = len(final_coupons)
+        if final_count == initial_count:
+            print(f"   ✅ Coupons deleted successfully - Count back to: {final_count}")
+        else:
+            print(f"   ⚠️  Coupon count unexpected: {final_count}")
+    
+    # ===== 5. ERROR HANDLING TESTS =====
+    print(f"\n{'='*20} 5. اختبارات معالجة الأخطاء {'='*20}")
+    
+    # Test 11: Try to create duplicate coupon
+    print("\n🔍 11. محاولة إنشاء كوبون مكرر...")
+    if existing_coupons:
+        existing_code = existing_coupons[0].get('code', 'WINTER50')
+        temp_token = tester.token
+        tester.token = tester.admin_token
+        
+        success, response = tester.run_test(
+            "Create Duplicate Coupon",
+            "POST",
+            "coupons",
+            400,  # Should fail with 400
+            data={"code": existing_code, "discount_percentage": 10}
+        )
+        
+        if success:
+            print(f"   ✅ Duplicate coupon {existing_code} correctly rejected")
+        
+        tester.token = temp_token
+    
+    # Test 12: Try to validate without authentication
+    print("\n🔍 12. محاولة التحقق بدون مصادقة...")
+    temp_token = tester.token
+    tester.token = None
+    
+    success, response = tester.run_test(
+        "Validate Without Auth",
+        "POST",
+        "coupons/validate",
+        401,  # Should fail with 401
+        data={"code": "TEST123"}
+    )
+    
+    if success:
+        print("   ✅ Unauthorized validation correctly rejected")
+    
+    tester.token = temp_token
+    
+    # ===== FINAL RESULTS =====
+    print("\n" + "=" * 80)
+    print("📊 ملخص نتائج اختبار نظام الكوبونات")
+    print("=" * 80)
+    print(f"إجمالي الاختبارات: {tester.tests_run}")
+    print(f"نجح: {tester.tests_passed}")
+    print(f"فشل: {tester.tests_run - tester.tests_passed}")
+    print(f"معدل النجاح: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    
+    # Detailed results by category
+    print(f"\n📋 تفاصيل النتائج:")
+    auth_tests = [t for t in tester.test_results if 'auth' in t['test_name'].lower() or 'login' in t['test_name'].lower()]
+    coupon_tests = [t for t in tester.test_results if 'coupon' in t['test_name'].lower()]
+    crud_tests = [t for t in coupon_tests if any(op in t['test_name'].lower() for op in ['create', 'update', 'delete', 'get'])]
+    validation_tests = [t for t in coupon_tests if 'validate' in t['test_name'].lower()]
+    
+    print(f"   🔐 اختبارات المصادقة: {len([t for t in auth_tests if t['success']])}/{len(auth_tests)} نجح")
+    print(f"   🎫 اختبارات CRUD للكوبونات: {len([t for t in crud_tests if t['success']])}/{len(crud_tests)} نجح")
+    print(f"   ✅ اختبارات التحقق من الكوبونات: {len([t for t in validation_tests if t['success']])}/{len(validation_tests)} نجح")
+    
+    # Save detailed results
+    results_file = f"/app/test_reports/coupon_system_test_{timestamp}.json"
+    with open(results_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            "test_type": "Coupon System Comprehensive Test",
+            "feature": "نظام الكوبونات (Coupon System)",
+            "backend_type": "Node.js/Express",
+            "database": "MongoDB (fashion_designer_db)",
+            "test_user": test_username,
+            "admin_user": admin_username,
+            "summary": {
+                "total_tests": tester.tests_run,
+                "passed_tests": tester.tests_passed,
+                "failed_tests": tester.tests_run - tester.tests_passed,
+                "success_rate": (tester.tests_passed/tester.tests_run)*100,
+                "test_timestamp": datetime.now().isoformat()
+            },
+            "category_results": {
+                "authentication": {
+                    "total": len(auth_tests),
+                    "passed": len([t for t in auth_tests if t['success']])
+                },
+                "coupon_crud": {
+                    "total": len(crud_tests),
+                    "passed": len([t for t in crud_tests if t['success']])
+                },
+                "coupon_validation": {
+                    "total": len(validation_tests),
+                    "passed": len([t for t in validation_tests if t['success']])
+                }
+            },
+            "detailed_results": tester.test_results,
+            "apis_tested": [
+                "GET /api/coupons",
+                "POST /api/coupons", 
+                "PUT /api/coupons/:id",
+                "DELETE /api/coupons/:id",
+                "POST /api/coupons/validate"
+            ],
+            "test_scenarios": [
+                "إنشاء كوبون مع تاريخ انتهاء",
+                "إنشاء كوبون بدون تاريخ انتهاء",
+                "التحقق من كوبون صالح",
+                "التحقق من كوبون غير موجود",
+                "تعديل كوبون",
+                "حذف كوبون",
+                "معالجة الأخطاء"
+            ]
+        }, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n📄 تم حفظ النتائج التفصيلية في: {results_file}")
+    
+    # Final status message
+    if tester.tests_passed == tester.tests_run:
+        print(f"\n🎉 جميع اختبارات نظام الكوبونات نجحت! النظام يعمل بشكل مثالي.")
+        return 0
+    else:
+        failed_tests = [t for t in tester.test_results if not t['success']]
+        print(f"\n⚠️  بعض الاختبارات فشلت:")
+        for test in failed_tests:
+            print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        # Check if coupon tests specifically failed
+        failed_coupons = [t for t in failed_tests if 'coupon' in t['test_name'].lower()]
+        if failed_coupons:
+            print(f"\n🎫 اختبارات الكوبونات الفاشلة:")
+            for test in failed_coupons:
+                print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        return 1
     print("🚀 اختبار شامل لميزة إدارة التصاميم الملهمة (Showcase Manager)")
     print("=" * 80)
     
