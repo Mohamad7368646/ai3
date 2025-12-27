@@ -460,6 +460,11 @@ export default function AdminDashboard({ user, onLogout }) {
           </div>
         )}
 
+        {/* Showcase Designs Tab */}
+        {activeTab === "showcase" && (
+          <ShowcaseManager token={localStorage.getItem('token')} />
+        )}
+
         {/* Coupons Tab */}
         {activeTab === "coupons" && (
           <div>
