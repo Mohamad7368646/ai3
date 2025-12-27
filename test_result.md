@@ -126,7 +126,7 @@ backend:
   - task: "Get Available Coupons API"
     implemented: true
     working: true
-    file: "/app/backend/server.py"
+    file: "/app/backend-nodejs/routes/coupons.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - GET /api/coupons returns 3 active coupons (WELCOME10, SAVE50, SUMMER25). Correctly filters out expired and max-used coupons. Response includes code, discount_percentage, discount_amount, expiry_date."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE COUPON TESTING COMPLETE - Success rate 84.2% (16/19 tests passed). CRUD operations working perfectly: 1) ✅ GET /api/coupons returns 5 existing coupons (NEW5631, NEWYEAR25, WINTER50, MLHAM20, DAMAS21), 2) ✅ POST /api/coupons creates coupons with and without expiry dates successfully, 3) ✅ PUT /api/coupons/:id updates coupon properties correctly, 4) ✅ DELETE /api/coupons/:id removes coupons successfully, 5) ✅ POST /api/coupons/validate works for valid coupons (TEST50: 60% discount, WINTER50: 50%, NEWYEAR25: 25%), 6) ✅ Error handling working (duplicate coupon rejection, unauthorized access blocked). Minor: 3 existing coupons (NEW5631, DAMAS21, MLHAM20) are expired but system correctly returns 'الكوبون منتهي الصلاحية' error. All fixes implemented successfully - expiry_date is optional and API paths corrected."
 
   - task: "Get User Orders API"
     implemented: true
