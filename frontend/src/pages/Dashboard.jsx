@@ -288,8 +288,8 @@ export default function Dashboard({ user, onLogout }) {
       
       const payload = {
         prompt: finalPrompt,
-        clothing_type: selectedTemplate?.type,
-        template_id: selectedTemplate?.id,
+        clothing_type: selectedClothingType,
+        template_id: null,
         logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
         user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null,
         view_angle: selectedViewAngle
@@ -300,8 +300,8 @@ export default function Dashboard({ user, onLogout }) {
       setGeneratedDesign({
         image_base64: response.data.image_base64,
         prompt: finalPrompt,
-        clothing_type: selectedTemplate?.type,
-        template_id: selectedTemplate?.id
+        clothing_type: selectedClothingType,
+        template_id: null
       });
       
       // Update quota after successful generation
