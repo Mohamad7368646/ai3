@@ -51,6 +51,7 @@ export default function AdminDashboard({ user, onLogout }) {
     if (activeTab === "orders") fetchOrders();
     if (activeTab === "designs") fetchDesigns();
     if (activeTab === "coupons") fetchCoupons();
+    // showcase tab is handled by ShowcaseManager component
   }, [activeTab]);
 
   const fetchStats = async () => {
