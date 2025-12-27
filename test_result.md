@@ -189,7 +189,7 @@ backend:
   - task: "Validate Coupon API"
     implemented: true
     working: true
-    file: "/app/backend/server.py"
+    file: "/app/backend-nodejs/routes/coupons.js"
     stuck_count: 0
     priority: "medium"
     needs_retesting: false
@@ -200,6 +200,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - POST /api/coupons/validate working correctly. Valid coupon WELCOME10 returns valid:true with discount info. Invalid coupon returns valid:false with appropriate error message."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE VALIDATION TESTING COMPLETE - POST /api/coupons/validate working perfectly for active coupons (TEST50: 60% discount, WINTER50: 50%, NEWYEAR25: 25%). Correctly rejects invalid coupons with 404 status and expired coupons with 'الكوبون منتهي الصلاحية' error. Authentication required - unauthorized access properly blocked with 401 status."
 
   - task: "Showcase Manager APIs"
     implemented: true
