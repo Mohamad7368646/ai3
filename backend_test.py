@@ -132,20 +132,138 @@ class NodeJSBackendTester:
         )
         return success
 
-    def test_generate_design(self, prompt):
-        """Test AI design preview generation"""
-        print(f"\n🎨 Testing AI Design Preview (this may take up to 60 seconds)...")
+    def test_admin_login(self, username, password):
+        """Test admin login"""
+        success, response = self.run_test(
+            "Admin Login",
+            "POST",
+            "auth/login",
+            200,
+            data={"username": username, "password": password}
+        )
+        
+        if success and 'access_token' in response:
+            user_data = response.get('user', {})
+            if user_data.get('is_admin'):
+                self.admin_token = response['access_token']
+                self.admin_user_id = user_data.get('id')
+                print(f"   ✅ Admin login successful - User: {user_data.get('username')}")
+                return True
+            else:
+                print(f"   ❌ User {username} is not an admin")
+                return False
+        return False
+
+    def test_admin_stats(self):
+        """Test admin dashboard statistics"""
+        # Temporarily use admin token
+        temp_token = self.token
+        self.token = self.admin_token
         
         success, response = self.run_test(
-            "Generate AI Design Preview",
+            "Admin Dashboard Stats",
+            "GET",
+            "admin/stats",
+            200
+        )
+        
+        if success:
+            stats = response
+            print(f"   📊 إجمالي المستخدمين: {stats.get('total_users', 0)}")
+            print(f"   📦 إجمالي الطلبات: {stats.get('total_orders', 0)}")
+            print(f"   🎨 إجمالي التصاميم: {stats.get('total_designs', 0)}")
+            print(f"   💰 الإيرادات الكلية: {stats.get('total_revenue', 0)} ر.س")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_admin_users(self):
+        """Test admin get all users"""
+        # Temporarily use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Get All Users",
+            "GET",
+            "admin/users",
+            200
+        )
+        
+        if success:
+            users = response
+            print(f"   👥 Found {len(users)} users in system")
+            for user in users[:3]:  # Show first 3 users
+                print(f"      - {user.get('username')} ({user.get('email')})")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_admin_orders(self):
+        """Test admin get all orders"""
+        # Temporarily use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Get All Orders",
+            "GET",
+            "admin/orders",
+            200
+        )
+        
+        if success:
+            orders = response
+            print(f"   📋 Found {len(orders)} orders in system")
+            for order in orders[:3]:  # Show first 3 orders
+                print(f"      - Order {order.get('id')[:8]}... by {order.get('user_name')} - Status: {order.get('status')}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_save_design_with_phone(self, prompt, phone_number):
+        """Test saving design with phone number (creates order automatically)"""
+        # First generate a preview
+        preview_success, preview_response = self.run_test(
+            "Generate Design Preview for Save",
             "POST",
             "designs/preview",
             200,
-            data={"prompt": prompt, "clothing_type": "shirt", "color": "blue"}
+            data={"prompt": prompt, "clothing_type": "shirt", "color": "أزرق"}
         )
         
-        if success and 'image_base64' in response:
-            return response['image_base64']
+        if not preview_success:
+            return False
+            
+        image_base64 = preview_response.get('image_base64')
+        if not image_base64:
+            print("   ❌ No image generated in preview")
+            return False
+        
+        # Now save the design
+        success, response = self.run_test(
+            "Save Design with Phone Number",
+            "POST",
+            "designs/save",
+            201,  # Node.js returns 201 for creation
+            data={
+                "prompt": prompt,
+                "image_base64": image_base64,
+                "clothing_type": "shirt",
+                "color": "أزرق",
+                "phone_number": phone_number
+            }
+        )
+        
+        if success and 'id' in response:
+            design_id = response['id']
+            self.created_designs.append(design_id)
+            print(f"   ✅ Design saved with ID: {design_id[:8]}...")
+            print(f"   📱 Phone number: {phone_number}")
+            return design_id
         return None
 
     def test_get_designs(self):
