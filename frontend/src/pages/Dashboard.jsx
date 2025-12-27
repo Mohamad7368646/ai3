@@ -250,8 +250,8 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const enhancePrompt = async () => {
-    if (!prompt.trim() || !selectedTemplate) {
-      toast.error("الرجاء إدخال وصف واختيار قالب");
+    if (!prompt.trim()) {
+      toast.error("الرجاء إدخال وصف التصميم");
       return;
     }
 
@@ -259,7 +259,7 @@ export default function Dashboard({ user, onLogout }) {
     try {
       const response = await axios.post(`${API}/prompt/enhance`, {
         prompt: prompt,
-        clothing_type: selectedTemplate.type
+        clothing_type: selectedClothingType
       });
       setEnhancedPrompt(response.data.enhanced_prompt);
       toast.success("تم تحسين الوصف بنجاح!");
