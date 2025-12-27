@@ -798,7 +798,7 @@ def test_coupon_system_comprehensive():
     
     # Test 2: Create coupon with expiry date
     print("\n🔍 2. إنشاء كوبون مع تاريخ انتهاء...")
-    from datetime import datetime, timedelta
+    from datetime import timedelta
     future_date = (datetime.now() + timedelta(days=30)).isoformat()
     
     success, coupon_id_1 = tester.test_create_coupon(
