@@ -4,15 +4,19 @@ import json
 from datetime import datetime
 import time
 
-class FashionDesignAPITester:
+class NodeJSBackendTester:
     def __init__(self, base_url="https://ai-clothier.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
+        self.admin_token = None
         self.user_id = None
+        self.admin_user_id = None
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        self.created_designs = []
+        self.created_orders = []
 
     def log_test(self, name, success, details=""):
         """Log test result"""
