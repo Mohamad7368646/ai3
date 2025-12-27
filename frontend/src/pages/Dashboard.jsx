@@ -208,14 +208,6 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const handleTemplateSelect = (template) => {
-    setSelectedTemplate(template);
-    setPrompt(template.prompt);
-    setGeneratedDesign(null);
-    setShowOrderForm(false);
-    setActiveView("customize");
-  };
-
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
