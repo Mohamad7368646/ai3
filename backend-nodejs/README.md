@@ -130,7 +130,8 @@ curl http://localhost:8002/api/user/designs-quota \
 └── routes/
     ├── auth.js        # Authentication routes
     ├── designs.js     # Design routes
-    └── user.js        # User routes
+    ├── user.js        # User routes
+    └── admin.js       # Admin routes
 ```
 
 ---
