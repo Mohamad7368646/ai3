@@ -387,7 +387,6 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const resetDesigner = () => {
-    setSelectedTemplate(null);
     setPrompt("");
     setEnhancedPrompt("");
     setLogoPreview(null);
@@ -395,6 +394,7 @@ export default function Dashboard({ user, onLogout }) {
     setGeneratedDesign(null);
     setShowOrderForm(false);
     setSelectedViewAngle("front");
+    setSelectedClothingType("tshirt");
   };
 
   const toggleFavorite = async (designId, currentStatus) => {
