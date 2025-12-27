@@ -1,0 +1,138 @@
+{
+  "test_type": "Node.js Backend Comprehensive Test",
+  "backend_type": "Node.js/Express",
+  "database": "MongoDB (fashion_designer_db)",
+  "test_user": "testuser_052855",
+  "admin_user": "mohamad",
+  "summary": {
+    "total_tests": 17,
+    "passed_tests": 16,
+    "failed_tests": 1,
+    "success_rate": 94.11764705882352,
+    "test_timestamp": "2025-12-27T05:28:57.347496"
+  },
+  "category_results": {
+    "authentication": {
+      "total": 4,
+      "passed": 3
+    },
+    "designs": {
+      "total": 7,
+      "passed": 7
+    },
+    "admin": {
+      "total": 4,
+      "passed": 4
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T05:28:56.091645"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.134761"
+    },
+    {
+      "test_name": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.463410"
+    },
+    {
+      "test_name": "Get User Designs Quota",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.507478"
+    },
+    {
+      "test_name": "Get Showcase Designs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.548998"
+    },
+    {
+      "test_name": "Generate Design Preview",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.590065"
+    },
+    {
+      "test_name": "Generate Design Preview for Save",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.637716"
+    },
+    {
+      "test_name": "Save Design with Phone Number",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-27T05:28:56.715363"
+    },
+    {
+      "test_name": "Get User Designs (NEW ENDPOINT)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.758093"
+    },
+    {
+      "test_name": "Get User Designs Quota",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.801783"
+    },
+    {
+      "test_name": "Admin Dashboard Stats",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.851765"
+    },
+    {
+      "test_name": "Admin Get All Users",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:56.894500"
+    },
+    {
+      "test_name": "Admin Get All Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:57.098960"
+    },
+    {
+      "test_name": "Invalid Login Test",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-12-27T05:28:57.156409"
+    },
+    {
+      "test_name": "Unauthorized Access Test",
+      "success": false,
+      "details": "Expected 403, got 401. Error: {'success': False, 'detail': 'غير مصرح، لا يوجد رمز'}",
+      "timestamp": "2025-12-27T05:28:57.197939"
+    },
+    {
+      "test_name": "Frontend Landing Page Access",
+      "success": true,
+      "details": "Frontend accessible",
+      "timestamp": "2025-12-27T05:28:57.234257"
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T05:28:57.346613"
+    }
+  ],
+  "created_resources": {
+    "designs": [
+      "4089d756-04a5-4ded-aa44-8157b788d896"
+    ],
+    "orders": []
+  }
+}
