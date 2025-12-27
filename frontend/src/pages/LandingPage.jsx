@@ -113,22 +113,72 @@ export default function LandingPage({ onLogin }) {
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="mt-24 glass rounded-3xl p-12 max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div data-testid="stat-designs">
-              <div className="text-5xl font-bold text-[#D4AF37] mb-2">1000+</div>
-              <div className="text-[#5D4037] text-lg">تصميم يومي</div>
+        {/* How It Works Section */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#3E2723] mb-4">كيف يعمل؟</h2>
+            <p className="text-lg text-[#5D4037]">ثلاث خطوات بسيطة للحصول على تصميمك المثالي</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center relative">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-[#3E2723] mb-3">اختر القالب</h3>
+              <p className="text-[#5D4037]">اختر من مجموعة متنوعة من القوالب الجاهزة</p>
+              <div className="hidden md:block absolute top-10 left-0 w-full h-0.5 bg-gradient-to-l from-[#D4AF37]/50 to-transparent -z-10"></div>
             </div>
-            <div data-testid="stat-users">
-              <div className="text-5xl font-bold text-[#D4AF37] mb-2">500+</div>
-              <div className="text-[#5D4037] text-lg">مصمم نشط</div>
+            <div className="text-center relative">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-[#3E2723] mb-3">صف تصميمك</h3>
+              <p className="text-[#5D4037]">أكتب وصفاً لتصميمك ودع الذكاء الاصطناعي يبدع</p>
+              <div className="hidden md:block absolute top-10 left-0 w-full h-0.5 bg-gradient-to-l from-[#D4AF37]/50 to-transparent -z-10"></div>
             </div>
-            <div data-testid="stat-satisfaction">
-              <div className="text-5xl font-bold text-[#D4AF37] mb-2">98%</div>
-              <div className="text-[#5D4037] text-lg">رضا المستخدمين</div>
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-[#3E2723] mb-3">احفظ وشارك</h3>
+              <p className="text-[#5D4037]">احفظ تصميمك واطلب تنفيذه أو شاركه</p>
             </div>
           </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="mt-24 glass rounded-3xl p-8 sm:p-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
+            <div data-testid="stat-designs" className="p-4">
+              <div className="text-3xl sm:text-5xl font-bold text-[#D4AF37] mb-2">1000+</div>
+              <div className="text-sm sm:text-lg text-[#5D4037]">تصميم يومي</div>
+            </div>
+            <div data-testid="stat-users" className="p-4">
+              <div className="text-3xl sm:text-5xl font-bold text-[#D4AF37] mb-2">500+</div>
+              <div className="text-sm sm:text-lg text-[#5D4037]">مصمم نشط</div>
+            </div>
+            <div data-testid="stat-satisfaction" className="p-4">
+              <div className="text-3xl sm:text-5xl font-bold text-[#D4AF37] mb-2">98%</div>
+              <div className="text-sm sm:text-lg text-[#5D4037]">رضا المستخدمين</div>
+            </div>
+            <div className="p-4">
+              <div className="text-3xl sm:text-5xl font-bold text-[#D4AF37] mb-2">24/7</div>
+              <div className="text-sm sm:text-lg text-[#5D4037]">دعم فني</div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-24 text-center pb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#3E2723] mb-4">جاهز لبدء التصميم؟</h2>
+          <p className="text-lg text-[#5D4037] mb-8">سجل الآن واحصل على 3 تصاميم مجانية</p>
+          <Button
+            onClick={() => setShowAuth(true)}
+            className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] hover:from-[#B8941F] hover:to-[#9A7A1A] text-white text-lg px-12 py-6 rounded-xl shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-300 hover:scale-105"
+          >
+            <Sparkles className="ml-2 w-6 h-6" />
+            ابدأ مجاناً
+          </Button>
         </div>
       </div>
 
