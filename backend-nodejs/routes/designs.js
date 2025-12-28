@@ -112,22 +112,44 @@ router.post('/preview', protect, async (req, res) => {
       });
     }
 
-    // Mock AI generation - create enhanced prompt
-    const enhancedPrompt = `${prompt}, ${clothing_type}, ${color || ''}, high quality, professional design, studio lighting`;
+    // Translate clothing type to English for better AI results
+    const clothingTypeMap = {
+      'tshirt': 't-shirt',
+      'shirt': 'formal shirt',
+      'hoodie': 'hoodie sweatshirt',
+      'dress': 'dress',
+      'jacket': 'jacket',
+      'pants': 'pants'
+    };
+    const englishClothingType = clothingTypeMap[clothing_type] || clothing_type;
 
-    // For now, return a mock base64 image (1x1 pixel PNG)
-    const mockImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    // Generate image using OpenAI DALL-E 3
+    const result = await generateImageWithAI(prompt, englishClothingType, color);
 
     res.json({
       success: true,
-      image_base64: mockImageBase64,
-      prompt: enhancedPrompt,
+      image_base64: result.image_base64,
+      prompt: result.revised_prompt || prompt,
       message: 'تم إنشاء التصميم بنجاح',
     });
   } catch (error) {
     console.error('Preview Error:', error);
+    
+    // Handle specific API errors
+    if (error.response?.status === 400) {
+      return res.status(400).json({ 
+        detail: 'الوصف غير مناسب. يرجى تعديله والمحاولة مرة أخرى.' 
+      });
+    }
+    
+    if (error.response?.status === 429) {
+      return res.status(429).json({ 
+        detail: 'تم تجاوز الحد المسموح. يرجى الانتظار والمحاولة لاحقاً.' 
+      });
+    }
+    
     res.status(500).json({ 
-      detail: 'خطأ في إنشاء التصميم: ' + error.message 
+      detail: 'خطأ في إنشاء التصميم. يرجى المحاولة مرة أخرى.' 
     });
   }
 });
