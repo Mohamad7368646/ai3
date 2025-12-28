@@ -1134,7 +1134,12 @@ export default function Dashboard({ user, onLogout }) {
                               <div className="flex flex-col items-center gap-1 w-full">
                                 <img src={logoPreview} alt="Logo" className="w-16 h-16 rounded object-contain border-2 border-[#D4AF37] bg-white p-1" />
                                 <span className="text-xs text-[#D4AF37] font-semibold">✓ جاهز</span>
-                                <span className="text-[9px] text-[#5D4037]">سيُطبع على الصدر</span>
+                                <button 
+                                  onClick={(e) => { e.preventDefault(); setLogoPreview(null); }}
+                                  className="text-[9px] text-red-500 hover:text-red-700"
+                                >
+                                  إزالة الشعار
+                                </button>
                               </div>
                             ) : (
                               <>
@@ -1146,6 +1151,31 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
                       </div>
                     </div>
+
+                    {/* Logo Position Selector - Shows only when logo is uploaded */}
+                    {logoPreview && (
+                      <div className="mt-3">
+                        <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
+                          📍 موضع الشعار على الملابس
+                        </Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          {LOGO_POSITIONS.map((position) => (
+                            <button
+                              key={position.value}
+                              onClick={() => setSelectedLogoPosition(position.value)}
+                              className={`p-2.5 rounded-lg border-2 transition-all text-center ${
+                                selectedLogoPosition === position.value
+                                  ? 'border-[#D4AF37] bg-[#D4AF37]/10'
+                                  : 'border-gray-300 hover:border-[#D4AF37]/50'
+                              }`}
+                            >
+                              <div className="text-lg mb-0.5">{position.icon}</div>
+                              <div className="text-[10px] sm:text-xs font-medium text-[#5D4037]">{position.label}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Phone Number Input */}
                     <div>
