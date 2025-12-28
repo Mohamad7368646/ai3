@@ -1,5 +1,6 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import Design from '../models/Design.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
@@ -8,6 +9,51 @@ import { protect } from '../middleware/auth.js';
 import { createNotification } from './notifications.js';
 
 const router = express.Router();
+
+// OpenAI Image Generation Helper
+const generateImageWithAI = async (prompt, clothingType, color) => {
+  const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error('مفتاح API غير متوفر');
+  }
+
+  // Create enhanced prompt for fashion design
+  const enhancedPrompt = `Professional fashion design: ${clothingType} clothing item. Design details: ${prompt}. ${color ? `Color: ${color}.` : ''} High-quality product photography style, clean white background, studio lighting, fashion catalog style, detailed fabric texture visible, professional clothing design.`;
+
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/images/generations',
+      {
+        model: 'dall-e-3',
+        prompt: enhancedPrompt,
+        size: '1024x1024',
+        quality: 'standard',
+        response_format: 'b64_json',
+        n: 1
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 120000 // 2 minutes timeout
+      }
+    );
+
+    if (response.data?.data?.[0]?.b64_json) {
+      return {
+        image_base64: response.data.data[0].b64_json,
+        revised_prompt: response.data.data[0].revised_prompt || enhancedPrompt
+      };
+    }
+
+    throw new Error('لم يتم إنشاء الصورة');
+  } catch (error) {
+    console.error('OpenAI API Error:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
 // @route   GET /api/designs/showcase
 // @desc    Get showcase designs for homepage
