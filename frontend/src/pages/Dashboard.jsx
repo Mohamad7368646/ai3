@@ -498,8 +498,11 @@ export default function Dashboard({ user, onLogout }) {
     setLogoPreview(null);
     setUserPhotoPreview(null);
     setGeneratedDesign(null);
+    setCompositeImage(null);
+    setShowComposite(false);
     setShowOrderForm(false);
     setSelectedViewAngle("front");
+    setSelectedLogoPosition("center");
     setSelectedClothingType(null);
     setDesignStep("select-type");
   };
