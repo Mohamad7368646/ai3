@@ -76,6 +76,40 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/notifications/unread-count
+// @desc    Get unread notifications count
+// @access  Private
+router.get('/unread-count', protect, async (req, res) => {
+  try {
+    const count = await Notification.countDocuments({
+      user_id: req.user.id,
+      is_read: false,
+    });
+
+    res.json({ count });
+  } catch (error) {
+    console.error('Unread Count Error:', error);
+    res.status(500).json({ detail: 'خطأ في جلب عدد الإشعارات' });
+  }
+});
+
+// @route   PUT /api/notifications/mark-all-read
+// @desc    Mark all notifications as read
+// @access  Private
+router.put('/mark-all-read', protect, async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { user_id: req.user.id, is_read: false },
+      { is_read: true }
+    );
+
+    res.json({ message: 'تم تحديد جميع الإشعارات كمقروءة' });
+  } catch (error) {
+    console.error('Mark All Read Error:', error);
+    res.status(500).json({ detail: 'خطأ في تحديث الإشعارات' });
+  }
+});
+
 // Helper function to create notification
 export const createNotification = async (userId, title, message, type = 'info') => {
   try {
