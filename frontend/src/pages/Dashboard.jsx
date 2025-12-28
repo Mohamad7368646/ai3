@@ -787,7 +787,10 @@ export default function Dashboard({ user, onLogout }) {
                         size="sm"
                         variant="ghost"
                         className="text-[#D4AF37] hover:text-white hover:bg-[#D4AF37] text-xs sm:text-sm h-8"
-                        onClick={() => setActiveView("customize")}
+                        onClick={() => {
+                          setActiveView("customize");
+                          setDesignStep("select-type");
+                        }}
                       >
                         ابدأ التصميم
                       </Button>
@@ -799,7 +802,10 @@ export default function Dashboard({ user, onLogout }) {
             
             <div className="mt-8 sm:mt-12 text-center">
               <Button
-                onClick={() => setActiveView("customize")}
+                onClick={() => {
+                  setActiveView("customize");
+                  setDesignStep("select-type");
+                }}
                 className="bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6"
               >
                 <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
@@ -809,16 +815,80 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* Customize View */}
-        {activeView === "customize" && (
+        {/* Customize View - Step 1: Select Clothing Type */}
+        {activeView === "customize" && designStep === "select-type" && (
+          <div className="fade-in">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3E2723] mb-3 sm:mb-4">
+                🎨 ماذا تريد أن تصمم؟
+              </h2>
+              <p className="text-base sm:text-lg text-[#5D4037] max-w-2xl mx-auto">
+                اختر نوع الملابس الذي تريد تصميمه، ثم سنساعدك في إنشاء تصميم فريد بالذكاء الاصطناعي
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+              {CLOTHING_TYPES.map((type) => (
+                <div
+                  key={type.value}
+                  onClick={() => handleClothingTypeSelect(type)}
+                  className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer group hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-[#D4AF37]/20 border-2 border-transparent hover:border-[#D4AF37]"
+                >
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br ${type.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <span className="text-3xl sm:text-4xl">{type.emoji}</span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-[#3E2723] text-center mb-1 sm:mb-2">
+                    {type.label}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#5D4037] text-center line-clamp-2">
+                    {type.description}
+                  </p>
+                  <div className="mt-3 sm:mt-4 flex justify-center">
+                    <span className="text-xs sm:text-sm text-[#D4AF37] font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                      ابدأ التصميم
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-8 sm:mt-12 text-center">
+              <p className="text-sm text-[#5D4037] mb-4">
+                💡 نصيحة: اختر النوع الذي يناسب احتياجاتك، يمكنك التغيير لاحقاً
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Customize View - Step 2: Design Details */}
+        {activeView === "customize" && designStep === "customize" && selectedClothingType && (
           <div className="fade-in">
             <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
-                <div className="w-full sm:w-auto">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3E2723]">تخصيص التصميم</h2>
-                  <p className="text-sm sm:text-base text-[#5D4037]">صمم ملابسك الخاصة بلمسة من الذكاء الاصطناعي</p>
+                <div className="w-full sm:w-auto flex items-center gap-3">
+                  <button
+                    onClick={goBackToTypeSelection}
+                    className="p-2 rounded-full hover:bg-[#D4AF37]/10 transition-colors"
+                  >
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37]" />
+                  </button>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3E2723] flex items-center gap-2">
+                      <span>{CLOTHING_TYPES.find(t => t.value === selectedClothingType)?.emoji}</span>
+                      تصميم {CLOTHING_TYPES.find(t => t.value === selectedClothingType)?.label}
+                    </h2>
+                    <p className="text-sm sm:text-base text-[#5D4037]">أدخل تفاصيل التصميم الذي تريده</p>
+                  </div>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    onClick={goBackToTypeSelection}
+                    className="flex-1 sm:flex-none text-xs sm:text-sm h-9 sm:h-10"
+                  >
+                    تغيير النوع
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => setShowSizeChart(true)}
