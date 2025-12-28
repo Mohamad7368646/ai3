@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin.js';
 import notificationRoutes from './routes/notifications.js';
 import couponRoutes from './routes/coupons.js';
 import oauthRoutes from './routes/oauth.js';
+import orderRoutes from './routes/orders.js';
 
 // Load environment variables
 dotenv.config();
@@ -45,6 +46,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/oauth', oauthRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
