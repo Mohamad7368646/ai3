@@ -14,14 +14,20 @@ const router = express.Router();
 const IMAGE_GENERATOR_URL = process.env.IMAGE_GENERATOR_URL || 'http://localhost:8002';
 
 // AI Image Generation Helper - calls Python microservice
-const generateImageWithAI = async (prompt, clothingType, color) => {
+const generateImageWithAI = async (prompt, clothingType, color, options = {}) => {
   try {
+    const { logo_base64, logo_position, user_photo_base64, view_angle } = options;
+    
     const response = await axios.post(
       `${IMAGE_GENERATOR_URL}/generate`,
       {
         prompt: prompt,
         clothing_type: clothingType,
-        color: color || ''
+        color: color || '',
+        logo_base64: logo_base64 || null,
+        logo_position: logo_position || 'center',
+        user_photo_base64: user_photo_base64 || null,
+        view_angle: view_angle || 'front'
       },
       {
         timeout: 180000 // 3 minutes timeout for AI generation
@@ -31,6 +37,7 @@ const generateImageWithAI = async (prompt, clothingType, color) => {
     if (response.data?.success && response.data?.image_base64) {
       return {
         image_base64: response.data.image_base64,
+        composite_image_base64: response.data.composite_image_base64 || '',
         revised_prompt: response.data.revised_prompt || prompt
       };
     }
