@@ -375,14 +375,28 @@ export default function Dashboard({ user, onLogout }) {
         template_id: null
       });
       
-      // Update quota after successful generation
-      await fetchDesignsQuota();
+      // Update quota from response data (more accurate)
+      if (response.data.designs_remaining !== undefined) {
+        setDesignsQuota(prev => ({
+          ...prev,
+          designs_used: response.data.designs_used,
+          designs_remaining: response.data.designs_remaining,
+          designs_limit: response.data.designs_limit
+        }));
+      } else {
+        // Fallback to fetching quota
+        await fetchDesignsQuota();
+      }
       
       toast.success("تم إنشاء التصميم بنجاح!");
       
       // Show warning if running low on designs
-      if (!designsQuota.is_unlimited && designsQuota.designs_remaining - 1 <= 3 && designsQuota.designs_remaining - 1 > 0) {
-        toast.warning(`⚠️ تبقى لديك ${designsQuota.designs_remaining - 1} تصاميم فقط`);
+      const remaining = response.data.designs_remaining ?? (designsQuota.designs_remaining - 1);
+      if (!designsQuota.is_unlimited && remaining <= 3 && remaining > 0) {
+        toast.warning(`⚠️ تبقى لديك ${remaining} تصاميم فقط`);
+      }
+      if (!designsQuota.is_unlimited && remaining <= 0) {
+        toast.error("⚠️ لقد استنفدت جميع محاولات التصميم المجانية!");
       }
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل في إنشاء التصميم");
