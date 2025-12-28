@@ -76,14 +76,64 @@ export default function Dashboard({ user, onLogout }) {
   });
   const [suggestedSize, setSuggestedSize] = useState("");
   
-  // Clothing types
+  // Clothing types with descriptions
   const CLOTHING_TYPES = [
-    { value: "tshirt", label: "تيشيرت", emoji: "👕" },
-    { value: "shirt", label: "قميص", emoji: "👔" },
-    { value: "hoodie", label: "هودي", emoji: "🧥" },
-    { value: "dress", label: "فستان", emoji: "👗" },
-    { value: "jacket", label: "جاكيت", emoji: "🧥" },
-    { value: "pants", label: "بنطلون", emoji: "👖" }
+    { 
+      value: "tshirt", 
+      label: "تيشيرت", 
+      emoji: "👕",
+      description: "تيشيرت قطني مريح للاستخدام اليومي",
+      color: "from-blue-400 to-blue-600"
+    },
+    { 
+      value: "shirt", 
+      label: "قميص رسمي", 
+      emoji: "👔",
+      description: "قميص أنيق للمناسبات والعمل",
+      color: "from-indigo-400 to-indigo-600"
+    },
+    { 
+      value: "hoodie", 
+      label: "هودي / كنزة", 
+      emoji: "🧥",
+      description: "هودي دافئ ومريح للشتاء",
+      color: "from-purple-400 to-purple-600"
+    },
+    { 
+      value: "dress", 
+      label: "فستان", 
+      emoji: "👗",
+      description: "فستان أنيق للمناسبات الخاصة",
+      color: "from-pink-400 to-pink-600"
+    },
+    { 
+      value: "jacket", 
+      label: "جاكيت", 
+      emoji: "🧥",
+      description: "جاكيت عصري للإطلالة المميزة",
+      color: "from-gray-500 to-gray-700"
+    },
+    { 
+      value: "pants", 
+      label: "بنطلون", 
+      emoji: "👖",
+      description: "بنطلون مريح بتصميم عصري",
+      color: "from-amber-400 to-amber-600"
+    },
+    { 
+      value: "polo", 
+      label: "بولو", 
+      emoji: "👕",
+      description: "قميص بولو كلاسيكي وأنيق",
+      color: "from-green-400 to-green-600"
+    },
+    { 
+      value: "sweater", 
+      label: "سويتر", 
+      emoji: "🧶",
+      description: "سويتر صوف دافئ للشتاء",
+      color: "from-red-400 to-red-600"
+    }
   ];
   
   // Designs quota state
