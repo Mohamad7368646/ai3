@@ -23,6 +23,13 @@ const VIEW_ANGLES = [
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
+const LOGO_POSITIONS = [
+  { value: "center", label: "وسط الصدر", icon: "⬤" },
+  { value: "left", label: "الصدر الأيسر", icon: "◀" },
+  { value: "right", label: "الصدر الأيمن", icon: "▶" },
+  { value: "bottom", label: "أسفل الملابس", icon: "▼" }
+];
+
 export default function Dashboard({ user, onLogout }) {
   const { isDark, toggleTheme } = useTheme();
   
