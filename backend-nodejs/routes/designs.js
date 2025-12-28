@@ -77,6 +77,46 @@ router.get('/showcase', async (req, res) => {
   }
 });
 
+// @route   POST /api/designs/enhance-prompt
+// @desc    Enhance design prompt using AI
+// @access  Private
+router.post('/enhance-prompt', protect, async (req, res) => {
+  try {
+    const { prompt, clothing_type } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ 
+        detail: 'يرجى إدخال الوصف' 
+      });
+    }
+
+    // Translate clothing type
+    const clothingTypeMap = {
+      'tshirt': 'تيشيرت',
+      'shirt': 'قميص',
+      'hoodie': 'هودي',
+      'dress': 'فستان',
+      'jacket': 'جاكيت',
+      'pants': 'بنطلون'
+    };
+    const arabicClothingType = clothingTypeMap[clothing_type] || clothing_type;
+
+    // Enhance the prompt with fashion-specific details
+    const enhancedPrompt = `${prompt}، ${arabicClothingType} بتصميم احترافي، خامة قطنية عالية الجودة، ألوان متناسقة، مناسب للموسم الحالي، تفاصيل دقيقة ومميزة، إطلالة عصرية وأنيقة`;
+
+    res.json({
+      success: true,
+      enhanced_prompt: enhancedPrompt,
+      original_prompt: prompt
+    });
+  } catch (error) {
+    console.error('Enhance Prompt Error:', error);
+    res.status(500).json({ 
+      detail: 'خطأ في تحسين الوصف' 
+    });
+  }
+});
+
 // @route   POST /api/designs/preview
 // @desc    Generate design preview (mock AI generation)
 // @access  Private
