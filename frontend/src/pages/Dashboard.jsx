@@ -904,29 +904,7 @@ export default function Dashboard({ user, onLogout }) {
               <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
                 {/* Left: Customization Options */}
                 <div className="space-y-4 sm:space-y-6">
-                  {/* Clothing Type Selector */}
-                  <div>
-                    <Label className="text-base sm:text-lg font-semibold text-[#3E2723] mb-2 sm:mb-3 block">
-                      نوع الملبس
-                    </Label>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                      {CLOTHING_TYPES.map((type) => (
-                        <button
-                          key={type.value}
-                          onClick={() => setSelectedClothingType(type.value)}
-                          className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all ${
-                            selectedClothingType === type.value
-                              ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                              : 'border-gray-300 hover:border-[#D4AF37]/50'
-                          }`}
-                        >
-                          <div className="text-2xl sm:text-3xl mb-0.5 sm:mb-1">{type.emoji}</div>
-                          <div className="text-xs sm:text-sm font-semibold">{type.label}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
+                  {/* Design Description */}
                   <div>
                     <Label className="text-base sm:text-lg font-semibold text-[#3E2723] mb-2 sm:mb-3 block">
                       وصف التصميم
@@ -934,7 +912,7 @@ export default function Dashboard({ user, onLogout }) {
                     <Textarea
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="صف التصميم الذي تريده بالتفصيل..."
+                      placeholder={`صف تصميم ${CLOTHING_TYPES.find(t => t.value === selectedClothingType)?.label} الذي تريده بالتفصيل...`}
                       className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base md:text-lg border-2 border-[#D4AF37]/30 focus:border-[#D4AF37]"
                     />
                   </div>
