@@ -37,6 +37,7 @@ export default function Dashboard({ user, onLogout }) {
   const [sizeChart, setSizeChart] = useState({});
   const [activeView, setActiveView] = useState("showcase");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [designStep, setDesignStep] = useState("select-type"); // "select-type" or "customize"
   
   // Design State
   const [prompt, setPrompt] = useState("");
@@ -46,7 +47,7 @@ export default function Dashboard({ user, onLogout }) {
   const [enhancing, setEnhancing] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState("classic");
   const [selectedViewAngle, setSelectedViewAngle] = useState("front");
-  const [selectedClothingType, setSelectedClothingType] = useState("tshirt");
+  const [selectedClothingType, setSelectedClothingType] = useState(null);
   const [selectedSize, setSelectedSize] = useState("M");
   
   // Preview State
