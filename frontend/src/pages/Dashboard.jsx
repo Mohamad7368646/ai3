@@ -663,16 +663,8 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="p-3 border-t border-[#3E2723]/10 bg-white/50">
                       <button
                         onClick={async () => {
-                          try {
-                            await Promise.all(
-                              notifications
-                                .filter(n => !n.is_read)
-                                .map(n => markNotificationAsRead(n.id))
-                            );
-                            setShowNotifications(false);
-                          } catch (error) {
-                            console.error('Error marking all as read:', error);
-                          }
+                          await markAllNotificationsAsRead();
+                          setShowNotifications(false);
                         }}
                         className="w-full text-center text-sm text-[#D4AF37] hover:text-[#B8941F] font-semibold py-2"
                       >
