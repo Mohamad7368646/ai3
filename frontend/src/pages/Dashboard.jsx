@@ -52,6 +52,9 @@ export default function Dashboard({ user, onLogout }) {
   
   // Preview State
   const [generatedDesign, setGeneratedDesign] = useState(null);
+  const [compositeImage, setCompositeImage] = useState(null);
+  const [showComposite, setShowComposite] = useState(false);
+  const [selectedLogoPosition, setSelectedLogoPosition] = useState("center");
   
   // Coupon State
   const [availableCoupons, setAvailableCoupons] = useState([]);
