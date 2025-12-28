@@ -268,11 +268,12 @@ export default function Dashboard({ user, onLogout }) {
 
     setEnhancing(true);
     try {
-      const response = await axios.post(`${API}/prompt/enhance`, {
+      const response = await axios.post(`${API}/designs/enhance-prompt`, {
         prompt: prompt,
         clothing_type: selectedClothingType
       });
       setEnhancedPrompt(response.data.enhanced_prompt);
+      setPrompt(response.data.enhanced_prompt); // Update the visible prompt too
       toast.success("تم تحسين الوصف بنجاح!");
     } catch (error) {
       toast.error("فشل في تحسين الوصف");
