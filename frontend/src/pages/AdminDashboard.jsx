@@ -118,7 +118,7 @@ export default function AdminDashboard({ user, onLogout }) {
 
   const updateUserLimit = async (userId, newLimit) => {
     try {
-      await axios.put(`${API}/admin/users/${userId}/designs-limit?designs_limit=${newLimit}`);
+      await axios.put(`${API}/admin/users/${userId}/designs-limit`, { designs_limit: newLimit });
       toast.success("تم تحديث حد التصاميم");
       fetchUsers();
       setEditUserModal({ open: false, user: null });
