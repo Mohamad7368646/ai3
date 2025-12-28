@@ -125,11 +125,11 @@ router.post('/enhance-prompt', protect, async (req, res) => {
 });
 
 // @route   POST /api/designs/preview
-// @desc    Generate design preview (mock AI generation)
+// @desc    Generate design preview with AI, logo blending, and user photo composition
 // @access  Private
 router.post('/preview', protect, async (req, res) => {
   try {
-    const { prompt, clothing_type, color } = req.body;
+    const { prompt, clothing_type, color, logo_base64, logo_position, user_photo_base64, view_angle } = req.body;
 
     if (!prompt || !clothing_type) {
       return res.status(400).json({ 
@@ -157,8 +157,13 @@ router.post('/preview', protect, async (req, res) => {
     };
     const englishClothingType = clothingTypeMap[clothing_type] || clothing_type;
 
-    // Generate image using OpenAI DALL-E 3
-    const result = await generateImageWithAI(prompt, englishClothingType, color);
+    // Generate image using OpenAI with logo and user photo options
+    const result = await generateImageWithAI(prompt, englishClothingType, color, {
+      logo_base64,
+      logo_position: logo_position || 'center',
+      user_photo_base64,
+      view_angle: view_angle || 'front'
+    });
 
     // Increment designs_used after successful generation
     await User.findOneAndUpdate(
@@ -173,6 +178,7 @@ router.post('/preview', protect, async (req, res) => {
     res.json({
       success: true,
       image_base64: result.image_base64,
+      composite_image_base64: result.composite_image_base64 || '',
       prompt: result.revised_prompt || prompt,
       message: 'تم إنشاء التصميم بنجاح',
       designs_remaining: designsRemaining,
