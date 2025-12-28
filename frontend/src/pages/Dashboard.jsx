@@ -446,7 +446,22 @@ export default function Dashboard({ user, onLogout }) {
     setGeneratedDesign(null);
     setShowOrderForm(false);
     setSelectedViewAngle("front");
-    setSelectedClothingType("tshirt");
+    setSelectedClothingType(null);
+    setDesignStep("select-type");
+  };
+  
+  const handleClothingTypeSelect = (type) => {
+    setSelectedClothingType(type.value);
+    setDesignStep("customize");
+    toast.success(`تم اختيار ${type.label}! أدخل تفاصيل التصميم`);
+  };
+  
+  const goBackToTypeSelection = () => {
+    setDesignStep("select-type");
+    setSelectedClothingType(null);
+    setGeneratedDesign(null);
+    setPrompt("");
+    setEnhancedPrompt("");
   };
 
   const toggleFavorite = async (designId, currentStatus) => {
