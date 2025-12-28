@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Simple FastAPI service for AI image generation using Emergent LLM Key
+AI Image Generation Service with Logo Support
 """
 import os
 import base64
-import asyncio
+import io
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -28,6 +29,8 @@ class ImageRequest(BaseModel):
     prompt: str
     clothing_type: str = "t-shirt"
     color: str = ""
+    logo_base64: Optional[str] = None
+    logo_description: Optional[str] = None
 
 class ImageResponse(BaseModel):
     success: bool
@@ -48,8 +51,19 @@ async def generate_image(request: ImageRequest):
         if not api_key:
             raise HTTPException(status_code=500, detail="API key not configured")
         
+        # Build the prompt with logo description if provided
+        logo_part = ""
+        if request.logo_description:
+            logo_part = f" The clothing has a custom logo/design on the front: {request.logo_description}."
+        elif request.logo_base64:
+            logo_part = " The clothing features a custom printed logo/design prominently displayed on the front center."
+        
         # Create enhanced prompt for fashion design
-        enhanced_prompt = f"Professional fashion design: {request.clothing_type} clothing item. Design details: {request.prompt}. {f'Color: {request.color}.' if request.color else ''} High-quality product photography style, clean white background, studio lighting, fashion catalog style, detailed fabric texture visible, professional clothing design."
+        enhanced_prompt = f"""Professional fashion photography: A {request.clothing_type} clothing item displayed on a mannequin or flat lay.
+Design details: {request.prompt}.
+{f'Primary color: {request.color}.' if request.color else ''}
+{logo_part}
+Style: High-end fashion catalog photography, clean white/light gray background, professional studio lighting, sharp details, fabric texture visible, premium quality clothing, fashion e-commerce style photo."""
         
         # Initialize image generator
         image_gen = OpenAIImageGeneration(api_key=api_key)
