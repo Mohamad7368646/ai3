@@ -1231,20 +1231,76 @@ export default function Dashboard({ user, onLogout }) {
 
                 {/* Right: Design Preview */}
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="w-full aspect-square bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center overflow-hidden">
+                  {/* Toggle between design and composite */}
+                  {generatedDesign && compositeImage && (
+                    <div className="flex justify-center gap-2 mb-2">
+                      <Button
+                        onClick={() => setShowComposite(false)}
+                        variant={!showComposite ? "default" : "outline"}
+                        size="sm"
+                        className={!showComposite 
+                          ? "bg-[#D4AF37] text-white" 
+                          : "border-[#D4AF37] text-[#D4AF37]"
+                        }
+                      >
+                        🎨 التصميم
+                      </Button>
+                      <Button
+                        onClick={() => setShowComposite(true)}
+                        variant={showComposite ? "default" : "outline"}
+                        size="sm"
+                        className={showComposite 
+                          ? "bg-[#D4AF37] text-white" 
+                          : "border-[#D4AF37] text-[#D4AF37]"
+                        }
+                      >
+                        👤 صورتك مع التصميم
+                      </Button>
+                    </div>
+                  )}
+                  
+                  <div className={`w-full bg-gradient-to-br from-[#D4AF37]/5 to-[#B8941F]/5 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#D4AF37]/30 flex items-center justify-center overflow-hidden ${
+                    showComposite && compositeImage ? 'aspect-[2/1]' : 'aspect-square'
+                  }`}>
                     {generatedDesign ? (
-                      <img 
-                        src={`data:image/png;base64,${generatedDesign.image_base64}`}
-                        alt="Generated Design" 
-                        className="w-full h-full object-contain"
-                      />
+                      showComposite && compositeImage ? (
+                        <img 
+                          src={`data:image/png;base64,${compositeImage}`}
+                          alt="Your Photo with Design" 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <img 
+                          src={`data:image/png;base64,${generatedDesign.image_base64}`}
+                          alt="Generated Design" 
+                          className="w-full h-full object-contain"
+                        />
+                      )
                     ) : (
                       <div className="text-center p-4">
                         <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#D4AF37] mx-auto mb-3 sm:mb-4 opacity-50" />
                         <p className="text-[#5D4037] text-sm sm:text-base md:text-lg">سيظهر تصميمك هنا</p>
+                        {userPhotoPreview && (
+                          <p className="text-[#D4AF37] text-xs mt-2">📸 ستظهر صورتك مع التصميم</p>
+                        )}
+                        {logoPreview && (
+                          <p className="text-[#D4AF37] text-xs mt-1">🎨 سيُدمج شعارك في التصميم</p>
+                        )}
                       </div>
                     )}
                   </div>
+
+                  {/* Info banner when composite is available */}
+                  {generatedDesign && compositeImage && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 text-center">
+                      <p className="text-sm text-green-800 font-medium">
+                        ✨ تم دمج صورتك مع التصميم بنجاح!
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        انقر على "صورتك مع التصميم" لرؤية النتيجة النهائية
+                      </p>
+                    </div>
+                  )}
 
                   {/* Actions when design is generated */}
                   {generatedDesign && !showOrderForm && (
