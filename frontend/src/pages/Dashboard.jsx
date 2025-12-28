@@ -376,6 +376,9 @@ export default function Dashboard({ user, onLogout }) {
     }
 
     setGenerating(true);
+    setCompositeImage(null);
+    setShowComposite(false);
+    
     try {
       const finalPrompt = enhancedPrompt || prompt;
       
@@ -384,6 +387,7 @@ export default function Dashboard({ user, onLogout }) {
         clothing_type: selectedClothingType,
         template_id: null,
         logo_base64: logoPreview ? logoPreview.split(',')[1] : null,
+        logo_position: selectedLogoPosition,
         user_photo_base64: userPhotoPreview ? userPhotoPreview.split(',')[1] : null,
         view_angle: selectedViewAngle
       };
@@ -397,6 +401,14 @@ export default function Dashboard({ user, onLogout }) {
         template_id: null
       });
       
+      // Store composite image if available
+      if (response.data.composite_image_base64) {
+        setCompositeImage(response.data.composite_image_base64);
+        toast.success("🎨 تم إنشاء التصميم مع صورتك!");
+      } else {
+        toast.success("تم إنشاء التصميم بنجاح!");
+      }
+      
       // Update quota from response data (more accurate)
       if (response.data.designs_remaining !== undefined) {
         setDesignsQuota(prev => ({
@@ -409,8 +421,6 @@ export default function Dashboard({ user, onLogout }) {
         // Fallback to fetching quota
         await fetchDesignsQuota();
       }
-      
-      toast.success("تم إنشاء التصميم بنجاح!");
       
       // Show warning if running low on designs
       const remaining = response.data.designs_remaining ?? (designsQuota.designs_remaining - 1);
