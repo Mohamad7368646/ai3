@@ -153,11 +153,24 @@ router.post('/preview', protect, async (req, res) => {
     // Generate image using OpenAI DALL-E 3
     const result = await generateImageWithAI(prompt, englishClothingType, color);
 
+    // Increment designs_used after successful generation
+    await User.findOneAndUpdate(
+      { id: req.user.id },
+      { $inc: { designs_used: 1 } }
+    );
+
+    // Get updated user data for response
+    const updatedUser = await User.findOne({ id: req.user.id });
+    const designsRemaining = updatedUser.is_unlimited ? 999 : (updatedUser.designs_limit - updatedUser.designs_used);
+
     res.json({
       success: true,
       image_base64: result.image_base64,
       prompt: result.revised_prompt || prompt,
       message: 'تم إنشاء التصميم بنجاح',
+      designs_remaining: designsRemaining,
+      designs_used: updatedUser.designs_used,
+      designs_limit: updatedUser.designs_limit
     });
   } catch (error) {
     console.error('Preview Error:', error);
