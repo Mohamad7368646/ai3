@@ -13,7 +13,7 @@ const orderSchema = new mongoose.Schema({
   },
   design_id: {
     type: String,
-    required: true,
+    required: false, // Made optional - can create order without saved design
     ref: 'Design',
   },
   design_image_base64: String,
@@ -33,6 +33,7 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  coupon_code: String,
   status: {
     type: String,
     enum: ['pending', 'processing', 'completed', 'cancelled'],
