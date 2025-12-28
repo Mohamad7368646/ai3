@@ -839,23 +839,42 @@ export default function Dashboard({ user, onLogout }) {
               {CLOTHING_TYPES.map((type) => (
                 <div
                   key={type.value}
-                  onClick={() => handleClothingTypeSelect(type)}
-                  className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer group hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-[#D4AF37]/20 border-2 border-transparent hover:border-[#D4AF37]"
+                  onClick={() => type.active && handleClothingTypeSelect(type)}
+                  className={`glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 relative overflow-hidden transition-all duration-300 border-2 ${
+                    type.active 
+                      ? 'cursor-pointer group hover:scale-105 hover:shadow-2xl hover:shadow-[#D4AF37]/20 border-transparent hover:border-[#D4AF37]' 
+                      : 'cursor-not-allowed opacity-60 border-gray-300'
+                  }`}
                 >
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br ${type.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <span className="text-3xl sm:text-4xl">{type.emoji}</span>
+                  {/* قيد التطوير Badge */}
+                  {!type.active && (
+                    <div className="absolute top-2 right-2 left-2 z-10">
+                      <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] sm:text-xs font-bold py-1 px-2 sm:px-3 rounded-full text-center shadow-lg">
+                        🚧 قيد التطوير
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br ${type.active ? type.color : 'from-gray-300 to-gray-400'} flex items-center justify-center shadow-lg ${type.active ? 'group-hover:scale-110' : ''} transition-transform duration-300 ${!type.active ? 'mt-4' : ''}`}>
+                    <span className={`text-3xl sm:text-4xl ${!type.active ? 'grayscale opacity-70' : ''}`}>{type.emoji}</span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-[#3E2723] text-center mb-1 sm:mb-2">
+                  <h3 className={`text-lg sm:text-xl font-bold text-center mb-1 sm:mb-2 ${type.active ? 'text-[#3E2723]' : 'text-gray-500'}`}>
                     {type.label}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#5D4037] text-center line-clamp-2">
-                    {type.description}
+                  <p className={`text-xs sm:text-sm text-center line-clamp-2 ${type.active ? 'text-[#5D4037]' : 'text-gray-400'}`}>
+                    {type.active ? type.description : 'سيتوفر قريباً...'}
                   </p>
                   <div className="mt-3 sm:mt-4 flex justify-center">
-                    <span className="text-xs sm:text-sm text-[#D4AF37] font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                      ابدأ التصميم
-                    </span>
+                    {type.active ? (
+                      <span className="text-xs sm:text-sm text-[#D4AF37] font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                        ابدأ التصميم
+                      </span>
+                    ) : (
+                      <span className="text-xs sm:text-sm text-gray-400 font-medium flex items-center gap-1">
+                        ⏳ قريباً
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -864,6 +883,9 @@ export default function Dashboard({ user, onLogout }) {
             <div className="mt-8 sm:mt-12 text-center">
               <p className="text-sm text-[#5D4037] mb-4">
                 💡 نصيحة: اختر النوع الذي يناسب احتياجاتك، يمكنك التغيير لاحقاً
+              </p>
+              <p className="text-xs text-[#5D4037]/70">
+                🚀 المزيد من الأنواع قادمة قريباً!
               </p>
             </div>
           </div>
