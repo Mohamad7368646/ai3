@@ -1297,7 +1297,7 @@ export default function Dashboard({ user, onLogout }) {
                         ✨ تم دمج صورتك مع التصميم بنجاح!
                       </p>
                       <p className="text-xs text-green-600 mt-1">
-                        انقر على "صورتك مع التصميم" لرؤية النتيجة النهائية
+                        انقر على زر &quot;صورتك مع التصميم&quot; لرؤية النتيجة النهائية
                       </p>
                     </div>
                   )}
