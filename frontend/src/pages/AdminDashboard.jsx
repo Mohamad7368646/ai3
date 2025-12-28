@@ -129,7 +129,7 @@ export default function AdminDashboard({ user, onLogout }) {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      await axios.put(`${API}/admin/orders/${orderId}/status?status=${status}`);
+      await axios.put(`${API}/admin/orders/${orderId}/status`, { status });
       toast.success("تم تحديث حالة الطلب");
       fetchOrders();
     } catch (error) {
