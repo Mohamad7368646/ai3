@@ -10,47 +10,34 @@ import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
-// OpenAI Image Generation Helper
+// Image Generator Service URL
+const IMAGE_GENERATOR_URL = process.env.IMAGE_GENERATOR_URL || 'http://localhost:8002';
+
+// AI Image Generation Helper - calls Python microservice
 const generateImageWithAI = async (prompt, clothingType, color) => {
-  const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    throw new Error('مفتاح API غير متوفر');
-  }
-
-  // Create enhanced prompt for fashion design
-  const enhancedPrompt = `Professional fashion design: ${clothingType} clothing item. Design details: ${prompt}. ${color ? `Color: ${color}.` : ''} High-quality product photography style, clean white background, studio lighting, fashion catalog style, detailed fabric texture visible, professional clothing design.`;
-
   try {
     const response = await axios.post(
-      'https://api.openai.com/v1/images/generations',
+      `${IMAGE_GENERATOR_URL}/generate`,
       {
-        model: 'dall-e-3',
-        prompt: enhancedPrompt,
-        size: '1024x1024',
-        quality: 'standard',
-        response_format: 'b64_json',
-        n: 1
+        prompt: prompt,
+        clothing_type: clothingType,
+        color: color || ''
       },
       {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 120000 // 2 minutes timeout
+        timeout: 180000 // 3 minutes timeout for AI generation
       }
     );
 
-    if (response.data?.data?.[0]?.b64_json) {
+    if (response.data?.success && response.data?.image_base64) {
       return {
-        image_base64: response.data.data[0].b64_json,
-        revised_prompt: response.data.data[0].revised_prompt || enhancedPrompt
+        image_base64: response.data.image_base64,
+        revised_prompt: response.data.revised_prompt || prompt
       };
     }
 
-    throw new Error('لم يتم إنشاء الصورة');
+    throw new Error(response.data?.error || 'فشل في توليد الصورة');
   } catch (error) {
-    console.error('OpenAI API Error:', error.response?.data || error.message);
+    console.error('Image Generator Error:', error.response?.data || error.message);
     throw error;
   }
 };
