@@ -221,7 +221,7 @@ export default function Dashboard({ user, onLogout }) {
       
       // Get unread count
       const unreadResponse = await axios.get(`${API}/notifications/unread-count`);
-      setUnreadCount(unreadResponse.data.count);
+      setUnreadCount(unreadResponse.data.count || 0);
     } catch (error) {
       console.error("Failed to fetch notifications");
     }
@@ -245,6 +245,18 @@ export default function Dashboard({ user, onLogout }) {
       setUnreadCount(Math.max(0, unreadCount - 1));
     } catch (error) {
       console.error("Failed to mark notification as read");
+    }
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    try {
+      await axios.put(`${API}/notifications/mark-all-read`);
+      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+      toast.success("تم تحديد جميع الإشعارات كمقروءة");
+    } catch (error) {
+      console.error("Failed to mark all notifications as read");
+      toast.error("فشل في تحديث الإشعارات");
     }
   };
 
