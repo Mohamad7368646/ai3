@@ -17,7 +17,7 @@ Edit `/app/frontend/.env`:
 
 ```bash
 # Change from:
-REACT_APP_BACKEND_URL=https://ai-clothier.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://styleit-1.preview.emergentagent.com
 
 # To:
 REACT_APP_BACKEND_URL=http://localhost:8002
@@ -92,7 +92,7 @@ If issues occur:
 ```bash
 # Switch back to FastAPI
 # Update .env to port 8001
-REACT_APP_BACKEND_URL=https://ai-clothier.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://styleit-1.preview.emergentagent.com
 
 # Restart frontend
 sudo supervisorctl restart frontend

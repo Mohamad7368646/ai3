@@ -12,7 +12,7 @@ from datetime import datetime
 class ArabicAuthTester:
     def __init__(self):
         # Use the backend URL from frontend/.env
-        self.base_url = "https://ai-clothier.preview.emergentagent.com"
+        self.base_url = "https://styleit-1.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.token = None
         self.user_data = None
