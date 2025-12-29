@@ -1025,9 +1025,365 @@ def test_coupon_system_comprehensive():
             for test in failed_coupons:
                 print(f"   ❌ {test['test_name']}: {test['details']}")
         
+def test_advanced_image_generation():
+    """
+    اختبار شامل لميزة توليد الصور المتقدمة الجديدة
+    Testing comprehensive advanced image generation feature
+    """
+    print("🎨 اختبار شامل لميزة توليد الصور المتقدمة")
+    print("=" * 80)
+    
+    tester = NodeJSBackendTester()
+    
+    # Generate unique test user
+    timestamp = datetime.now().strftime('%H%M%S')
+    test_username = f"imagetest_{timestamp}"
+    test_email = f"imagetest_{timestamp}@example.com"
+    test_password = "TestPass123!"
+    
+    # Admin credentials from request
+    admin_username = "mohamad"
+    admin_password = "mohamad271"
+    
+    print(f"\n📝 Test User: {test_username}")
+    print(f"📧 Test Email: {test_email}")
+    print(f"👑 Admin User: {admin_username}")
+    
+    # ===== 1. PYTHON MICROSERVICE HEALTH CHECK =====
+    print(f"\n{'='*20} 1. اختبار Python Microservice Health {'='*20}")
+    
+    try:
+        # Test Python microservice health endpoint
+        microservice_url = "http://localhost:8002"
+        response = requests.get(f"{microservice_url}/health", timeout=10)
+        
+        if response.status_code == 200:
+            health_data = response.json()
+            tester.log_test("Python Microservice Health Check", True, 
+                          f"Status: {health_data.get('status')}, Service: {health_data.get('service')}")
+            print(f"   ✅ Python microservice is running on port 8002")
+            print(f"   📊 Status: {health_data.get('status')}")
+            print(f"   🔧 Service: {health_data.get('service')}")
+        else:
+            tester.log_test("Python Microservice Health Check", False, 
+                          f"Expected 200, got {response.status_code}")
+            print(f"   ❌ Python microservice health check failed")
+            return 1
+            
+    except Exception as e:
+        tester.log_test("Python Microservice Health Check", False, f"Exception: {str(e)}")
+        print(f"   ❌ Cannot connect to Python microservice: {e}")
+        return 1
+    
+    # ===== 2. AUTHENTICATION SETUP =====
+    print(f"\n{'='*20} 2. إعداد المصادقة {'='*20}")
+    
+    # Test user registration
+    if not tester.test_register(test_username, test_email, test_password):
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    # Test admin login
+    if not tester.test_admin_login(admin_username, admin_password):
+        print("❌ Admin login failed, continuing with user tests only")
+    
+    # ===== 3. BASIC IMAGE GENERATION TESTS =====
+    print(f"\n{'='*20} 3. اختبارات توليد الصور الأساسية {'='*20}")
+    
+    # Test 1: Basic image generation without logo or user photo
+    print("\n🔍 1. توليد صورة بسيط (بدون شعار أو صورة مستخدم)...")
+    basic_success, basic_response = tester.run_test(
+        "Basic Image Generation",
+        "POST",
+        "designs/preview",
+        200,
+        data={
+            "prompt": "تيشيرت أحمر بتصميم عصري",
+            "clothing_type": "tshirt"
+        }
+    )
+    
+    if basic_success and basic_response.get('success') and basic_response.get('image_base64'):
+        print(f"   ✅ Basic image generation successful")
+        print(f"   📊 Designs remaining: {basic_response.get('designs_remaining', 'N/A')}")
+        print(f"   📊 Designs used: {basic_response.get('designs_used', 'N/A')}")
+    else:
+        print(f"   ❌ Basic image generation failed")
+        if basic_response.get('detail'):
+            print(f"   📝 Error: {basic_response.get('detail')}")
+    
+    # Test 2: Image generation with logo position
+    print("\n🔍 2. توليد صورة مع موضع شعار...")
+    logo_success, logo_response = tester.run_test(
+        "Image Generation with Logo Position",
+        "POST",
+        "designs/preview",
+        200,
+        data={
+            "prompt": "تيشيرت أزرق أنيق",
+            "clothing_type": "tshirt",
+            "logo_position": "center"
+        }
+    )
+    
+    if logo_success and logo_response.get('success'):
+        print(f"   ✅ Logo position parameter accepted")
+        print(f"   📊 Response includes image_base64: {'Yes' if logo_response.get('image_base64') else 'No'}")
+    else:
+        print(f"   ❌ Logo position test failed")
+    
+    # Test 3: Image generation with all options
+    print("\n🔍 3. توليد صورة مع جميع الخيارات...")
+    
+    # Create a simple base64 logo for testing
+    mock_logo_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    mock_user_photo_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    
+    full_options_success, full_options_response = tester.run_test(
+        "Image Generation with All Options",
+        "POST",
+        "designs/preview",
+        200,
+        data={
+            "prompt": "هودي أسود فاخر",
+            "clothing_type": "hoodie",
+            "logo_position": "left",
+            "view_angle": "front",
+            "logo_base64": mock_logo_base64,
+            "user_photo_base64": mock_user_photo_base64
+        }
+    )
+    
+    if full_options_success and full_options_response.get('success'):
+        print(f"   ✅ All options accepted successfully")
+        print(f"   📊 Main image generated: {'Yes' if full_options_response.get('image_base64') else 'No'}")
+        print(f"   📊 Composite image generated: {'Yes' if full_options_response.get('composite_image_base64') else 'No'}")
+        
+        # Check if composite image was created
+        if full_options_response.get('composite_image_base64'):
+            print(f"   🎉 Composite image (user photo + design) created successfully!")
+        else:
+            print(f"   ⚠️  Composite image not created (may be expected if microservice doesn't support it)")
+            
+    else:
+        print(f"   ❌ Full options test failed")
+        if full_options_response.get('detail'):
+            print(f"   📝 Error: {full_options_response.get('detail')}")
+    
+    # ===== 4. LOGO POSITION TESTS =====
+    print(f"\n{'='*20} 4. اختبارات مواضع الشعار {'='*20}")
+    
+    logo_positions = ["center", "left", "right", "bottom"]
+    
+    for position in logo_positions:
+        print(f"\n🔍 Testing logo position: {position}")
+        position_success, position_response = tester.run_test(
+            f"Logo Position - {position}",
+            "POST",
+            "designs/preview",
+            200,
+            data={
+                "prompt": f"تيشيرت مع شعار في موضع {position}",
+                "clothing_type": "tshirt",
+                "logo_position": position,
+                "logo_base64": mock_logo_base64
+            }
+        )
+        
+        if position_success and position_response.get('success'):
+            print(f"   ✅ Position '{position}' accepted")
+        else:
+            print(f"   ❌ Position '{position}' failed")
+    
+    # ===== 5. DESIGN SAVING WITH NEW FEATURES =====
+    print(f"\n{'='*20} 5. حفظ التصميم مع الميزات الجديدة {'='*20}")
+    
+    # First generate an image to save
+    if basic_success and basic_response.get('image_base64'):
+        print("\n🔍 حفظ تصميم مع صورة المستخدم والشعار...")
+        
+        save_success, save_response = tester.run_test(
+            "Save Design with Logo and User Photo",
+            "POST",
+            "designs/save",
+            201,
+            data={
+                "prompt": "تيشيرت مميز مع شعار وصورة شخصية",
+                "image_base64": basic_response.get('image_base64'),
+                "clothing_type": "tshirt",
+                "color": "أزرق",
+                "phone_number": "+963937938856",
+                "logo_base64": mock_logo_base64,
+                "user_photo_base64": mock_user_photo_base64
+            }
+        )
+        
+        if save_success and save_response.get('id'):
+            print(f"   ✅ Design saved with new features")
+            print(f"   📝 Design ID: {save_response.get('id')[:8]}...")
+            print(f"   📱 Phone: +963937938856")
+            print(f"   🖼️  Logo included: Yes")
+            print(f"   👤 User photo included: Yes")
+        else:
+            print(f"   ❌ Failed to save design with new features")
+    
+    # ===== 6. ADMIN VERIFICATION =====
+    if tester.admin_token:
+        print(f"\n{'='*20} 6. التحقق من لوحة الأدمن {'='*20}")
+        
+        # Check admin orders to see if new orders were created
+        tester.test_admin_orders()
+        
+        # Check admin stats
+        tester.test_admin_stats()
+    
+    # ===== 7. ERROR HANDLING TESTS =====
+    print(f"\n{'='*20} 7. اختبارات معالجة الأخطاء {'='*20}")
+    
+    # Test with missing required fields
+    print("\n🔍 اختبار مع حقول مفقودة...")
+    error_success, error_response = tester.run_test(
+        "Missing Required Fields",
+        "POST",
+        "designs/preview",
+        400,
+        data={
+            "prompt": "",  # Empty prompt
+            "clothing_type": ""  # Empty clothing type
+        }
+    )
+    
+    if error_success:
+        print(f"   ✅ Missing fields correctly rejected")
+    else:
+        print(f"   ⚠️  Error handling may need improvement")
+    
+    # Test with invalid logo position
+    print("\n🔍 اختبار مع موضع شعار غير صالح...")
+    invalid_position_success, invalid_position_response = tester.run_test(
+        "Invalid Logo Position",
+        "POST",
+        "designs/preview",
+        200,  # Should still work, just use default position
+        data={
+            "prompt": "تيشيرت مع موضع شعار غير صالح",
+            "clothing_type": "tshirt",
+            "logo_position": "invalid_position"
+        }
+    )
+    
+    if invalid_position_success:
+        print(f"   ✅ Invalid position handled gracefully")
+    else:
+        print(f"   ⚠️  Invalid position handling may need improvement")
+    
+    # ===== FINAL RESULTS =====
+    print("\n" + "=" * 80)
+    print("📊 ملخص نتائج اختبار توليد الصور المتقدمة")
+    print("=" * 80)
+    print(f"إجمالي الاختبارات: {tester.tests_run}")
+    print(f"نجح: {tester.tests_passed}")
+    print(f"فشل: {tester.tests_run - tester.tests_passed}")
+    print(f"معدل النجاح: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    
+    # Detailed results by category
+    print(f"\n📋 تفاصيل النتائج:")
+    microservice_tests = [t for t in tester.test_results if 'microservice' in t['test_name'].lower() or 'health' in t['test_name'].lower()]
+    image_tests = [t for t in tester.test_results if 'image' in t['test_name'].lower() or 'generation' in t['test_name'].lower()]
+    logo_tests = [t for t in tester.test_results if 'logo' in t['test_name'].lower()]
+    save_tests = [t for t in tester.test_results if 'save' in t['test_name'].lower()]
+    
+    print(f"   🔧 اختبارات Python Microservice: {len([t for t in microservice_tests if t['success']])}/{len(microservice_tests)} نجح")
+    print(f"   🎨 اختبارات توليد الصور: {len([t for t in image_tests if t['success']])}/{len(image_tests)} نجح")
+    print(f"   🏷️  اختبارات مواضع الشعار: {len([t for t in logo_tests if t['success']])}/{len(logo_tests)} نجح")
+    print(f"   💾 اختبارات حفظ التصميم: {len([t for t in save_tests if t['success']])}/{len(save_tests)} نجح")
+    
+    # Save detailed results
+    results_file = f"/app/test_reports/advanced_image_generation_test_{timestamp}.json"
+    with open(results_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            "test_type": "Advanced Image Generation Test",
+            "feature": "توليد الصور المتقدمة مع دمج الشعار والصورة الشخصية",
+            "backend_type": "Node.js/Express + Python Microservice",
+            "microservice_url": "http://localhost:8002",
+            "database": "MongoDB (fashion_designer_db)",
+            "test_user": test_username,
+            "admin_user": admin_username,
+            "summary": {
+                "total_tests": tester.tests_run,
+                "passed_tests": tester.tests_passed,
+                "failed_tests": tester.tests_run - tester.tests_passed,
+                "success_rate": (tester.tests_passed/tester.tests_run)*100,
+                "test_timestamp": datetime.now().isoformat()
+            },
+            "category_results": {
+                "microservice_health": {
+                    "total": len(microservice_tests),
+                    "passed": len([t for t in microservice_tests if t['success']])
+                },
+                "image_generation": {
+                    "total": len(image_tests),
+                    "passed": len([t for t in image_tests if t['success']])
+                },
+                "logo_positions": {
+                    "total": len(logo_tests),
+                    "passed": len([t for t in logo_tests if t['success']])
+                },
+                "design_saving": {
+                    "total": len(save_tests),
+                    "passed": len([t for t in save_tests if t['success']])
+                }
+            },
+            "detailed_results": tester.test_results,
+            "apis_tested": [
+                "GET http://localhost:8002/health",
+                "POST /api/designs/preview",
+                "POST /api/designs/save"
+            ],
+            "features_tested": [
+                "Python microservice health check",
+                "Basic image generation",
+                "Logo position selection (center, left, right, bottom)",
+                "User photo composition",
+                "Design saving with new features",
+                "Error handling"
+            ],
+            "logo_positions_tested": ["center", "left", "right", "bottom"],
+            "test_scenarios": [
+                "توليد صورة بسيط بدون شعار أو صورة مستخدم",
+                "توليد صورة مع موضع شعار",
+                "توليد صورة مع جميع الخيارات",
+                "اختبار جميع مواضع الشعار",
+                "حفظ التصميم مع الميزات الجديدة",
+                "معالجة الأخطاء"
+            ]
+        }, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n📄 تم حفظ النتائج التفصيلية في: {results_file}")
+    
+    # Final status message
+    if tester.tests_passed == tester.tests_run:
+        print(f"\n🎉 جميع اختبارات توليد الصور المتقدمة نجحت! الميزة تعمل بشكل مثالي.")
+        return 0
+    else:
+        failed_tests = [t for t in tester.test_results if not t['success']]
+        print(f"\n⚠️  بعض الاختبارات فشلت:")
+        for test in failed_tests:
+            print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        # Check if critical features failed
+        critical_failures = [t for t in failed_tests if any(keyword in t['test_name'].lower() 
+                           for keyword in ['health', 'basic', 'generation'])]
+        if critical_failures:
+            print(f"\n🚨 اختبارات حرجة فشلت:")
+            for test in critical_failures:
+                print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        return 1
+
 def main():
-    """Main function - calls coupon system comprehensive test"""
-    return test_coupon_system_comprehensive()
+    """Main function - calls advanced image generation test"""
+    return test_advanced_image_generation()
 
 if __name__ == "__main__":
     sys.exit(main())
