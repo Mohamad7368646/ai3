@@ -102,7 +102,33 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "AI-powered clothing design website with My Orders, Coupons, Dark/Light mode, and Notifications features"
+user_problem_statement: "AI-powered clothing design website with My Orders, Coupons, Dark/Light mode, Notifications features, and advanced image generation with logo blending and user photo composition"
+
+backend:
+  - task: "Advanced Image Generation with Logo Blending and User Photo"
+    implemented: true
+    working: "NA"
+    file: "/app/backend-nodejs/image_generator.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented advanced image generation feature: 1) Logo blending on design at user-selected position (center, left, right, bottom), 2) User photo + design composite side-by-side image, 3) Updated Python microservice with Pillow for image processing, 4) Updated Node.js to pass new parameters, 5) Updated frontend with logo position selector and composite image toggle"
+
+frontend:
+  - task: "Logo Position Selector and Composite Image Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added logo position selector with 4 options (center, left, right, bottom), toggle buttons to switch between design view and composite view (user photo + design), info banner when composite is available"
 
 backend:
   - task: "User Authentication (Register/Login)"
