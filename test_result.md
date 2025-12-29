@@ -320,7 +320,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Coupon System Testing - Completed successfully"
+    - "Advanced Image Generation Testing - Completed successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
