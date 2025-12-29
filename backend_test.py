@@ -1038,7 +1038,7 @@ def test_advanced_image_generation():
     # Generate unique test user
     timestamp = datetime.now().strftime('%H%M%S')
     test_username = f"imagetest_{timestamp}"
-    test_email = f"imagetest_{timestamp}@example.com"
+    test_email = f"imagetest_{timestamp}@gmail.com"
     test_password = "TestPass123!"
     
     # Admin credentials from request
