@@ -1,0 +1,153 @@
+{
+  "test_type": "Advanced Image Generation Test",
+  "feature": "توليد الصور المتقدمة مع دمج الشعار والصورة الشخصية",
+  "backend_type": "Node.js/Express + Python Microservice",
+  "microservice_url": "http://localhost:8002",
+  "database": "MongoDB (fashion_designer_db)",
+  "test_user": "imagetest_042332",
+  "admin_user": "mohamad",
+  "summary": {
+    "total_tests": 15,
+    "passed_tests": 10,
+    "failed_tests": 5,
+    "success_rate": 66.66666666666666,
+    "test_timestamp": "2025-12-29T04:24:24.487729"
+  },
+  "category_results": {
+    "microservice_health": {
+      "total": 1,
+      "passed": 1
+    },
+    "image_generation": {
+      "total": 3,
+      "passed": 3
+    },
+    "logo_positions": {
+      "total": 7,
+      "passed": 2
+    },
+    "design_saving": {
+      "total": 1,
+      "passed": 1
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "Python Microservice Health Check",
+      "success": true,
+      "details": "Status: ok, Service: image-generator",
+      "timestamp": "2025-12-29T04:23:32.186110"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-29T04:23:32.364072"
+    },
+    {
+      "test_name": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:23:32.692612"
+    },
+    {
+      "test_name": "Basic Image Generation",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:23:51.213594"
+    },
+    {
+      "test_name": "Image Generation with Logo Position",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:24:06.738256"
+    },
+    {
+      "test_name": "Image Generation with All Options",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:24:23.495605"
+    },
+    {
+      "test_name": "Logo Position - center",
+      "success": false,
+      "details": "Expected 200, got 403. Error: {'detail': 'لقد وصلت إلى الحد الأقصى من التصاميم المجانية'}",
+      "timestamp": "2025-12-29T04:24:23.554194"
+    },
+    {
+      "test_name": "Logo Position - left",
+      "success": false,
+      "details": "Expected 200, got 403. Error: {'detail': 'لقد وصلت إلى الحد الأقصى من التصاميم المجانية'}",
+      "timestamp": "2025-12-29T04:24:23.593407"
+    },
+    {
+      "test_name": "Logo Position - right",
+      "success": false,
+      "details": "Expected 200, got 403. Error: {'detail': 'لقد وصلت إلى الحد الأقصى من التصاميم المجانية'}",
+      "timestamp": "2025-12-29T04:24:23.631862"
+    },
+    {
+      "test_name": "Logo Position - bottom",
+      "success": false,
+      "details": "Expected 200, got 403. Error: {'detail': 'لقد وصلت إلى الحد الأقصى من التصاميم المجانية'}",
+      "timestamp": "2025-12-29T04:24:23.675465"
+    },
+    {
+      "test_name": "Save Design with Logo and User Photo",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-29T04:24:23.950226"
+    },
+    {
+      "test_name": "Admin Get All Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:24:24.261670"
+    },
+    {
+      "test_name": "Admin Dashboard Stats",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-29T04:24:24.314088"
+    },
+    {
+      "test_name": "Missing Required Fields",
+      "success": true,
+      "details": "Status: 400",
+      "timestamp": "2025-12-29T04:24:24.353284"
+    },
+    {
+      "test_name": "Invalid Logo Position",
+      "success": false,
+      "details": "Expected 200, got 403. Error: {'detail': 'لقد وصلت إلى الحد الأقصى من التصاميم المجانية'}",
+      "timestamp": "2025-12-29T04:24:24.486768"
+    }
+  ],
+  "apis_tested": [
+    "GET http://localhost:8002/health",
+    "POST /api/designs/preview",
+    "POST /api/designs/save"
+  ],
+  "features_tested": [
+    "Python microservice health check",
+    "Basic image generation",
+    "Logo position selection (center, left, right, bottom)",
+    "User photo composition",
+    "Design saving with new features",
+    "Error handling"
+  ],
+  "logo_positions_tested": [
+    "center",
+    "left",
+    "right",
+    "bottom"
+  ],
+  "test_scenarios": [
+    "توليد صورة بسيط بدون شعار أو صورة مستخدم",
+    "توليد صورة مع موضع شعار",
+    "توليد صورة مع جميع الخيارات",
+    "اختبار جميع مواضع الشعار",
+    "حفظ التصميم مع الميزات الجديدة",
+    "معالجة الأخطاء"
+  ]
+}
