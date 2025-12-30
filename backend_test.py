@@ -1536,7 +1536,7 @@ def test_new_admin_features():
     print("\n🔍 4. إنشاء مستخدم تجريبي للاختبار...")
     timestamp = datetime.now().strftime('%H%M%S')
     test_username = f"deletetest_{timestamp}"
-    test_email = f"deletetest_{timestamp}@example.com"
+    test_email = f"deletetest_{timestamp}@gmail.com"  # Must be Gmail
     test_password = "TestPass123!"
     
     # Create test user
