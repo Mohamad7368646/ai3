@@ -712,6 +712,105 @@ export default function AdminDashboard({ user, onLogout }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete User Confirmation Modal */}
+      <Dialog open={deleteUserModal.open} onOpenChange={(open) => setDeleteUserModal({ open, user: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-600">⚠️ تأكيد حذف المستخدم</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 font-semibold mb-2">
+                هل أنت متأكد من حذف هذا المستخدم؟
+              </p>
+              <p className="text-red-700 text-sm">
+                سيتم حذف المستخدم <strong>{deleteUserModal.user?.username}</strong> وجميع بياناته بشكل نهائي:
+              </p>
+              <ul className="text-red-700 text-sm mt-2 list-disc list-inside">
+                <li>جميع التصاميم المحفوظة</li>
+                <li>جميع الطلبات</li>
+                <li>سجل استخدام الكوبونات</li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteUserModal({ open: false, user: null })}>
+              إلغاء
+            </Button>
+            <Button 
+              onClick={() => deleteUser(deleteUserModal.user?.id)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <UserX className="w-4 h-4 ml-2" />
+              تأكيد الحذف
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Coupon Usage Modal */}
+      <Dialog open={couponUsageModal.open} onOpenChange={(open) => setCouponUsageModal({ open, coupon: null, usages: [] })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              إحصائيات الكوبون: {couponUsageModal.coupon?.coupon_code}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Coupon Summary */}
+            <div className="bg-[#D4AF37]/10 rounded-lg p-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-[#3E2723]">{couponUsageModal.coupon?.total_uses || 0}</p>
+                  <p className="text-sm text-[#5D4037]">إجمالي الاستخدامات</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-[#3E2723]">{couponUsageModal.coupon?.discount_percentage}%</p>
+                  <p className="text-sm text-[#5D4037]">نسبة الخصم</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-[#3E2723]">
+                    {couponUsageModal.coupon?.max_uses || '∞'}
+                  </p>
+                  <p className="text-sm text-[#5D4037]">الحد الأقصى</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Users List */}
+            <div>
+              <h4 className="font-semibold text-[#3E2723] mb-3">المستخدمون الذين استعملوا الكوبون:</h4>
+              {couponUsageModal.usages.length === 0 ? (
+                <p className="text-center text-[#5D4037] py-8">لم يتم استخدام هذا الكوبون بعد</p>
+              ) : (
+                <div className="max-h-64 overflow-y-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-[#3E2723]">المستخدم</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-[#3E2723]">البريد</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-[#3E2723]">تاريخ الاستخدام</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {couponUsageModal.usages.map((usage, index) => (
+                        <tr key={usage.id || index} className="border-t">
+                          <td className="px-3 py-2 text-sm text-[#3E2723]">{usage.username}</td>
+                          <td className="px-3 py-2 text-sm text-[#5D4037]">{usage.email}</td>
+                          <td className="px-3 py-2 text-sm text-[#5D4037]">
+                            {new Date(usage.used_at).toLocaleString('ar-EG')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
