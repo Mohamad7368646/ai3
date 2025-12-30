@@ -594,6 +594,98 @@ class NodeJSBackendTester:
             return response['id']
         return None
 
+    # ===== NEW ADMIN FEATURES TESTS =====
+    
+    def test_admin_coupons_stats(self):
+        """Test admin get coupon usage statistics"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Get Coupons Stats",
+            "GET",
+            "admin/coupons-stats",
+            200
+        )
+        
+        if success:
+            coupons = response
+            print(f"   📊 Found {len(coupons)} coupons with statistics")
+            for coupon in coupons[:3]:  # Show first 3 coupons
+                print(f"      - {coupon.get('code')}: {coupon.get('current_uses')}/{coupon.get('max_uses')} uses ({coupon.get('discount_percentage')}%)")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response if success else []
+
+    def test_admin_coupon_usage_details(self, coupon_id):
+        """Test admin get specific coupon usage details"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Get Coupon Usage Details",
+            "GET",
+            f"admin/coupons/{coupon_id}/usage",
+            200
+        )
+        
+        if success:
+            usage_data = response
+            print(f"   📋 Coupon: {usage_data.get('coupon_code')} ({usage_data.get('discount_percentage')}%)")
+            print(f"   📊 Total uses: {usage_data.get('total_uses')}/{usage_data.get('max_uses')}")
+            usages = usage_data.get('usages', [])
+            print(f"   👥 Users who used this coupon: {len(usages)}")
+            for usage in usages[:3]:  # Show first 3 users
+                print(f"      - {usage.get('username')} ({usage.get('email')}) - {usage.get('used_at')[:10]}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success, response if success else {}
+
+    def test_admin_delete_user(self, user_id):
+        """Test admin delete user"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Delete User",
+            "DELETE",
+            f"admin/users/{user_id}",
+            200
+        )
+        
+        if success:
+            message = response.get('message', 'تم حذف المستخدم')
+            print(f"   ✅ {message}")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
+    def test_admin_delete_admin_user(self, admin_user_id):
+        """Test admin cannot delete admin user (should fail)"""
+        # Use admin token
+        temp_token = self.token
+        self.token = self.admin_token
+        
+        success, response = self.run_test(
+            "Admin Delete Admin User (Should Fail)",
+            "DELETE",
+            f"admin/users/{admin_user_id}",
+            403  # Should be forbidden
+        )
+        
+        if success:
+            print(f"   ✅ Admin user deletion correctly prevented")
+        
+        # Restore user token
+        self.token = temp_token
+        return success
+
     # ===== SHOWCASE MANAGER TESTS =====
     
     def test_admin_get_showcase_designs(self):
