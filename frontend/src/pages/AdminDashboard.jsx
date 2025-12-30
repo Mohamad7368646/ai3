@@ -532,25 +532,55 @@ export default function AdminDashboard({ user, onLogout }) {
               {coupons.map(coupon => (
                 <Card key={coupon.id} className="glass">
                   <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-3">
                       <div>
                         <p className="text-lg font-bold text-[#3E2723]">{coupon.code}</p>
                         <p className="text-sm text-[#5D4037]">خصم {coupon.discount_percentage}%</p>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deleteCoupon(coupon.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => fetchCouponUsage(coupon.id)}
+                          className="text-blue-600 hover:text-blue-700"
+                          title="عرض المستخدمين"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteCoupon(coupon.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    {coupon.expiry_date && (
-                      <p className="text-xs text-[#5D4037]">
-                        ينتهي: {new Date(coupon.expiry_date).toLocaleDateString('ar-EG')}
-                      </p>
-                    )}
+                    
+                    {/* Usage Stats */}
+                    <div className="bg-[#D4AF37]/10 rounded-lg p-2 mb-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-[#5D4037]">عدد الاستخدامات:</span>
+                        <span className="font-bold text-[#3E2723]">
+                          {coupon.current_uses || 0}
+                          {coupon.max_uses ? ` / ${coupon.max_uses}` : ' (غير محدود)'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs text-[#5D4037]">
+                      <span>
+                        {coupon.is_active ? (
+                          <span className="text-green-600">✓ فعال</span>
+                        ) : (
+                          <span className="text-red-600">✗ غير فعال</span>
+                        )}
+                      </span>
+                      {coupon.expiry_date && (
+                        <span>ينتهي: {new Date(coupon.expiry_date).toLocaleDateString('ar-EG')}</span>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
