@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { 
   Users, Package, Image, Tag, TrendingUp, DollarSign, 
   Edit, Trash2, Plus, X, Search, CheckCircle, Clock, 
-  XCircle, ShoppingCart, Phone, Mail, Calendar, Award, Sparkles
+  XCircle, ShoppingCart, Phone, Mail, Calendar, Award, Sparkles, Eye, UserX
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -41,6 +41,8 @@ export default function AdminDashboard({ user, onLogout }) {
   const [editUserModal, setEditUserModal] = useState({ open: false, user: null });
   const [createCouponModal, setCreateCouponModal] = useState(false);
   const [viewDesignModal, setViewDesignModal] = useState({ open: false, design: null });
+  const [couponUsageModal, setCouponUsageModal] = useState({ open: false, coupon: null, usages: [] });
+  const [deleteUserModal, setDeleteUserModal] = useState({ open: false, user: null });
   
   // Search
   const [searchQuery, setSearchQuery] = useState("");
