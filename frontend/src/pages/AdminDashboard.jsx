@@ -358,35 +358,55 @@ export default function AdminDashboard({ user, onLogout }) {
                       <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">اسم المستخدم</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">البريد</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">حد التصاميم</th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">المستخدم</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">تاريخ التسجيل</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold text-[#3E2723]">إجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.map(user => (
-                      <tr key={user.id} className="border-t border-[#3E2723]/10">
-                        <td className="px-4 py-3 text-sm text-[#3E2723]">{user.username}</td>
-                        <td className="px-4 py-3 text-sm text-[#5D4037]">{user.email}</td>
+                    {filteredUsers.map(u => (
+                      <tr key={u.id} className="border-t border-[#3E2723]/10">
+                        <td className="px-4 py-3 text-sm text-[#3E2723]">
+                          <div className="flex items-center gap-2">
+                            {u.username}
+                            {u.is_admin && (
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded text-xs">مدير</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-[#5D4037]">{u.email}</td>
                         <td className="px-4 py-3 text-sm">
                           <span className={`px-2 py-1 rounded ${
-                            user.designs_limit === -1 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                            u.is_unlimited ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                           }`}>
-                            {user.designs_limit === -1 ? 'غير محدود' : `${user.designs_used || 0}/${user.designs_limit}`}
+                            {u.is_unlimited ? 'غير محدود' : `${u.designs_used || 0}/${u.designs_limit}`}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-[#5D4037]">
-                          {new Date(user.created_at).toLocaleDateString('ar-EG')}
+                          {new Date(u.created_at).toLocaleDateString('ar-EG')}
                         </td>
                         <td className="px-4 py-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditUserModal({ open: true, user })}
-                            className="text-xs"
-                          >
-                            <Edit className="w-3 h-3 ml-1" />
-                            تعديل الحد
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditUserModal({ open: true, user: u })}
+                              className="text-xs"
+                            >
+                              <Edit className="w-3 h-3 ml-1" />
+                              تعديل
+                            </Button>
+                            {!u.is_admin && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setDeleteUserModal({ open: true, user: u })}
+                                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              >
+                                <UserX className="w-3 h-3 ml-1" />
+                                حذف
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
