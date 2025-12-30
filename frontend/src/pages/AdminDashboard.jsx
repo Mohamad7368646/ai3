@@ -350,7 +350,8 @@ export default function AdminDashboard({ user, onLogout }) {
               </div>
             </div>
             
-            <div className="glass rounded-2xl overflow-hidden">
+            {/* Desktop Table View */}
+            <div className="glass rounded-2xl overflow-hidden hidden md:block">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-[#D4AF37]/10">
@@ -413,6 +414,62 @@ export default function AdminDashboard({ user, onLogout }) {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredUsers.map(u => (
+                <Card key={u.id} className="glass">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-bold text-[#3E2723]">{u.username}</p>
+                          {u.is_admin && (
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded text-xs">مدير</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-[#5D4037]">{u.email}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                        u.is_unlimited ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {u.is_unlimited ? 'غير محدود' : `${u.designs_used || 0}/${u.designs_limit}`}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs text-[#5D4037] mb-3">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(u.created_at).toLocaleDateString('ar-EG')}
+                      </span>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditUserModal({ open: true, user: u })}
+                        className="text-xs flex-1"
+                      >
+                        <Edit className="w-3 h-3 ml-1" />
+                        تعديل الحد
+                      </Button>
+                      {!u.is_admin && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setDeleteUserModal({ open: true, user: u })}
+                          className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                          <UserX className="w-3 h-3 ml-1" />
+                          حذف
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
