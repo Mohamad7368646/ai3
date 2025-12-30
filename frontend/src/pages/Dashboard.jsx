@@ -278,26 +278,29 @@ export default function Dashboard({ user, onLogout }) {
 
     setValidatingCoupon(true);
     try {
-      const response = await axios.post(`${API}/coupons/validate`, null, {
-        params: {
-          code: couponCode,
-          amount: 100 // Default amount for validation
-        }
+      const response = await axios.post(`${API}/coupons/validate`, {
+        code: couponCode
       });
 
       if (response.data.valid) {
         setAppliedCoupon(response.data);
-        toast.success(response.data.message);
+        toast.success(`🎉 تم تطبيق الكوبون! خصم ${response.data.discount_percentage}%`);
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data.message || "الكوبون غير صالح");
         setAppliedCoupon(null);
       }
     } catch (error) {
-      toast.error("فشل في التحقق من الكوبون");
+      toast.error(error.response?.data?.detail || "كود الكوبون غير صحيح");
       setAppliedCoupon(null);
     } finally {
       setValidatingCoupon(false);
     }
+  };
+
+  const removeCoupon = () => {
+    setCouponCode("");
+    setAppliedCoupon(null);
+    toast.info("تم إزالة الكوبون");
   };
 
   const handleLogoUpload = (e) => {
