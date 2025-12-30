@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Order from '../models/Order.js';
 import Design from '../models/Design.js';
 import User from '../models/User.js';
+import Coupon from '../models/Coupon.js';
+import CouponUsage from '../models/CouponUsage.js';
 import { protect } from '../middleware/auth.js';
 import { createNotification } from './notifications.js';
 
@@ -46,6 +48,26 @@ router.post('/create', protect, async (req, res) => {
       status: 'pending',
       coupon_code: coupon_code || null,
     });
+
+    // Record coupon usage if coupon was used
+    if (coupon_code) {
+      const coupon = await Coupon.findOne({ code: coupon_code.toUpperCase() });
+      if (coupon) {
+        await CouponUsage.create({
+          id: uuidv4(),
+          coupon_id: coupon.id,
+          coupon_code: coupon.code,
+          user_id: req.user.id,
+          order_id: orderId,
+        });
+        
+        // Increment coupon usage count
+        await Coupon.findOneAndUpdate(
+          { id: coupon.id },
+          { $inc: { current_uses: 1 } }
+        );
+      }
+    }
 
     // Create notification for user
     await createNotification(
