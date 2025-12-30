@@ -1473,9 +1473,200 @@ def test_advanced_image_generation():
         
         return 1
 
+def test_new_admin_features():
+    """
+    اختبار شامل للميزات الجديدة في لوحة الأدمن
+    Testing comprehensive new admin features
+    """
+    print("👑 اختبار شامل للميزات الجديدة في لوحة الأدمن")
+    print("=" * 80)
+    
+    tester = NodeJSBackendTester()
+    
+    # Admin credentials from request
+    admin_username = "mohamad"
+    admin_password = "mohamad271"
+    
+    print(f"👑 Admin User: {admin_username}")
+    
+    # ===== 1. ADMIN AUTHENTICATION =====
+    print(f"\n{'='*20} 1. مصادقة الأدمن {'='*20}")
+    
+    # Test admin login
+    if not tester.test_admin_login(admin_username, admin_password):
+        print("❌ Admin login failed, stopping tests")
+        return 1
+    
+    # ===== 2. COUPON STATISTICS TESTS =====
+    print(f"\n{'='*20} 2. اختبارات إحصائيات الكوبونات {'='*20}")
+    
+    # Test 1: Get coupon statistics
+    print("\n🔍 1. جلب إحصائيات استخدام الكوبونات...")
+    success, coupons_stats = tester.test_admin_coupons_stats()
+    if not success:
+        print("❌ Failed to get coupon statistics")
+        return 1
+    
+    # Test 2: Get specific coupon usage details
+    if coupons_stats and len(coupons_stats) > 0:
+        print("\n🔍 2. جلب تفاصيل استخدام كوبون محدد...")
+        first_coupon = coupons_stats[0]
+        coupon_id = first_coupon.get('id')
+        
+        if coupon_id:
+            success, usage_details = tester.test_admin_coupon_usage_details(coupon_id)
+            if not success:
+                print("❌ Failed to get coupon usage details")
+        else:
+            print("⚠️  No coupon ID found to test usage details")
+    else:
+        print("⚠️  No coupons found to test usage details")
+    
+    # ===== 3. USER MANAGEMENT TESTS =====
+    print(f"\n{'='*20} 3. اختبارات إدارة المستخدمين {'='*20}")
+    
+    # Test 3: Get all users with is_admin flag
+    print("\n🔍 3. جلب قائمة المستخدمين مع علامة الأدمن...")
+    success, users_list = tester.test_admin_users()
+    if not success:
+        print("❌ Failed to get users list")
+        return 1
+    
+    # Test 4: Create a test user for deletion
+    print("\n🔍 4. إنشاء مستخدم تجريبي للاختبار...")
+    timestamp = datetime.now().strftime('%H%M%S')
+    test_username = f"deletetest_{timestamp}"
+    test_email = f"deletetest_{timestamp}@example.com"
+    test_password = "TestPass123!"
+    
+    # Create test user
+    test_success = tester.test_register(test_username, test_email, test_password)
+    if not test_success:
+        print("❌ Failed to create test user for deletion")
+        return 1
+    
+    # Get the created user ID
+    created_user_id = tester.user_id
+    print(f"   ✅ Test user created: {test_username} (ID: {created_user_id[:8]}...)")
+    
+    # Test 5: Delete the test user
+    print("\n🔍 5. حذف المستخدم التجريبي...")
+    delete_success = tester.test_admin_delete_user(created_user_id)
+    if not delete_success:
+        print("❌ Failed to delete test user")
+    
+    # Test 6: Try to delete admin user (should fail)
+    print("\n🔍 6. محاولة حذف مستخدم أدمن (يجب أن تفشل)...")
+    admin_user_id = tester.admin_user_id
+    if admin_user_id:
+        admin_delete_success = tester.test_admin_delete_admin_user(admin_user_id)
+        if not admin_delete_success:
+            print("❌ Admin user deletion test failed (this might be expected)")
+    else:
+        print("⚠️  Admin user ID not available for deletion test")
+    
+    # Test 7: Verify user was deleted by checking users list again
+    print("\n🔍 7. التحقق من حذف المستخدم...")
+    success, updated_users_list = tester.test_admin_users()
+    if success:
+        # Check if test user is no longer in the list
+        deleted_user_found = any(user.get('id') == created_user_id for user in updated_users_list)
+        if not deleted_user_found:
+            print(f"   ✅ Test user successfully deleted from system")
+        else:
+            print(f"   ⚠️  Test user still found in system")
+    
+    # ===== FINAL RESULTS =====
+    print("\n" + "=" * 80)
+    print("📊 ملخص نتائج اختبار الميزات الجديدة للأدمن")
+    print("=" * 80)
+    print(f"إجمالي الاختبارات: {tester.tests_run}")
+    print(f"نجح: {tester.tests_passed}")
+    print(f"فشل: {tester.tests_run - tester.tests_passed}")
+    print(f"معدل النجاح: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    
+    # Detailed results by category
+    print(f"\n📋 تفاصيل النتائج:")
+    auth_tests = [t for t in tester.test_results if 'admin' in t['test_name'].lower() and 'login' in t['test_name'].lower()]
+    coupon_tests = [t for t in tester.test_results if 'coupon' in t['test_name'].lower()]
+    user_tests = [t for t in tester.test_results if 'user' in t['test_name'].lower() and 'delete' in t['test_name'].lower()]
+    
+    print(f"   🔐 اختبارات مصادقة الأدمن: {len([t for t in auth_tests if t['success']])}/{len(auth_tests)} نجح")
+    print(f"   🎫 اختبارات إحصائيات الكوبونات: {len([t for t in coupon_tests if t['success']])}/{len(coupon_tests)} نجح")
+    print(f"   👥 اختبارات إدارة المستخدمين: {len([t for t in user_tests if t['success']])}/{len(user_tests)} نجح")
+    
+    # Save detailed results
+    results_file = f"/app/test_reports/new_admin_features_test_{timestamp}.json"
+    with open(results_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            "test_type": "New Admin Features Test",
+            "feature": "الميزات الجديدة في لوحة الأدمن",
+            "backend_type": "Node.js/Express",
+            "database": "MongoDB (fashion_designer_db)",
+            "admin_user": admin_username,
+            "summary": {
+                "total_tests": tester.tests_run,
+                "passed_tests": tester.tests_passed,
+                "failed_tests": tester.tests_run - tester.tests_passed,
+                "success_rate": (tester.tests_passed/tester.tests_run)*100,
+                "test_timestamp": datetime.now().isoformat()
+            },
+            "category_results": {
+                "admin_authentication": {
+                    "total": len(auth_tests),
+                    "passed": len([t for t in auth_tests if t['success']])
+                },
+                "coupon_statistics": {
+                    "total": len(coupon_tests),
+                    "passed": len([t for t in coupon_tests if t['success']])
+                },
+                "user_management": {
+                    "total": len(user_tests),
+                    "passed": len([t for t in user_tests if t['success']])
+                }
+            },
+            "detailed_results": tester.test_results,
+            "apis_tested": [
+                "GET /api/admin/coupons-stats",
+                "GET /api/admin/coupons/:id/usage",
+                "DELETE /api/admin/users/:id",
+                "GET /api/admin/users"
+            ],
+            "test_scenarios": [
+                "جلب إحصائيات استخدام الكوبونات",
+                "جلب تفاصيل استخدام كوبون محدد",
+                "إنشاء مستخدم تجريبي",
+                "حذف مستخدم عادي",
+                "منع حذف مستخدم أدمن",
+                "التحقق من حذف المستخدم"
+            ]
+        }, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n📄 تم حفظ النتائج التفصيلية في: {results_file}")
+    
+    # Final status message
+    if tester.tests_passed == tester.tests_run:
+        print(f"\n🎉 جميع اختبارات الميزات الجديدة للأدمن نجحت! النظام يعمل بشكل مثالي.")
+        return 0
+    else:
+        failed_tests = [t for t in tester.test_results if not t['success']]
+        print(f"\n⚠️  بعض الاختبارات فشلت:")
+        for test in failed_tests:
+            print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        # Check if critical features failed
+        critical_failures = [t for t in failed_tests if any(keyword in t['test_name'].lower() 
+                           for keyword in ['admin', 'coupon', 'delete'])]
+        if critical_failures:
+            print(f"\n🚨 اختبارات حرجة فشلت:")
+            for test in critical_failures:
+                print(f"   ❌ {test['test_name']}: {test['details']}")
+        
+        return 1
+
 def main():
-    """Main function - calls advanced image generation test"""
-    return test_advanced_image_generation()
+    """Main function - calls new admin features test"""
+    return test_new_admin_features()
 
 if __name__ == "__main__":
     sys.exit(main())
