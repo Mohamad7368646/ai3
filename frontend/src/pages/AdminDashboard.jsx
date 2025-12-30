@@ -263,24 +263,25 @@ export default function AdminDashboard({ user, onLogout }) {
         <div className="glass rounded-2xl p-2 mb-8">
           <div className="flex gap-2 overflow-x-auto">
             {[
-              { id: "overview", label: "نظرة عامة", icon: TrendingUp },
-              { id: "users", label: "المستخدمين", icon: Users },
-              { id: "orders", label: "الطلبات", icon: Package },
-              { id: "designs", label: "التصاميم", icon: Image },
-              { id: "showcase", label: "التصاميم الملهمة", icon: Sparkles },
-              { id: "coupons", label: "الكوبونات", icon: Tag }
+              { id: "overview", label: "نظرة عامة", shortLabel: "عامة", icon: TrendingUp },
+              { id: "users", label: "المستخدمين", shortLabel: "المستخدمين", icon: Users },
+              { id: "orders", label: "الطلبات", shortLabel: "الطلبات", icon: Package },
+              { id: "designs", label: "التصاميم", shortLabel: "التصاميم", icon: Image },
+              { id: "showcase", label: "التصاميم الملهمة", shortLabel: "ملهمة", icon: Sparkles },
+              { id: "coupons", label: "الكوبونات", shortLabel: "كوبونات", icon: Tag }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-all whitespace-nowrap text-xs sm:text-sm ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white"
+                    ? "bg-gradient-to-l from-[#D4AF37] to-[#B8941F] text-white shadow-lg"
                     : "text-[#5D4037] hover:bg-white/50"
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
               </button>
             ))}
           </div>
