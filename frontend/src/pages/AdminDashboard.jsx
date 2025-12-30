@@ -478,35 +478,35 @@ export default function AdminDashboard({ user, onLogout }) {
         {/* Orders Tab */}
         {activeTab === "orders" && (
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#3E2723]">إدارة الطلبات</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#3E2723]">إدارة الطلبات</h2>
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="بحث..."
-                className="w-64"
+                className="w-full sm:w-64"
               />
             </div>
             
             <div className="grid gap-4">
               {filteredOrders.map(order => (
                 <Card key={order.id} className="glass">
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                       <img 
                         src={`data:image/png;base64,${order.design_image_base64}`}
                         alt="Design"
-                        className="w-24 h-24 rounded-lg object-cover"
+                        className="w-full sm:w-24 h-40 sm:h-24 rounded-lg object-cover"
                       />
                       <div className="flex-1">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <p className="font-semibold text-[#3E2723]">{order.user_info?.username}</p>
-                            <p className="text-sm text-[#5D4037]">{order.prompt}</p>
+                            <p className="font-semibold text-[#3E2723]">{order.user_name || order.user_info?.username}</p>
+                            <p className="text-sm text-[#5D4037] line-clamp-2">{order.prompt}</p>
                           </div>
                           {getStatusBadge(order.status)}
                         </div>
-                        <div className="flex gap-4 text-xs text-[#5D4037] mt-2">
+                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs text-[#5D4037] mt-2">
                           <span className="flex items-center gap-1">
                             <Phone className="w-3 h-3" />
                             {order.phone_number}
@@ -516,8 +516,28 @@ export default function AdminDashboard({ user, onLogout }) {
                             {new Date(order.created_at).toLocaleDateString('ar-EG')}
                           </span>
                         </div>
+                        
+                        {/* Mobile Status Selector */}
+                        <div className="mt-3 sm:hidden">
+                          <Select
+                            value={order.status}
+                            onValueChange={(val) => updateOrderStatus(order.id, val)}
+                          >
+                            <SelectTrigger className="w-full h-9 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">قيد الانتظار</SelectItem>
+                              <SelectItem value="processing">قيد المعالجة</SelectItem>
+                              <SelectItem value="completed">مكتمل</SelectItem>
+                              <SelectItem value="cancelled">ملغي</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-2">
+                      
+                      {/* Desktop Status Selector */}
+                      <div className="hidden sm:flex flex-col gap-2">
                         <Select
                           value={order.status}
                           onValueChange={(val) => updateOrderStatus(order.id, val)}
