@@ -1139,6 +1139,61 @@ export default function Dashboard({ user, onLogout }) {
                         className="border-2 border-[#D4AF37]/30 focus:border-[#D4AF37]"
                       />
                     </div>
+
+                    {/* Coupon Code Input */}
+                    <div>
+                      <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
+                        🎟️ كود الخصم (اختياري)
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="أدخل كود الخصم"
+                          disabled={appliedCoupon}
+                          className="border-2 border-[#D4AF37]/30 focus:border-[#D4AF37] flex-1"
+                        />
+                        {!appliedCoupon ? (
+                          <Button
+                            onClick={validateCouponCode}
+                            disabled={validatingCoupon || !couponCode.trim()}
+                            variant="outline"
+                            className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white px-3"
+                          >
+                            {validatingCoupon ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              "تطبيق"
+                            )}
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={removeCoupon}
+                            variant="outline"
+                            className="border-red-400 text-red-500 hover:bg-red-50 px-3"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {/* Applied Coupon Badge */}
+                      {appliedCoupon && (
+                        <div className="mt-2 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-2.5 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-600 text-lg">✓</span>
+                            <div>
+                              <p className="text-green-800 font-semibold text-sm">تم تطبيق الكوبون!</p>
+                              <p className="text-green-600 text-xs">خصم {appliedCoupon.discount_percentage}% على طلبك</p>
+                            </div>
+                          </div>
+                          <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            {appliedCoupon.discount_percentage}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
