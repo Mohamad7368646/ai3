@@ -107,14 +107,44 @@ export default function AdminDashboard({ user, onLogout }) {
   const fetchCoupons = async () => {
     setLoading(true);
     try {
-      // Admin should see all coupons, not just active ones
-      const response = await axios.get(`${API}/coupons`);
+      // Fetch coupons with usage stats
+      const response = await axios.get(`${API}/admin/coupons-stats`);
       setCoupons(response.data);
     } catch (error) {
-      toast.error("فشل في تحميل الكوبونات");
-      console.error("Fetch coupons error:", error);
+      // Fallback to regular coupons endpoint
+      try {
+        const response = await axios.get(`${API}/coupons`);
+        setCoupons(response.data);
+      } catch (err) {
+        toast.error("فشل في تحميل الكوبونات");
+        console.error("Fetch coupons error:", err);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCouponUsage = async (couponId) => {
+    try {
+      const response = await axios.get(`${API}/admin/coupons/${couponId}/usage`);
+      setCouponUsageModal({
+        open: true,
+        coupon: response.data,
+        usages: response.data.usages || []
+      });
+    } catch (error) {
+      toast.error("فشل في تحميل إحصائيات الكوبون");
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`);
+      toast.success("تم حذف المستخدم بنجاح");
+      fetchUsers();
+      setDeleteUserModal({ open: false, user: null });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "فشل في حذف المستخدم");
     }
   };
 
