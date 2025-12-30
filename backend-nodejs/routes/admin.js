@@ -445,4 +445,86 @@ router.put('/showcase-designs/:id/toggle-featured', protect, admin, async (req, 
   }
 });
 
+// ===== Coupon Usage Statistics =====
+
+// @route   GET /api/admin/coupons/:id/usage
+// @desc    Get all users who used a specific coupon
+// @access  Private/Admin
+router.get('/coupons/:id/usage', protect, admin, async (req, res) => {
+  try {
+    const couponId = req.params.id;
+    
+    // Get the coupon
+    const coupon = await Coupon.findOne({ id: couponId });
+    if (!coupon) {
+      return res.status(404).json({ detail: 'الكوبون غير موجود' });
+    }
+
+    // Get usage records
+    const usages = await CouponUsage.find({ coupon_id: couponId }).sort({ used_at: -1 });
+
+    // Get user details for each usage
+    const usageDetails = await Promise.all(
+      usages.map(async (usage) => {
+        const user = await User.findOne({ id: usage.user_id }).select('username email');
+        const order = usage.order_id ? await Order.findOne({ id: usage.order_id }).select('final_price') : null;
+        
+        return {
+          id: usage.id,
+          user_id: usage.user_id,
+          username: user?.username || 'غير معروف',
+          email: user?.email || 'غير معروف',
+          order_id: usage.order_id,
+          order_amount: order?.final_price || 0,
+          used_at: usage.used_at.toISOString(),
+        };
+      })
+    );
+
+    res.json({
+      coupon_id: couponId,
+      coupon_code: coupon.code,
+      discount_percentage: coupon.discount_percentage,
+      total_uses: usages.length,
+      max_uses: coupon.max_uses,
+      usages: usageDetails,
+    });
+  } catch (error) {
+    console.error('Get Coupon Usage Error:', error);
+    res.status(500).json({ detail: 'خطأ في جلب إحصائيات الكوبون' });
+  }
+});
+
+// @route   GET /api/admin/coupons-stats
+// @desc    Get overall coupon statistics
+// @access  Private/Admin
+router.get('/coupons-stats', protect, admin, async (req, res) => {
+  try {
+    const coupons = await Coupon.find({}).select('-_id');
+    
+    // Get usage count for each coupon
+    const couponsWithStats = await Promise.all(
+      coupons.map(async (coupon) => {
+        const usageCount = await CouponUsage.countDocuments({ coupon_id: coupon.id });
+        
+        return {
+          id: coupon.id,
+          code: coupon.code,
+          discount_percentage: coupon.discount_percentage,
+          expiry_date: coupon.expiry_date.toISOString(),
+          is_active: coupon.is_active,
+          max_uses: coupon.max_uses,
+          current_uses: usageCount,
+          created_at: coupon.created_at.toISOString(),
+        };
+      })
+    );
+
+    res.json(couponsWithStats);
+  } catch (error) {
+    console.error('Get Coupons Stats Error:', error);
+    res.status(500).json({ detail: 'خطأ في جلب إحصائيات الكوبونات' });
+  }
+});
+
 export default router;
