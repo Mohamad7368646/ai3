@@ -1,0 +1,92 @@
+{
+  "test_type": "New Admin Features Test",
+  "feature": "الميزات الجديدة في لوحة الأدمن",
+  "backend_type": "Node.js/Express",
+  "database": "MongoDB (fashion_designer_db)",
+  "admin_user": "mohamad",
+  "summary": {
+    "total_tests": 8,
+    "passed_tests": 8,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "test_timestamp": "2025-12-30T04:57:25.377493"
+  },
+  "category_results": {
+    "admin_authentication": {
+      "total": 1,
+      "passed": 1
+    },
+    "coupon_statistics": {
+      "total": 2,
+      "passed": 2
+    },
+    "user_management": {
+      "total": 2,
+      "passed": 2
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.021556"
+    },
+    {
+      "test_name": "Admin Get Coupons Stats",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.064573"
+    },
+    {
+      "test_name": "Admin Get Coupon Usage Details",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.104361"
+    },
+    {
+      "test_name": "Admin Get All Users",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.145731"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Status: 201",
+      "timestamp": "2025-12-30T04:57:25.263609"
+    },
+    {
+      "test_name": "Admin Delete User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.301667"
+    },
+    {
+      "test_name": "Admin Delete Admin User (Should Fail)",
+      "success": true,
+      "details": "Status: 403",
+      "timestamp": "2025-12-30T04:57:25.335490"
+    },
+    {
+      "test_name": "Admin Get All Users",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-30T04:57:25.376769"
+    }
+  ],
+  "apis_tested": [
+    "GET /api/admin/coupons-stats",
+    "GET /api/admin/coupons/:id/usage",
+    "DELETE /api/admin/users/:id",
+    "GET /api/admin/users"
+  ],
+  "test_scenarios": [
+    "جلب إحصائيات استخدام الكوبونات",
+    "جلب تفاصيل استخدام كوبون محدد",
+    "إنشاء مستخدم تجريبي",
+    "حذف مستخدم عادي",
+    "منع حذف مستخدم أدمن",
+    "التحقق من حذف المستخدم"
+  ]
+}
