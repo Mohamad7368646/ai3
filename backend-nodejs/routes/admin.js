@@ -4,6 +4,8 @@ import User from '../models/User.js';
 import Design from '../models/Design.js';
 import Order from '../models/Order.js';
 import ShowcaseDesign from '../models/ShowcaseDesign.js';
+import Coupon from '../models/Coupon.js';
+import CouponUsage from '../models/CouponUsage.js';
 import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
