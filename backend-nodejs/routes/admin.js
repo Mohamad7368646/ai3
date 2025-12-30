@@ -179,6 +179,39 @@ router.put('/users/:id/designs-limit', protect, admin, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete a user and all their data
+// @access  Private/Admin
+router.delete('/users/:id', protect, admin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Check if user exists
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).json({ detail: 'المستخدم غير موجود' });
+    }
+
+    // Prevent deleting admin users
+    if (user.is_admin) {
+      return res.status(403).json({ detail: 'لا يمكن حذف مستخدم مدير' });
+    }
+
+    // Delete all related data
+    await Promise.all([
+      Design.deleteMany({ user_id: userId }),
+      Order.deleteMany({ user_id: userId }),
+      CouponUsage.deleteMany({ user_id: userId }),
+      User.deleteOne({ id: userId })
+    ]);
+
+    res.json({ message: 'تم حذف المستخدم وجميع بياناته بنجاح' });
+  } catch (error) {
+    console.error('Delete User Error:', error);
+    res.status(500).json({ detail: 'خطأ في حذف المستخدم' });
+  }
+});
+
 // @route   GET /api/admin/designs
 // @desc    Get all designs with user details
 // @access  Private/Admin
