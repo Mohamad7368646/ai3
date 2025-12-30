@@ -1102,80 +1102,26 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
                       </div>
 
-                      {/* Logo Upload */}
-                      <div>
+                      {/* Logo Upload - قيد التطوير */}
+                      <div className="relative">
                         <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
                           🎨 شعار/لوجو مخصص
                         </Label>
                         <p className="text-[10px] text-[#5D4037]/70 mb-2">سيُطبع بجودة احترافية على الملابس</p>
-                        <div className="relative">
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  setLogoPreview(reader.result);
-                                  toast.success("تم رفع الشعار");
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                            className="hidden"
-                            id="logo-upload"
-                          />
-                          <label
-                            htmlFor="logo-upload"
-                            className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-[#D4AF37]/50 rounded-lg hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 cursor-pointer transition-all"
-                          >
-                            {logoPreview ? (
-                              <div className="flex flex-col items-center gap-1 w-full">
-                                <img src={logoPreview} alt="Logo" className="w-16 h-16 rounded object-contain border-2 border-[#D4AF37] bg-white p-1" />
-                                <span className="text-xs text-[#D4AF37] font-semibold">✓ جاهز</span>
-                                <button 
-                                  onClick={(e) => { e.preventDefault(); setLogoPreview(null); }}
-                                  className="text-[9px] text-red-500 hover:text-red-700"
-                                >
-                                  إزالة الشعار
-                                </button>
-                              </div>
-                            ) : (
-                              <>
-                                <Sparkles className="w-4 h-4 text-[#D4AF37]" />
-                                <span className="text-xs sm:text-sm text-[#5D4037]">ارفع الشعار</span>
-                              </>
-                            )}
-                          </label>
+                        <div className="relative opacity-50 pointer-events-none">
+                          <div className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                            <Sparkles className="w-4 h-4 text-gray-400" />
+                            <span className="text-xs sm:text-sm text-gray-400">ارفع الشعار</span>
+                          </div>
+                        </div>
+                        {/* شارة قيد التطوير */}
+                        <div className="absolute top-0 right-0 left-0 flex justify-center">
+                          <span className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-bold py-1 px-3 rounded-full shadow-lg">
+                            🚧 قيد التطوير
+                          </span>
                         </div>
                       </div>
                     </div>
-
-                    {/* Logo Position Selector - Shows only when logo is uploaded */}
-                    {logoPreview && (
-                      <div className="mt-3">
-                        <Label className="text-sm font-medium text-[#5D4037] mb-2 block">
-                          📍 موضع الشعار على الملابس
-                        </Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                          {LOGO_POSITIONS.map((position) => (
-                            <button
-                              key={position.value}
-                              onClick={() => setSelectedLogoPosition(position.value)}
-                              className={`p-2.5 rounded-lg border-2 transition-all text-center ${
-                                selectedLogoPosition === position.value
-                                  ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                  : 'border-gray-300 hover:border-[#D4AF37]/50'
-                              }`}
-                            >
-                              <div className="text-lg mb-0.5">{position.icon}</div>
-                              <div className="text-[10px] sm:text-xs font-medium text-[#5D4037]">{position.label}</div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Phone Number Input */}
                     <div>
