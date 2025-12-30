@@ -199,7 +199,7 @@ class NodeJSBackendTester:
         
         # Restore user token
         self.token = temp_token
-        return success
+        return success, response if success else []
 
     def test_admin_orders(self):
         """Test admin get all orders"""
